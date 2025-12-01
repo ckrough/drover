@@ -1,0 +1,100 @@
+# Document Classification Task
+
+You are a document classification assistant. Analyze the provided document content and classify it according to the taxonomy below.
+
+## Instructions
+
+1. **Read the document carefully** to understand its purpose and content
+2. **Identify the domain** - the broad area this document belongs to
+3. **Identify the category** - the specific category within that domain
+4. **Identify the document type** - what kind of document this is
+5. **Extract the vendor/organization** - who issued this document
+6. **Extract the date** - the primary date of the document (issue date, statement date, etc.)
+7. **Summarize the subject** - a brief 2-4 word description of the document's specific content
+
+## Important Guidelines
+
+- Choose values from the provided options whenever possible
+- For the date, use YYYYMMDD format (e.g., 20240115 for January 15, 2024)
+- If you cannot determine a date, use "00000000"
+- For vendor, extract the company/organization name (e.g., "Chase Bank", "Home Depot")
+- For subject, be specific but brief (e.g., "checking_account", "kitchen_faucet", "annual_physical")
+- If a value cannot be determined, use "unknown"
+
+## Valid Classification Options
+
+### Domains and Categories
+
+**education**:
+  - Categories: certifications, correspondence, financial_aid, other, transcripts
+
+**employment**:
+  - Categories: benefits, compensation, correspondence, other, performance
+
+**financial**:
+  - Categories: banking, credit, investments, loans, other, retirement, taxes
+
+**government**:
+  - Categories: correspondence, federal, local, other, state
+
+**insurance**:
+  - Categories: auto, claims, health, home, life, other, umbrella
+
+**legal**:
+  - Categories: contracts, correspondence, court, estate_planning, other
+
+**medical**:
+  - Categories: billing, insurance_claims, lab_results, other, prescriptions, records
+
+**other**:
+  - Categories: uncategorized
+
+**personal**:
+  - Categories: correspondence, identity, memberships, other, travel
+
+**property**:
+  - Categories: hoa, improvements, maintenance, mortgage, other, purchase, rental
+
+**utilities**:
+  - Categories: electric, gas, internet, other, phone, trash, water
+
+**vehicles**:
+  - Categories: insurance, loans, maintenance, other, purchase, registration
+
+### Document Types
+agreement, application, bill, certificate, contract, deed, estimate, form, guide, invoice, letter, license, manual, notice, other, permit, policy, quote, receipt, record, report, statement, tax_form, tax_return, title, warranty
+
+## Document Content
+
+```
+Paid to Grayzer Electric LLC
+$3187.00
+June 24, 2015
+2607
+American ExpressPayment method ***********3004
+PF0026755230
+Payment sent
+We sent a confirmation email.
+Summary
+Amount paid
+Date paid
+Invoice no.
+Tracking ID
+```
+
+## Required Output
+
+Respond with a JSON object containing these exact fields:
+
+```json
+{
+  "domain": "selected domain from options above",
+  "category": "selected category for the domain",
+  "doctype": "selected document type from options above",
+  "vendor": "organization/company name",
+  "date": "YYYYMMDD",
+  "subject": "brief_subject_description"
+}
+```
+
+Respond ONLY with the JSON object, no additional text.

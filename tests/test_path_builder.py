@@ -6,7 +6,7 @@ import pytest
 
 from drover.models import PathConstraints, RawClassification
 from drover.naming import NARAPolicyNaming
-from drover.path_builder import PathBuilder, build_suggested_path
+from drover.path_builder import PathBuilder, PathConstraintError, build_suggested_path
 
 
 class TestPathBuilder:
@@ -128,7 +128,26 @@ class TestPathBuilder:
         original = Path("/documents/test.pdf")
 
         # Should raise due to path length
-        with pytest.raises(ValueError, match="exceeds max length"):
+        with pytest.raises(PathConstraintError, match="exceeds max length"):
+            builder.build(classification, original)
+
+    def test_folder_segments_respect_allowed_chars(self, policy: NARAPolicyNaming) -> None:
+        """Folder components must obey PathConstraints.allowed_chars pattern."""
+        # Disallow letters to force a violation on the folder part
+        constraints = PathConstraints(allowed_chars="0-9")
+        builder = PathBuilder(naming_policy=policy, constraints=constraints)
+
+        classification = RawClassification(
+            domain="financial",
+            category="banking",
+            doctype="statement",
+            vendor="Test",
+            date="20240115",
+            subject="test",
+        )
+        original = Path("/documents/test.pdf")
+
+        with pytest.raises(PathConstraintError, match="disallowed characters"):
             builder.build(classification, original)
 
 

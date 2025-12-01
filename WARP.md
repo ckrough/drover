@@ -38,6 +38,15 @@ ruff check src/
 
 # Fix lint issues
 ruff check src/ --fix
+
+# Security 
+bandit -r src/ -f json --severity-level medium --confidence-level medium --quiet -c pyproject.toml
+
+# Prepare Commit
+git --no-pager status -sb
+git --no-pager diff --stat
+git add -A
+git --no-pager status -sb
 ```
 
 ## Architecture

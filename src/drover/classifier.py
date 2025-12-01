@@ -18,6 +18,7 @@ from langchain_openai import ChatOpenAI
 from pydantic import ValidationError
 
 from drover.config import AIProvider, TaxonomyMode
+from drover.metrics import create_metrics_callback
 from drover.models import RawClassification
 from drover.taxonomy.base import BaseTaxonomy
 
@@ -163,12 +164,14 @@ class DocumentClassifier:
         self,
         content: str,
         capture_debug: bool = False,
-    ) -> tuple[RawClassification, dict[str, str] | None]:
+        collect_metrics: bool = False,
+    ) -> tuple[RawClassification, dict[str, Any] | None]:
         """Classify document content.
 
         Args:
             content: Extracted document text content.
             capture_debug: Whether to capture debug info (prompt, response).
+            collect_metrics: Whether to collect AI metrics for this call.
 
         Returns:
             Tuple of (classification result, debug info dict or None).
@@ -184,18 +187,38 @@ class DocumentClassifier:
             document_content=content,
         )
 
-        debug_info: dict[str, str] | None = None
+        debug_info: dict[str, Any] | None = None
+        if capture_debug or collect_metrics:
+            debug_info = {}
         if capture_debug:
-            debug_info = {"prompt": prompt}
+            debug_info["prompt"] = prompt
+
+        # Prepare metrics callback if requested
+        metrics_callback = None
+        if collect_metrics:
+            metrics_callback = create_metrics_callback(self.provider.value, self.model)
 
         # Call LLM
         llm = self._get_llm()
         message = HumanMessage(content=prompt)
-        response = await llm.ainvoke([message])
+
+        # In LangChain 0.3+ callbacks should be passed via the runnable config,
+        # not as a direct keyword argument, otherwise the internal
+        # `agenerate_prompt` call can receive duplicate `callbacks` values.
+        invoke_config: dict[str, Any] | None = None
+        if metrics_callback is not None:
+            invoke_config = {"callbacks": [metrics_callback]}
+
+        if invoke_config is not None:
+            response = await llm.ainvoke([message], config=invoke_config)
+        else:
+            response = await llm.ainvoke([message])
 
         raw_response = response.content
-        if capture_debug:
+        if capture_debug and debug_info is not None:
             debug_info["response"] = str(raw_response)
+        if collect_metrics and metrics_callback is not None and debug_info is not None:
+            debug_info["metrics"] = metrics_callback.metrics.model_dump()
 
         # Parse JSON response
         classification = self._parse_response(str(raw_response))
@@ -217,32 +240,90 @@ class DocumentClassifier:
         Raises:
             LLMParseError: If JSON parsing fails.
         """
-        # Try to extract JSON from response
+        # Normalize whitespace
         response = response.strip()
 
-        # Try direct parse first
+        # 1) Try direct parse first for clean JSON responses
         try:
             return json.loads(response)
         except json.JSONDecodeError:
             pass
 
-        # Try to find JSON object in response
-        json_match = re.search(r"\{[^{}]*\}", response, re.DOTALL)
-        if json_match:
+        # 1a) Handle common template-style double-brace wrappers like `{{ ... }}`
+        #     that appear in prompt examples. These are usually meant to be
+        #     a normal JSON object with single braces.
+        if response.startswith("{{") and response.endswith("}}"):
+            candidate = "{" + response[2:-2].strip() + "}"
             try:
-                return json.loads(json_match.group())
+                return json.loads(candidate)
             except json.JSONDecodeError:
-                pass
+                # If this still fails, continue with other heuristics using the
+                # normalized content as the new response text.
+                response = candidate
 
-        # Try code block extraction
+        # 2) Try to extract JSON from a fenced code block
         code_match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", response)
         if code_match:
+            block = code_match.group(1).strip()
             try:
-                return json.loads(code_match.group(1))
+                return json.loads(block)
             except json.JSONDecodeError:
+                # Fall through to balanced-brace extraction
+                pass
+
+        # 3) Fallback: scan for the largest balanced JSON object
+        candidate = self._extract_largest_json_object(response)
+        if candidate is not None:
+            try:
+                return json.loads(candidate)
+            except json.JSONDecodeError:
+                # Last resort: give up with a helpful error
                 pass
 
         raise LLMParseError(f"Could not parse JSON from response: {response[:200]}...")
+
+    def _extract_largest_json_object(self, text: str) -> str | None:
+        """Extract the largest balanced JSON object substring from text.
+
+        This uses a simple brace depth counter and is tolerant of
+        surrounding non-JSON commentary.
+        """
+        best_span: tuple[int, int] | None = None
+        depth = 0
+        start_idx: int | None = None
+        in_string = False
+        escape = False
+
+        for idx, ch in enumerate(text):
+            if ch == "\"" and not escape:
+                in_string = not in_string
+            if ch == "\\" and not escape:
+                escape = True
+            else:
+                escape = False
+
+            if in_string:
+                continue
+
+            if ch == "{":
+                if depth == 0:
+                    start_idx = idx
+                depth += 1
+            elif ch == "}":
+                if depth > 0:
+                    depth -= 1
+                    if depth == 0 and start_idx is not None:
+                        end_idx = idx + 1
+                        if (
+                            best_span is None
+                            or (end_idx - start_idx) > (best_span[1] - best_span[0])
+                        ):
+                            best_span = (start_idx, end_idx)
+
+        if best_span is None:
+            return None
+
+        return text[best_span[0] : best_span[1]]
 
     def _normalize_classification(self, raw: dict) -> RawClassification:
         """Normalize classification through taxonomy.

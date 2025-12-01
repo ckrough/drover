@@ -15,6 +15,8 @@ from typing import Self
 import yaml
 from pydantic import BaseModel, Field
 
+from drover.sampling import SampleStrategy
+
 
 class AIProvider(StrEnum):
     """Supported AI providers."""
@@ -29,15 +31,6 @@ class TaxonomyMode(StrEnum):
 
     STRICT = "strict"  # Reject unknown values
     FALLBACK = "fallback"  # Map unknown to "other"
-
-
-class SampleStrategy(StrEnum):
-    """Document sampling strategies for large files."""
-
-    FULL = "full"  # Process entire document
-    FIRST_N = "first_n"  # First N pages only
-    BOOKENDS = "bookends"  # First + last N pages
-    ADAPTIVE = "adaptive"  # Auto-select based on doc size/type
 
 
 class LogLevel(StrEnum):
@@ -77,6 +70,9 @@ class DroverConfig(BaseModel):
     concurrency: int = Field(default=1)
     metrics: bool = Field(default=False)
     capture_debug: bool = Field(default=False)
+    debug_dir: Path | None = Field(
+        default=None, description="Directory for debug prompt/response files"
+    )
 
     @classmethod
     def default_config_paths(cls) -> list[Path]:
@@ -109,6 +105,7 @@ class DroverConfig(BaseModel):
             "DROVER_LOG_LEVEL": ("log_level",),
             "DROVER_ON_ERROR": ("on_error",),
             "DROVER_CONCURRENCY": ("concurrency",),
+            "DROVER_DEBUG_DIR": ("debug_dir",),
         }
 
         result: dict = {}

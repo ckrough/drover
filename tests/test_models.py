@@ -1,7 +1,7 @@
 """Tests for Pydantic models."""
 
 from drover.models import (
-    ClassificationError,
+    ClassificationErrorResult,
     ClassificationResult,
     ErrorCode,
     RawClassification,
@@ -26,7 +26,7 @@ def test_classification_result_success():
 
 def test_classification_error_from_exception():
     """Test creating error from exception."""
-    error = ClassificationError.from_exception(
+    error = ClassificationErrorResult.from_exception(
         filename="corrupt.pdf",
         code=ErrorCode.DOCUMENT_LOAD_FAILED,
         exception=ValueError("Cannot parse PDF"),

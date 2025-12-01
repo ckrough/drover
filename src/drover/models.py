@@ -14,6 +14,8 @@ class ErrorCode(StrEnum):
     LLM_API_ERROR = "LLM_API_ERROR"
     TAXONOMY_VALIDATION_FAILED = "TAXONOMY_VALIDATION_FAILED"
     CONFIG_ERROR = "CONFIG_ERROR"
+    FILENAME_POLICY_VIOLATION = "FILENAME_POLICY_VIOLATION"
+    UNEXPECTED_ERROR = "UNEXPECTED_ERROR"
 
 
 class ClassificationResult(BaseModel):
@@ -30,20 +32,26 @@ class ClassificationResult(BaseModel):
     error: bool = Field(default=False, description="Whether classification failed")
     error_code: ErrorCode | None = Field(default=None, description="Error code if failed")
     error_message: str | None = Field(default=None, description="Error message if failed")
+    metrics: dict | None = Field(
+        default=None, description="AI metrics for this classification, if collected"
+    )
 
 
-class ClassificationError(BaseModel):
+class ClassificationErrorResult(BaseModel):
     """Error result when classification fails."""
 
     original: str = Field(description="Original filename")
     error: bool = Field(default=True)
     error_code: ErrorCode = Field(description="Error code")
     error_message: str = Field(description="Human-readable error message")
+    metrics: dict | None = Field(
+        default=None, description="AI metrics for this classification, if collected"
+    )
 
     @classmethod
     def from_exception(
         cls, filename: str | Path, code: ErrorCode, exception: Exception
-    ) -> "ClassificationError":
+    ) -> "ClassificationErrorResult":
         """Create error result from an exception."""
         return cls(
             original=str(filename),

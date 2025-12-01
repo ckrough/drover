@@ -4,8 +4,8 @@ Supports PDF, images, and text files with configurable sampling
 strategies for handling large documents efficiently.
 """
 
+import asyncio
 import mimetypes
-from enum import StrEnum
 from pathlib import Path
 
 from langchain_community.document_loaders import (
@@ -16,14 +16,7 @@ from langchain_community.document_loaders import (
 from langchain_core.documents import Document
 from pydantic import BaseModel, Field
 
-
-class SampleStrategy(StrEnum):
-    """Document sampling strategies."""
-
-    FULL = "full"  # Process entire document
-    FIRST_N = "first_n"  # First N pages only
-    BOOKENDS = "bookends"  # First + last N pages
-    ADAPTIVE = "adaptive"  # Auto-select based on doc size/type
+from drover.sampling import SampleStrategy
 
 
 class LoadedDocument(BaseModel):
@@ -141,13 +134,14 @@ class DocumentLoader:
         Returns:
             List of Document objects (one per page for PDFs).
         """
-        # Most loaders are synchronous, wrap appropriately
+        # Most loaders are synchronous, so run them in a thread to avoid
+        # blocking the event loop.
         loader = loader_cls(str(path))
 
         # PyPDFLoader returns one Document per page
         # TextLoader returns one Document for the whole file
         # UnstructuredImageLoader extracts text from images
-        return loader.load()
+        return await asyncio.to_thread(loader.load)
 
     def _apply_sampling(self, documents: list[Document], total_pages: int) -> list[Document]:
         """Apply sampling strategy to document pages.

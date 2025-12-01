@@ -1,0 +1,10 @@
+```json
+{
+  "domain": "financial",
+  "category": "credit",
+  "doctype": "application",
+  "vendor": "Grayzer Electric LLC",
+  "date": "20150624",
+  "subject": "payment_confirmation Email"
+}
+```

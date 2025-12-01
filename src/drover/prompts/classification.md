@@ -39,14 +39,14 @@ You are a document classification assistant. Analyze the provided document conte
 Respond with a JSON object containing these exact fields:
 
 ```json
-{{
+{
   "domain": "selected domain from options above",
   "category": "selected category for the domain",
   "doctype": "selected document type from options above",
   "vendor": "organization/company name",
   "date": "YYYYMMDD",
   "subject": "brief_subject_description"
-}}
+}
 ```
 
 Respond ONLY with the JSON object, no additional text.
