@@ -38,6 +38,8 @@ class TestHouseholdTaxonomy:
         assert taxonomy.canonical_domain("money") == "financial"
         assert taxonomy.canonical_domain("home") == "property"
         assert taxonomy.canonical_domain("health") == "medical"
+        assert taxonomy.canonical_domain("healthcare") == "medical"
+        assert taxonomy.canonical_domain("housing") == "property"
         assert taxonomy.canonical_domain("car") == "vehicles"
 
     def test_canonical_domain_unknown(self, taxonomy: HouseholdTaxonomy) -> None:
@@ -49,7 +51,18 @@ class TestHouseholdTaxonomy:
         """Test direct category matching."""
         assert taxonomy.canonical_category("financial", "banking") == "banking"
         assert taxonomy.canonical_category("financial", "taxes") == "taxes"
+        assert taxonomy.canonical_category("financial", "receipts") == "receipts"
         assert taxonomy.canonical_category("property", "mortgage") == "mortgage"
+        assert taxonomy.canonical_category("property", "properties") == "properties"
+        assert taxonomy.canonical_category("medical", "dental") == "dental"
+        assert taxonomy.canonical_category("legal", "identification") == "identification"
+        assert taxonomy.canonical_category("vehicles", "reference") == "reference"
+        assert taxonomy.canonical_category("career", "applications") == "applications"
+        assert taxonomy.canonical_category("food", "recipes") == "recipes"
+        assert taxonomy.canonical_category("household", "maintenance") == "maintenance"
+        assert taxonomy.canonical_category("lifestyle", "travel") == "travel"
+        assert taxonomy.canonical_category("pets", "medical") == "medical"
+        assert taxonomy.canonical_category("reference", "manuals") == "manuals"
 
     def test_canonical_category_alias(self, taxonomy: HouseholdTaxonomy) -> None:
         """Test category alias resolution."""
@@ -68,12 +81,20 @@ class TestHouseholdTaxonomy:
         assert taxonomy.canonical_doctype("statement") == "statement"
         assert taxonomy.canonical_doctype("invoice") == "invoice"
         assert taxonomy.canonical_doctype("receipt") == "receipt"
+        assert taxonomy.canonical_doctype("recipe") == "recipe"
+        assert taxonomy.canonical_doctype("resume") == "resume"
+        assert taxonomy.canonical_doctype("immunization_record") == "immunization_record"
+        assert taxonomy.canonical_doctype("id_card") == "id_card"
 
     def test_canonical_doctype_alias(self, taxonomy: HouseholdTaxonomy) -> None:
         """Test doctype alias resolution."""
         assert taxonomy.canonical_doctype("bank_statement") == "statement"
         assert taxonomy.canonical_doctype("lease") == "agreement"
         assert taxonomy.canonical_doctype("1040") == "tax_return"
+        assert taxonomy.canonical_doctype("cookbook") == "recipe"
+        assert taxonomy.canonical_doctype("cv") == "resume"
+        assert taxonomy.canonical_doctype("shot_record") == "immunization_record"
+        assert taxonomy.canonical_doctype("travel_plan") == "itinerary"
 
     def test_canonical_doctype_unknown(self, taxonomy: HouseholdTaxonomy) -> None:
         """Test unknown doctype returns None."""
@@ -86,6 +107,9 @@ class TestHouseholdTaxonomy:
         assert domains == sorted(domains)
         assert "financial" in domains
         assert "property" in domains
+        # New domains
+        for domain in ["career", "food", "household", "lifestyle", "pets", "reference"]:
+            assert domain in domains
 
     def test_categories_for_domain(self, taxonomy: HouseholdTaxonomy) -> None:
         """Test categories_for_domain returns sorted list."""
@@ -94,6 +118,19 @@ class TestHouseholdTaxonomy:
         assert categories == sorted(categories)
         assert "banking" in categories
         assert "taxes" in categories
+        assert "receipts" in categories
+        # Spot-check new domains
+        career_categories = taxonomy.categories_for_domain("career")
+        assert "applications" in career_categories
+        assert "resumes" in career_categories
+        food_categories = taxonomy.categories_for_domain("food")
+        assert "recipes" in food_categories
+        household_categories = taxonomy.categories_for_domain("household")
+        assert "maintenance" in household_categories
+        lifestyle_categories = taxonomy.categories_for_domain("lifestyle")
+        assert "travel" in lifestyle_categories
+        pets_categories = taxonomy.categories_for_domain("pets")
+        assert "medical" in pets_categories
 
     def test_categories_for_unknown_domain(self, taxonomy: HouseholdTaxonomy) -> None:
         """Test categories_for_domain with unknown domain."""
