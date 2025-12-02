@@ -44,6 +44,9 @@ htmlcov/
 *.prompt.txt
 *.response.txt
 
+# Temporary files
+tmp/
+
 # OS
 .DS_Store
 Thumbs.db
