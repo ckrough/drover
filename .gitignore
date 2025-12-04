@@ -43,6 +43,7 @@ htmlcov/
 # Debug output
 *.prompt.txt
 *.response.txt
+debug_output/
 
 # Temporary files
 tmp/

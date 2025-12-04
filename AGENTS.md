@@ -1,4 +1,6 @@
-# AGENTS.md
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
@@ -6,46 +8,9 @@ Drover is a document classification CLI that uses LLMs to analyze documents and 
 
 **Python Version:** 3.11.3+
 
-## Project Structure
-
-```
-src/drover/
-├── cli.py              # Entry point, Click commands
-├── config.py           # Configuration management (Pydantic models)
-├── loader.py           # DocumentLoader - PDF/image text extraction
-├── classifier.py       # LLM-based DocumentClassifier
-├── encoder_classifier.py  # Local embedding-based classifier
-├── hybrid_classifier.py   # Encoder + LLM pipeline
-├── path_builder.py     # PathBuilder - generates organized paths
-├── models.py           # Data models (RawClassification, ClassificationResult)
-├── service.py          # High-level service orchestration
-├── metrics.py          # Classification metrics tracking
-├── sampling.py         # Page sampling strategies
-├── prompts/            # Prompt templates (classification.md)
-├── taxonomy/           # Taxonomy plugin system
-│   ├── base.py         # BaseTaxonomy abstract class
-│   ├── household.py    # HouseholdTaxonomy implementation
-│   └── loader.py       # Taxonomy registry
-└── naming/             # Naming policy plugin system
-    ├── base.py         # BaseNamingPolicy abstract class
-    ├── nara.py         # NARA-compliant naming
-    └── loader.py       # Naming policy registry
-
-tests/                  # pytest test suite
-```
-
 ## Commands
 
 ```bash
-
-# Create venv if needed
-  if [[ ! -x .venv/bin/python ]]; then
-    python3 -m venv .venv
-  fi
-
-# Activate venv
-  source .venv/bin/activate
-
 # Install with dev dependencies
 pip install -e ".[dev]"
 
@@ -61,20 +26,11 @@ pytest tests/test_taxonomy.py
 # Run a specific test
 pytest tests/test_taxonomy.py::TestHouseholdTaxonomy::test_canonical_domain_alias
 
-# Linting
-ruff check src/
+# Lint and format
+ruff check src/ --fix && ruff format src/
 
-# Fix lint issues
-ruff check src/ --fix
-
-# Security 
+# Security scan
 bandit -r src/ -f json --severity-level medium --confidence-level medium --quiet -c pyproject.toml
-
-# Prepare Commit
-git --no-pager status -sb
-git --no-pager diff --stat
-git add -A
-git --no-pager status -sb
 ```
 
 ## Architecture
@@ -123,37 +79,20 @@ Config locations searched: `drover.yaml`, `~/.config/drover/config.yaml`
 
 ## Code Style
 
-- **Formatting:** `ruff check src/ --fix` and `ruff format src/`
 - **Line length:** 100 characters
-- **Linting rules:** E, F, I (isort), N (naming), W, UP (pyupgrade)
 - **Type hints:** Required on all public function signatures
-- **String formatting:** Use f-strings exclusively
 - **Data containers:** Use Pydantic models or dataclasses
-- **Imports:** Sorted per isort conventions (stdlib → third-party → local)
+- **Imports:** stdlib → third-party → local (enforced by ruff)
 
-## Testing Guidelines
+## Testing
 
-- **Framework:** pytest with pytest-asyncio for async tests
-- **Test location:** `tests/` directory, mirroring source structure
-- **Naming:** `test_<module>.py` files with `test_<behavior>` functions
-- **LLM mocking:** Never call real LLMs in unit tests; mock at the classifier level
-- **Fixtures:** Define reusable fixtures in `conftest.py`
-- **Coverage target:** Focus on business logic in classifier, taxonomy, and path_builder
+- pytest with pytest-asyncio (`asyncio_mode = "auto"`)
+- **Never call real LLMs in unit tests** — mock at the classifier level
+- Test parsing logic directly without LLM invocation:
 
-Example test pattern for classifier parsing (no LLM invocation):
 ```python
-def _make_classifier() -> DocumentClassifier:
-    """Create classifier for parsing tests only."""
-    taxonomy = HouseholdTaxonomy()
-    return DocumentClassifier(
-        provider=AIProvider.OLLAMA,
-        model="dummy",
-        taxonomy=taxonomy,
-        taxonomy_mode=TaxonomyMode.FALLBACK,
-    )
-
 def test_parse_response_direct_json() -> None:
-    classifier = _make_classifier()
+    classifier = _make_classifier()  # uses dummy model
     result = classifier._parse_response('{"domain": "financial", ...}')
     assert result["domain"] == "financial"
 ```
@@ -176,14 +115,6 @@ def test_parse_response_direct_json() -> None:
 | `DROVER_ON_ERROR` | Error handling (fail, continue, skip) | `fail` |
 | `DROVER_CONCURRENCY` | Parallel processing | `1` |
 | `DROVER_DEBUG_DIR` | Directory for debug outputs | `./debug` |
-
-## Security Considerations
-
-- **No hardcoded secrets:** API keys must come from environment variables or config files
-- **Validate LLM outputs:** Always normalize through taxonomy before using in filesystem paths
-- **Path traversal:** PathBuilder sanitizes outputs; never construct paths directly from LLM responses
-- **File permissions:** DocumentLoader only reads files; never writes without explicit user action
-- **Dependency security:** Run `bandit -r src/` before commits
 
 ## Common Gotchas
 
