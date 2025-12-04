@@ -44,7 +44,6 @@ class DocumentLoader:
     efficiently handle large documents.
     """
 
-    # File extensions to loader class mapping
     _LOADERS: dict[str, type] = {
         ".pdf": PyPDFLoader,
         ".txt": TextLoader,
@@ -58,7 +57,6 @@ class DocumentLoader:
         ".tif": UnstructuredImageLoader,
     }
 
-    # Thresholds for adaptive strategy
     _SMALL_DOC_PAGES = 5
     _MEDIUM_DOC_PAGES = 20
 
@@ -106,11 +104,8 @@ class DocumentLoader:
         if not documents:
             raise DocumentLoadError(f"No content extracted from {path.name}")
 
-        # Apply sampling strategy
         total_pages = len(documents)
         sampled_docs = self._apply_sampling(documents, total_pages)
-
-        # Combine content from sampled pages
         content = "\n\n".join(doc.page_content for doc in sampled_docs if doc.page_content.strip())
 
         if not content.strip():
@@ -134,13 +129,8 @@ class DocumentLoader:
         Returns:
             List of Document objects (one per page for PDFs).
         """
-        # Most loaders are synchronous, so run them in a thread to avoid
-        # blocking the event loop.
+        # Run synchronous loaders in a thread to avoid blocking the event loop.
         loader = loader_cls(str(path))
-
-        # PyPDFLoader returns one Document per page
-        # TextLoader returns one Document for the whole file
-        # UnstructuredImageLoader extracts text from images
         return await asyncio.to_thread(loader.load)
 
     def _apply_sampling(self, documents: list[Document], total_pages: int) -> list[Document]:
@@ -167,7 +157,6 @@ class DocumentLoader:
                 half = self.max_pages // 2
                 return documents[:half] + documents[-half:]
             case _:
-                # Fallback to first_n
                 return documents[: self.max_pages]
 
     def _select_strategy(self, total_pages: int) -> SampleStrategy:
@@ -184,13 +173,11 @@ class DocumentLoader:
         if self.strategy != SampleStrategy.ADAPTIVE:
             return self.strategy
 
-        # Adaptive logic
         if total_pages <= self._SMALL_DOC_PAGES:
             return SampleStrategy.FULL
         elif total_pages <= self._MEDIUM_DOC_PAGES:
             return SampleStrategy.FIRST_N
         else:
-            # Large documents: bookends to capture intro and conclusion
             return SampleStrategy.BOOKENDS
 
 

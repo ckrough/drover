@@ -41,7 +41,6 @@ class TestNARAPolicyNaming:
             date="20240220",
             extension=".pdf",
         )
-        # Inc. should be stripped
         assert "inc" not in filename.lower()
         assert "home_depot" in filename
 
@@ -69,7 +68,6 @@ class TestNARAPolicyNaming:
 
     def test_format_filename_date_normalization(self, policy: NARAPolicyNaming) -> None:
         """Test various date format normalizations."""
-        # Already YYYYMMDD
         filename = policy.format_filename(
             doctype="statement",
             vendor="test",
@@ -79,7 +77,6 @@ class TestNARAPolicyNaming:
         )
         assert "20240115" in filename
 
-        # YYMMDD -> 20YYMMDD
         filename = policy.format_filename(
             doctype="statement",
             vendor="test",

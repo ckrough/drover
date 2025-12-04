@@ -51,7 +51,6 @@ class PromptTemplate:
             template_path: Path to template file, or None to use default.
         """
         if template_path is None:
-            # Load default template from package resources
             template_path = files("drover.prompts").joinpath("classification.md")
 
         self.template_path = template_path
@@ -64,12 +63,10 @@ class PromptTemplate:
             return
 
         if hasattr(self.template_path, "read_text"):
-            # importlib.resources Traversable
             raw = self.template_path.read_text()
         else:
             raw = Path(self.template_path).read_text()
 
-        # Parse YAML frontmatter
         if raw.startswith("---"):
             parts = raw.split("---", 2)
             if len(parts) >= 3:
@@ -151,7 +148,6 @@ class DocumentClassifier:
             case AIProvider.OPENAI:
                 self._llm = ChatOpenAI(model=self.model)
             case AIProvider.ANTHROPIC:
-                # langchain-anthropic import
                 from langchain_anthropic import ChatAnthropic
 
                 self._llm = ChatAnthropic(model=self.model)
@@ -180,7 +176,6 @@ class DocumentClassifier:
             LLMParseError: If LLM output cannot be parsed.
             TaxonomyValidationError: If strict mode validation fails.
         """
-        # Render prompt with taxonomy menu
         taxonomy_menu = self.taxonomy.to_prompt_menu()
         prompt = self.template.render(
             taxonomy_menu=taxonomy_menu,
@@ -193,12 +188,10 @@ class DocumentClassifier:
         if capture_debug:
             debug_info["prompt"] = prompt
 
-        # Prepare metrics callback if requested
         metrics_callback = None
         if collect_metrics:
             metrics_callback = create_metrics_callback(self.provider.value, self.model)
 
-        # Call LLM
         llm = self._get_llm()
         message = HumanMessage(content=prompt)
 
@@ -220,10 +213,7 @@ class DocumentClassifier:
         if collect_metrics and metrics_callback is not None and debug_info is not None:
             debug_info["metrics"] = metrics_callback.metrics.model_dump()
 
-        # Parse JSON response
         classification = self._parse_response(str(raw_response))
-
-        # Normalize with taxonomy
         normalized = self._normalize_classification(classification)
 
         return normalized, debug_info
@@ -240,44 +230,34 @@ class DocumentClassifier:
         Raises:
             LLMParseError: If JSON parsing fails.
         """
-        # Normalize whitespace
         response = response.strip()
 
-        # 1) Try direct parse first for clean JSON responses
         try:
             return json.loads(response)
         except json.JSONDecodeError:
             pass
 
-        # 1a) Handle common template-style double-brace wrappers like `{{ ... }}`
-        #     that appear in prompt examples. These are usually meant to be
-        #     a normal JSON object with single braces.
+        # Handle template-style double-brace wrappers like `{{ ... }}`
         if response.startswith("{{") and response.endswith("}}"):
             candidate = "{" + response[2:-2].strip() + "}"
             try:
                 return json.loads(candidate)
             except json.JSONDecodeError:
-                # If this still fails, continue with other heuristics using the
-                # normalized content as the new response text.
                 response = candidate
 
-        # 2) Try to extract JSON from a fenced code block
         code_match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", response)
         if code_match:
             block = code_match.group(1).strip()
             try:
                 return json.loads(block)
             except json.JSONDecodeError:
-                # Fall through to balanced-brace extraction
                 pass
 
-        # 3) Fallback: scan for the largest balanced JSON object
         candidate = self._extract_largest_json_object(response)
         if candidate is not None:
             try:
                 return json.loads(candidate)
             except json.JSONDecodeError:
-                # Last resort: give up with a helpful error
                 pass
 
         raise LLMParseError(f"Could not parse JSON from response: {response[:200]}...")
@@ -337,13 +317,11 @@ class DocumentClassifier:
         Raises:
             TaxonomyValidationError: If strict mode and unknown value found.
         """
-        # Validate against Pydantic model first
         try:
             classification = RawClassification.model_validate(raw)
         except ValidationError as e:
             raise LLMParseError(f"Invalid classification structure: {e}")
 
-        # Normalize domain
         normalized_domain = self.taxonomy.canonical_domain(classification.domain)
         if normalized_domain is None:
             if self.taxonomy_mode == TaxonomyMode.STRICT:
@@ -352,7 +330,6 @@ class DocumentClassifier:
                 )
             normalized_domain = "other"
 
-        # Normalize category
         normalized_category = self.taxonomy.canonical_category(
             normalized_domain, classification.category
         )
@@ -363,7 +340,6 @@ class DocumentClassifier:
                 )
             normalized_category = "other"
 
-        # Normalize doctype
         normalized_doctype = self.taxonomy.canonical_doctype(classification.doctype)
         if normalized_doctype is None:
             if self.taxonomy_mode == TaxonomyMode.STRICT:

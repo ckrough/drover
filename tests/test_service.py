@@ -50,15 +50,12 @@ async def test_classification_service_error_modes_continue(tmp_path: Path) -> No
 @pytest.mark.asyncio
 async def test_debug_dir_writes_files(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """When debug_dir is configured, prompts are written there."""
-    # Create a small dummy text file we can load
     doc_path = tmp_path / "doc.txt"
     doc_path.write_text("dummy content")
 
     cfg = DroverConfig(capture_debug=True, debug_dir=tmp_path / "debug")
     service = ClassificationService(cfg)
 
-    # Monkeypatch classifier.classify to avoid real LLM calls but still
-    # exercise _save_debug_files via classify_file.
     async def fake_classify(content: str, capture_debug: bool = False, collect_metrics: bool = False):  # type: ignore[override]
         debug_info = {"prompt": "PROMPT", "response": "RESPONSE"} if capture_debug else None
         return (
@@ -80,7 +77,6 @@ async def test_debug_dir_writes_files(tmp_path: Path, monkeypatch: pytest.Monkey
     exit_code = await service.classify_files([doc_path])
     assert exit_code == 0
 
-    # Debug directory should exist and contain prompt/response files.
     assert cfg.debug_dir is not None
     debug_dir_path = Path(cfg.debug_dir)
     assert debug_dir_path.exists()

@@ -21,7 +21,6 @@ from drover.models import ClassificationErrorResult as ClassificationErrorModel
 from drover.models import ClassificationResult
 from drover.service import ClassificationService
 
-# Console for stderr output
 console = Console(stderr=True)
 
 
@@ -134,10 +133,7 @@ def classify(
     if not files:
         raise click.UsageError("At least one file is required.")
 
-    # Load configuration with precedence
     config = DroverConfig.load(config_path)
-
-    # Apply CLI overrides
     config = config.with_overrides(
         ai_provider=ai_provider,
         ai_model=ai_model,
@@ -154,11 +150,9 @@ def classify(
         log_level=log_level,
     )
 
-    # Set error mode default based on batch
     if on_error is None:
         config = config.with_overrides(on_error=ErrorMode.CONTINUE if batch else ErrorMode.FAIL)
 
-    # Run async classification
     exit_code = asyncio.run(_classify_files(files, config, batch))
     sys.exit(exit_code)
 
@@ -186,7 +180,6 @@ async def _classify_files(
         console.print(f"[dim]Debug: Processing {len(files)} file(s)[/dim]")
         console.print(f"[dim]Debug: Provider={config.ai.provider}, Model={config.ai.model}[/dim]")
 
-    # Initialize service; configuration errors surface here
     try:
         service = ClassificationService(config)
     except ValueError as e:

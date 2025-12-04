@@ -3,7 +3,6 @@
 from drover.taxonomy.base import BaseTaxonomy
 from drover.taxonomy.household import HouseholdTaxonomy
 
-# Registry of built-in taxonomies
 _BUILTIN_TAXONOMIES: dict[str, type[BaseTaxonomy]] = {
     "household": HouseholdTaxonomy,
 }
@@ -50,7 +49,6 @@ class TaxonomyLoader:
         self._taxonomies[taxonomy.name] = taxonomy
 
 
-# Singleton loader instance
 _loader: TaxonomyLoader | None = None
 
 

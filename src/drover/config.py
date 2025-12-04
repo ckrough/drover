@@ -111,13 +111,11 @@ class DroverConfig(BaseModel):
         result: dict = {}
         for env_var, path in env_map.items():
             if value := os.environ.get(env_var):
-                # Handle nested paths
                 if len(path) == 2:
                     if path[0] not in result:
                         result[path[0]] = {}
                     result[path[0]][path[1]] = value
                 else:
-                    # Convert numeric values
                     if path[0] in ("max_pages", "concurrency"):
                         result[path[0]] = int(value)
                     else:
@@ -136,19 +134,16 @@ class DroverConfig(BaseModel):
         """
         file_data: dict = {}
 
-        # Try explicit path first
         if config_path and config_path.exists():
             with config_path.open() as f:
                 file_data = yaml.safe_load(f) or {}
         else:
-            # Search default locations
             for default_path in cls.default_config_paths():
                 if default_path.exists():
                     with default_path.open() as f:
                         file_data = yaml.safe_load(f) or {}
                     break
 
-        # Layer environment on top of file config
         env_data = cls.from_env()
         merged = cls._deep_merge(file_data, env_data)
 
@@ -173,13 +168,11 @@ class DroverConfig(BaseModel):
         """
         data = self.model_dump()
 
-        # Handle flattened AI options
         if "ai_provider" in kwargs and kwargs["ai_provider"] is not None:
             data["ai"]["provider"] = kwargs.pop("ai_provider")
         if "ai_model" in kwargs and kwargs["ai_model"] is not None:
             data["ai"]["model"] = kwargs.pop("ai_model")
 
-        # Apply remaining overrides
         for key, value in kwargs.items():
             if value is not None and key in data:
                 data[key] = value

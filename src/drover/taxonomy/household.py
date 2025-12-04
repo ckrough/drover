@@ -234,7 +234,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
         "other",
     }
 
-    # Common variations → canonical domain
     DOMAIN_ALIASES: ClassVar[dict[str, str]] = {
         "finances": "financial",
         "finance": "financial",
@@ -272,14 +271,11 @@ class HouseholdTaxonomy(BaseTaxonomy):
         "unknown": "other",
     }
 
-    # (domain, variation) → canonical category
     CATEGORY_ALIASES: ClassVar[dict[tuple[str, str], str]] = {
-        # Cross-domain disambiguation
         ("employment", "resumes"): "resumes",
         ("employment", "interviewing"): "interviewing",
         ("personal", "travel"): "travel",
         ("personal", "goals"): "goals",
-        # Financial
         ("financial", "bank"): "banking",
         ("financial", "checking"): "banking",
         ("financial", "savings"): "banking",
@@ -294,14 +290,12 @@ class HouseholdTaxonomy(BaseTaxonomy):
         ("financial", "pension"): "retirement",
         ("financial", "tax"): "taxes",
         ("financial", "irs"): "taxes",
-        # Property
         ("property", "home_improvement"): "improvements",
         ("property", "home_improvements"): "improvements",
         ("property", "repairs"): "maintenance",
         ("property", "home_repairs"): "maintenance",
         ("property", "association"): "hoa",
         ("property", "condo"): "hoa",
-        # Medical
         ("medical", "health_records"): "records",
         ("medical", "medical_records"): "records",
         ("medical", "bills"): "billing",
@@ -310,7 +304,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
         ("medical", "medications"): "prescriptions",
         ("medical", "labs"): "lab_results",
         ("medical", "tests"): "lab_results",
-        # Insurance
         ("insurance", "car"): "auto",
         ("insurance", "vehicle"): "auto",
         ("insurance", "homeowners"): "home",
@@ -318,7 +311,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
         ("insurance", "medical"): "health",
     }
 
-    # variation → canonical doctype
     DOCTYPE_ALIASES: ClassVar[dict[str, str]] = {
         "bank_statement": "statement",
         "account_statement": "statement",

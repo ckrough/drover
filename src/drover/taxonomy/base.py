@@ -21,22 +21,11 @@ class BaseTaxonomy(ABC):
     normalization methods for custom logic.
     """
 
-    # Allowed top-level domains
     CANONICAL_DOMAINS: ClassVar[set[str]]
-
-    # Domain → allowed categories mapping
     CANONICAL_CATEGORIES: ClassVar[dict[str, set[str]]]
-
-    # Allowed document types (cross-domain)
     CANONICAL_DOCTYPES: ClassVar[set[str]]
-
-    # Alias mappings: variation → canonical
     DOMAIN_ALIASES: ClassVar[dict[str, str]]
-
-    # Category aliases: (domain, variation) → canonical
     CATEGORY_ALIASES: ClassVar[dict[tuple[str, str], str]]
-
-    # Doctype aliases: variation → canonical
     DOCTYPE_ALIASES: ClassVar[dict[str, str]]
 
     @property
@@ -56,11 +45,9 @@ class BaseTaxonomy(ABC):
         """
         normalized = raw.lower().strip().replace(" ", "_")
 
-        # Direct match
         if normalized in self.CANONICAL_DOMAINS:
             return normalized
 
-        # Check aliases
         if normalized in self.DOMAIN_ALIASES:
             return self.DOMAIN_ALIASES[normalized]
 
@@ -77,15 +64,11 @@ class BaseTaxonomy(ABC):
             Canonical category string, or None if not recognized.
         """
         normalized = raw.lower().strip().replace(" ", "_")
-
-        # Get valid categories for this domain
         valid_categories = self.CANONICAL_CATEGORIES.get(domain, set())
 
-        # Direct match
         if normalized in valid_categories:
             return normalized
 
-        # Check aliases
         alias_key = (domain, normalized)
         if alias_key in self.CATEGORY_ALIASES:
             return self.CATEGORY_ALIASES[alias_key]
@@ -103,11 +86,9 @@ class BaseTaxonomy(ABC):
         """
         normalized = raw.lower().strip().replace(" ", "_")
 
-        # Direct match
         if normalized in self.CANONICAL_DOCTYPES:
             return normalized
 
-        # Check aliases
         if normalized in self.DOCTYPE_ALIASES:
             return self.DOCTYPE_ALIASES[normalized]
 

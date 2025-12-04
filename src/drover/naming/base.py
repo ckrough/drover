@@ -33,7 +33,6 @@ class BaseNamingPolicy(ABC):
     - Component ordering
     """
 
-    # Default constraints (subclasses can override)
     CONSTRAINTS: ClassVar[NamingConstraints] = NamingConstraints()
 
     @property
@@ -82,22 +81,18 @@ class BaseNamingPolicy(ABC):
         """
         constraints = self.CONSTRAINTS
 
-        # Lowercase and replace spaces
         normalized = value.lower().strip()
         normalized = re.sub(r"\s+", constraints.word_separator, normalized)
 
-        # Remove characters not matching allowed pattern
         allowed_pattern = constraints.allowed_chars_pattern
         normalized = "".join(
             c for c in normalized if re.match(allowed_pattern, c) or c == constraints.word_separator
         )
 
-        # Collapse multiple separators
         sep = constraints.word_separator
         normalized = re.sub(f"{re.escape(sep)}+", sep, normalized)
         normalized = normalized.strip(sep)
 
-        # Truncate
         if len(normalized) > constraints.max_component_length:
             normalized = normalized[: constraints.max_component_length].rstrip(sep)
 
@@ -114,7 +109,6 @@ class BaseNamingPolicy(ABC):
         Returns:
             Normalized vendor string.
         """
-        # Remove common suffixes
         vendor = re.sub(r"\b(inc|llc|ltd|corp|co|company)\b\.?", "", vendor, flags=re.IGNORECASE)
         return self.normalize_component(vendor)
 
@@ -132,10 +126,7 @@ class BaseNamingPolicy(ABC):
         if len(filename) > constraints.max_filename_length:
             return False, f"Filename exceeds {constraints.max_filename_length} characters"
 
-        # Check for disallowed characters (excluding extension separator)
         base_name = filename.rsplit(".", 1)[0] if "." in filename else filename
-
-        # Extract character class content from pattern like "[a-z0-9_]"
         allowed_chars = constraints.allowed_chars_pattern
         if allowed_chars.startswith("[") and allowed_chars.endswith("]"):
             allowed_chars = allowed_chars[1:-1]

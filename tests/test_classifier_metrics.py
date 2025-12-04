@@ -61,14 +61,12 @@ async def test_classify_passes_callbacks_via_config(monkeypatch) -> None:
         "some document text", capture_debug=True, collect_metrics=True
     )
 
-    # Sanity check: classification should be normalized and debug info populated
     assert classification.domain == "financial"
     assert classification.category == "banking"
     assert classification.doctype == "statement"
     assert debug_info is not None
     assert "metrics" in debug_info
 
-    # Most importantly, ensure callbacks are carried via config and not kwargs
     assert stub_llm.last_config is not None
     assert "callbacks" in stub_llm.last_config
     assert stub_llm.last_kwargs == {}

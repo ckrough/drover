@@ -11,20 +11,15 @@ from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.outputs import LLMResult
 from pydantic import BaseModel, Field
 
-# Token pricing per 1M tokens (as of 2024)
-# Format: (input_price, output_price)
 MODEL_PRICING: dict[str, tuple[float, float]] = {
-    # OpenAI
     "gpt-4o": (2.50, 10.00),
     "gpt-4o-mini": (0.15, 0.60),
     "gpt-4-turbo": (10.00, 30.00),
     "gpt-4": (30.00, 60.00),
     "gpt-3.5-turbo": (0.50, 1.50),
-    # Anthropic
     "claude-3-5-sonnet-latest": (3.00, 15.00),
     "claude-3-5-haiku-latest": (0.80, 4.00),
     "claude-3-opus-latest": (15.00, 75.00),
-    # Ollama (local, free)
     "llama3.2:latest": (0.0, 0.0),
     "llama3.1:latest": (0.0, 0.0),
     "mistral:latest": (0.0, 0.0),
@@ -72,25 +67,21 @@ class MetricsCallback(BaseCallbackHandler):
 
     def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:
         """Called when LLM finishes generating."""
-        # Calculate latency
         if self._start_time is not None:
             elapsed = time.perf_counter() - self._start_time
             self._metrics.latency_ms = elapsed * 1000
 
-        # Extract token usage if available
         if response.llm_output:
             token_usage = response.llm_output.get("token_usage", {})
             self._metrics.input_tokens = token_usage.get("prompt_tokens", 0)
             self._metrics.output_tokens = token_usage.get("completion_tokens", 0)
             self._metrics.total_tokens = token_usage.get("total_tokens", 0)
 
-            # Fallback calculation
             if self._metrics.total_tokens == 0:
                 self._metrics.total_tokens = (
                     self._metrics.input_tokens + self._metrics.output_tokens
                 )
 
-        # Calculate cost
         self._metrics.cost_usd = self._calculate_cost()
 
     def _calculate_cost(self) -> float | None:
@@ -99,10 +90,8 @@ class MetricsCallback(BaseCallbackHandler):
         Returns:
             Estimated cost in USD, or None if pricing unavailable.
         """
-        # Find pricing for model
         pricing = MODEL_PRICING.get(self.model)
         if pricing is None:
-            # Try partial match
             for model_name, prices in MODEL_PRICING.items():
                 if model_name in self.model or self.model in model_name:
                     pricing = prices

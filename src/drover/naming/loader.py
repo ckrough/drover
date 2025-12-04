@@ -3,7 +3,6 @@
 from drover.naming.base import BaseNamingPolicy
 from drover.naming.nara import NARAPolicyNaming
 
-# Registry of built-in naming policies
 _BUILTIN_POLICIES: dict[str, type[BaseNamingPolicy]] = {
     "nara": NARAPolicyNaming,
 }
@@ -50,7 +49,6 @@ class NamingPolicyLoader:
         self._policies[policy.name] = policy
 
 
-# Singleton loader instance
 _loader: NamingPolicyLoader | None = None
 
 

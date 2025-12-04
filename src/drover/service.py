@@ -38,9 +38,6 @@ class ClassificationService:
     def __init__(self, config: DroverConfig) -> None:
         self.config = config
 
-        # Initialize taxonomy and naming policy; may raise ValueError for
-        # unknown names, which the caller is expected to surface as a
-        # configuration error.
         self._taxonomy = get_taxonomy(config.taxonomy)
         self._naming_policy = get_naming_policy(config.naming_style)
 
@@ -93,7 +90,6 @@ class ClassificationService:
                         on_result(result)
                     return 2
                 if self.config.on_error == ErrorMode.SKIP:
-                    # Skip output for failed items
                     continue
 
             if on_result is not None:
@@ -118,14 +114,11 @@ class ClassificationService:
                 collect_metrics=cfg.metrics,
             )
 
-            # Save debug artifacts if requested
             if cfg.capture_debug and debug_info:
                 self._save_debug_files(file_path, debug_info)
 
-            # Build final path
             result = self._path_builder.build(classification, file_path)
 
-            # Attach metrics if collected
             if cfg.metrics and debug_info and "metrics" in debug_info:
                 result.metrics = debug_info["metrics"]
 
@@ -177,7 +170,6 @@ class ClassificationService:
         """
         cfg = self.config
 
-        # Determine base path for debug artifacts
         if cfg.debug_dir is not None:
             debug_root = Path(cfg.debug_dir).expanduser()
             debug_root.mkdir(parents=True, exist_ok=True)

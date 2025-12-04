@@ -60,25 +60,20 @@ class NARAPolicyNaming(BaseNamingPolicy):
         """
         sep = self.CONSTRAINTS.component_separator
 
-        # Normalize each component
         norm_doctype = self.normalize_component(doctype)
         norm_vendor = self.normalize_vendor(vendor)
         norm_subject = self.normalize_component(subject)
         norm_date = self._normalize_date(date)
 
-        # Build filename
         components = [norm_doctype, norm_vendor, norm_subject, norm_date]
         base_name = sep.join(c for c in components if c)
 
-        # Ensure extension starts with dot
         if extension and not extension.startswith("."):
             extension = f".{extension}"
 
         filename = f"{base_name}{extension.lower()}"
 
-        # Validate and truncate if needed
         if len(filename) > self.CONSTRAINTS.max_filename_length:
-            # Truncate subject to fit
             max_subject = (
                 self.CONSTRAINTS.max_filename_length
                 - len(norm_doctype)
@@ -106,18 +101,14 @@ class NARAPolicyNaming(BaseNamingPolicy):
         Returns:
             Date in YYYYMMDD format, or "00000000" if unparseable.
         """
-        # Strip non-digits
         digits = "".join(c for c in date if c.isdigit())
 
-        # Already YYYYMMDD
         if len(digits) == 8:
             return digits
 
-        # YYMMDD → YYYYMMDD (assume 2000s)
         if len(digits) == 6:
             return f"20{digits}"
 
-        # YYYY-MM-DD or similar
         if len(digits) >= 8:
             return digits[:8]
 

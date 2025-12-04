@@ -52,14 +52,12 @@ class PathBuilder:
         Returns:
             ClassificationResult with suggested path.
         """
-        # Build folder structure
         folder_path = self._build_folder_path(
             domain=classification.domain,
             category=classification.category,
             doctype=classification.doctype,
         )
 
-        # Generate filename
         filename = self.naming_policy.format_filename(
             doctype=classification.doctype,
             vendor=classification.vendor,
@@ -68,17 +66,13 @@ class PathBuilder:
             extension=original_path.suffix,
         )
 
-        # Validate filename against naming policy constraints
         is_valid, error_message = self.naming_policy.validate_filename(filename)
         if not is_valid:
             raise PathConstraintError(
                 error_message or "Generated filename violates naming constraints"
             )
 
-        # Combine into full path
         suggested_path = f"{folder_path}/{filename}"
-
-        # Validate constraints on the full path
         self._validate_path(suggested_path)
 
         return ClassificationResult(
@@ -110,9 +104,7 @@ class PathBuilder:
         """
         parts = [domain, category, doctype]
 
-        # Check folder depth constraint
         if len(parts) > self.constraints.max_folder_depth:
-            # Flatten by removing middle components
             parts = parts[: self.constraints.max_folder_depth]
 
         return "/".join(parts)
@@ -132,10 +124,8 @@ class PathBuilder:
                 f"{len(path)} chars"
             )
 
-        # Split into folder and filename parts
         folder_part, _, _ = path.rpartition("/")
 
-        # Count folder depth based on folder segments only
         if folder_part:
             folder_depth = folder_part.count("/") + 1
         else:
@@ -147,7 +137,6 @@ class PathBuilder:
                 f"{folder_depth} levels"
             )
 
-        # Validate folder segment characters against allowed pattern
         if folder_part:
             allowed_chars = self.constraints.allowed_chars
             pattern = f"^[{allowed_chars}]+$"
