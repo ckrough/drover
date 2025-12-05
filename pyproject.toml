@@ -7,13 +7,12 @@ requires-python = ">=3.13"
 license = {text = "MIT"}
 dependencies = [
     "langchain>=0.3",
-    "langchain-community>=0.3",
     "langchain-openai>=0.2",
     "langchain-ollama>=0.2",
     "click>=8.1",
     "pydantic>=2.0",
     "pyyaml>=6.0",
-    "pypdf>=4.0",
+    "unstructured[pdf,docx,xlsx,pptx,md]>=0.16",
     "rich>=13.0",
     "python-dotenv>=1.0",
 ]

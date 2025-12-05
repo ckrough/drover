@@ -1,20 +1,15 @@
-"""Document loading with LangChain integration.
+"""Document loading with unstructured library integration.
 
-Supports PDF, images, and text files with configurable sampling
-strategies for handling large documents efficiently.
+Supports PDF, images, Office documents, and text files with configurable
+sampling strategies for handling large documents efficiently.
 """
 
 import asyncio
 import mimetypes
 from pathlib import Path
 
-from langchain_community.document_loaders import (
-    PyPDFLoader,
-    TextLoader,
-    UnstructuredImageLoader,
-)
-from langchain_core.documents import Document
 from pydantic import BaseModel, Field
+from unstructured.partition.auto import partition
 
 from drover.sampling import SampleStrategy
 
@@ -37,25 +32,46 @@ class DocumentLoadError(Exception):
     pass
 
 
+# Supported file extensions for validation
+_SUPPORTED_EXTENSIONS: set[str] = {
+    # PDF
+    ".pdf",
+    # Text
+    ".txt",
+    ".md",
+    # Images
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".bmp",
+    ".tiff",
+    ".tif",
+    # Office documents
+    ".docx",
+    ".doc",
+    ".xlsx",
+    ".xls",
+    ".pptx",
+    ".ppt",
+    # Other
+    ".html",
+    ".htm",
+    ".csv",
+    ".tsv",
+    ".eml",
+    ".epub",
+    ".odt",
+    ".rtf",
+}
+
+
 class DocumentLoader:
     """Loads and samples documents for classification.
 
     Supports multiple file types and sampling strategies to
     efficiently handle large documents.
     """
-
-    _LOADERS: dict[str, type] = {
-        ".pdf": PyPDFLoader,
-        ".txt": TextLoader,
-        ".md": TextLoader,
-        ".png": UnstructuredImageLoader,
-        ".jpg": UnstructuredImageLoader,
-        ".jpeg": UnstructuredImageLoader,
-        ".gif": UnstructuredImageLoader,
-        ".bmp": UnstructuredImageLoader,
-        ".tiff": UnstructuredImageLoader,
-        ".tif": UnstructuredImageLoader,
-    }
 
     _SMALL_DOC_PAGES = 5
     _MEDIUM_DOC_PAGES = 20
@@ -92,21 +108,26 @@ class DocumentLoader:
         suffix = path.suffix.lower()
         mime_type, _ = mimetypes.guess_type(str(path))
 
-        loader_cls = self._LOADERS.get(suffix)
-        if not loader_cls:
+        if suffix not in _SUPPORTED_EXTENSIONS:
             raise DocumentLoadError(f"Unsupported file type: {suffix}")
 
         try:
-            documents = await self._load_with_loader(path, loader_cls)
+            elements = await asyncio.to_thread(partition, filename=str(path))
         except Exception as e:
             raise DocumentLoadError(f"Failed to load {path.name}: {e}") from e
 
-        if not documents:
+        if not elements:
             raise DocumentLoadError(f"No content extracted from {path.name}")
 
-        total_pages = len(documents)
-        sampled_docs = self._apply_sampling(documents, total_pages)
-        content = "\n\n".join(doc.page_content for doc in sampled_docs if doc.page_content.strip())
+        # Group elements by page number for sampling
+        pages = self._group_by_page(elements)
+        total_pages = len(pages) if pages else 1
+
+        # Apply sampling strategy
+        sampled_pages = self._apply_sampling(pages, total_pages)
+
+        # Extract text from sampled pages
+        content = self._extract_text(sampled_pages)
 
         if not content.strip():
             raise DocumentLoadError(f"No text content found in {path.name}")
@@ -115,49 +136,79 @@ class DocumentLoader:
             path=path,
             content=content,
             page_count=total_pages,
-            pages_sampled=len(sampled_docs),
+            pages_sampled=len(sampled_pages),
             mime_type=mime_type,
         )
 
-    async def _load_with_loader(self, path: Path, loader_cls: type) -> list[Document]:
-        """Load document using appropriate LangChain loader.
+    def _group_by_page(self, elements: list) -> list[list]:
+        """Group elements by their page number.
 
         Args:
-            path: Path to document.
-            loader_cls: LangChain loader class to use.
+            elements: List of unstructured elements.
 
         Returns:
-            List of Document objects (one per page for PDFs).
+            List of element groups, one per page.
         """
-        # Run synchronous loaders in a thread to avoid blocking the event loop.
-        loader = loader_cls(str(path))
-        return await asyncio.to_thread(loader.load)
+        if not elements:
+            return []
 
-    def _apply_sampling(self, documents: list[Document], total_pages: int) -> list[Document]:
+        pages: dict[int, list] = {}
+        for el in elements:
+            page_num = getattr(el.metadata, "page_number", 1) or 1
+            if page_num not in pages:
+                pages[page_num] = []
+            pages[page_num].append(el)
+
+        # Return pages in order
+        if not pages:
+            return [[el for el in elements]]
+
+        max_page = max(pages.keys())
+        return [pages.get(i, []) for i in range(1, max_page + 1) if pages.get(i)]
+
+    def _extract_text(self, pages: list[list]) -> str:
+        """Extract text content from grouped elements.
+
+        Args:
+            pages: List of element groups by page.
+
+        Returns:
+            Combined text content.
+        """
+        texts = []
+        for page_elements in pages:
+            page_text = "\n".join(
+                str(el) for el in page_elements if str(el).strip()
+            )
+            if page_text.strip():
+                texts.append(page_text)
+        return "\n\n".join(texts)
+
+    def _apply_sampling(self, pages: list[list], total_pages: int) -> list[list]:
         """Apply sampling strategy to document pages.
 
         Args:
-            documents: All loaded document pages.
+            pages: All loaded document pages.
             total_pages: Total number of pages.
 
         Returns:
-            Sampled subset of documents.
+            Sampled subset of pages.
         """
         if total_pages <= self.max_pages:
-            return documents
+            return pages
 
         effective_strategy = self._select_strategy(total_pages)
 
         match effective_strategy:
             case SampleStrategy.FULL:
-                return documents
+                return pages
             case SampleStrategy.FIRST_N:
-                return documents[: self.max_pages]
+                return pages[: self.max_pages]
             case SampleStrategy.BOOKENDS:
                 half = self.max_pages // 2
-                return documents[:half] + documents[-half:]
+                return pages[:half] + pages[-half:]
             case _:
-                return documents[: self.max_pages]
+                return pages[: self.max_pages]
 
     def _select_strategy(self, total_pages: int) -> SampleStrategy:
         """Select effective strategy based on document size.

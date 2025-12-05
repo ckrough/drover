@@ -30,6 +30,30 @@ source .venv/bin/activate
 pip install -e .
 ```
 
+## Project Structure
+
+```
+src/drover/
+├── cli.py              # Entry point, Click commands
+├── config.py           # Configuration management (Pydantic models)
+├── loader.py           # DocumentLoader - text extraction from documents
+├── classifier.py       # LLM-based DocumentClassifier
+├── path_builder.py     # PathBuilder - generates organized paths
+├── models.py           # Data models (RawClassification, ClassificationResult)
+├── service.py          # High-level service orchestration
+├── metrics.py          # Classification metrics tracking
+├── sampling.py         # Page sampling strategies
+├── prompts/            # Prompt templates (classification.md)
+├── taxonomy/           # Taxonomy plugin system
+│   ├── base.py         # BaseTaxonomy abstract class
+│   ├── household.py    # HouseholdTaxonomy implementation
+│   └── loader.py       # Taxonomy registry
+└── naming/             # Naming policy plugin system
+    ├── base.py         # BaseNamingPolicy abstract class
+    ├── nara.py         # NARA-compliant naming
+    └── loader.py       # Naming policy registry
+```
+
 ## Commands
 
 ```bash
@@ -59,7 +83,7 @@ bandit -r src/ -f json --severity-level medium --confidence-level medium --quiet
 
 ### Core Pipeline Flow
 1. **CLI** (`cli.py`) → Entry point, orchestrates the pipeline
-2. **DocumentLoader** (`loader.py`) → Extracts text from PDFs/images via LangChain loaders with sampling strategies
+2. **DocumentLoader** (`loader.py`) → Extracts text from documents (PDF, Office, images, etc.) with sampling strategies
 3. **DocumentClassifier** (`classifier.py`) → Sends content to LLM with taxonomy-constrained prompts
 4. **PathBuilder** (`path_builder.py`) → Generates `{domain}/{category}/{doctype}/{filename}` paths using naming policies
 
@@ -125,9 +149,6 @@ def test_parse_response_direct_json() -> None:
 |----------|-------------|---------|
 | `DROVER_AI_PROVIDER` | AI provider (ollama, openai, anthropic) | `ollama` |
 | `DROVER_AI_MODEL` | Model name | `llama3.2:latest` |
-| `DROVER_ENCODER_ENABLED` | Enable local encoder classifier | `true` |
-| `DROVER_ENCODER_MODEL` | Sentence-transformer model | `all-MiniLM-L6-v2` |
-| `DROVER_ENCODER_DEVICE` | Device (cpu, cuda, mps) | `mps` |
 | `DROVER_TAXONOMY` | Taxonomy to use | `household` |
 | `DROVER_TAXONOMY_MODE` | Validation mode (strict, fallback) | `fallback` |
 | `DROVER_NAMING_STYLE` | Naming policy | `nara` |
@@ -150,11 +171,6 @@ def test_parse_response_direct_json() -> None:
    - `strict`: Rejects unknown values (raises error)
    - `fallback`: Maps unknown values to "other" category
 
-5. **Encoder vs LLM classifiers:**
-   - `DocumentClassifier`: Uses LLM API calls (slower, more accurate)
-   - `EncoderClassifier`: Local embeddings (faster, no API cost)
-   - `HybridClassifier`: Encoder for taxonomy, LLM for metadata extraction
+5. **Config precedence:** CLI options override config file, which overrides environment variables, which override defaults. Check all layers when debugging config issues.
 
-6. **Config precedence:** CLI options override config file, which overrides environment variables, which override defaults. Check all layers when debugging config issues.
-
-7. **Async considerations:** Some classifiers are async. Use `pytest-asyncio` and `asyncio_mode = "auto"` in pytest config.
+6. **Async considerations:** Some classifiers are async. Use `pytest-asyncio` and `asyncio_mode = "auto"` in pytest config.
