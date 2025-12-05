@@ -27,7 +27,8 @@ ENV/
 
 # IDE
 .idea/
-.vscode/
+.vscode/settings.json.local
+.vscode/*.log
 *.swp
 *.swo
 
