@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -6,7 +6,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Drover is a document classification CLI that uses LLMs to analyze documents and suggest organized filesystem paths. It supports multiple AI providers (Ollama, OpenAI, Anthropic) through LangChain.
 
-**Python Version:** 3.11.3+
+## Python Environment Setup
+
+### Virtual Environment
+- **ALWAYS** use the `.venv` virtual environment in the project root
+- **NEVER** install packages globally with pip
+- Activate before any Python operations: `source .venv/bin/activate`
+- If `.venv` doesn't exist, run: `./scripts/setup-venv.sh`
+
+### Python Version
+- Use Python 3.13+ for all new projects
+- Check version: `python --version`
+
+### Dependency Management
+- All dependencies defined in `pyproject.toml`
+- Install dependencies: `pip install -e .`
+- Add new dependency: Update `pyproject.toml`, then `pip install -e .`
+
+### Before Running Any Python Code
+```bash
+# Always ensure venv is active
+source .venv/bin/activate
+pip install -e .
+```
 
 ## Commands
 

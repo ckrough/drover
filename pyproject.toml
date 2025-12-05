@@ -3,7 +3,7 @@ name = "drover"
 version = "0.1.0"
 description = "Document classification CLI that classifies files into organized folder structures"
 readme = "README.md"
-requires-python = ">=3.11.3"
+requires-python = ">=3.13"
 license = {text = "MIT"}
 dependencies = [
     "langchain>=0.3",
@@ -24,6 +24,7 @@ dev = [
     "pytest-asyncio>=0.24",
     "ruff>=0.8",
     "bandit>=1.7.5",
+    "mypy>=1.8.0",
 ]
 
 [project.scripts]
@@ -41,8 +42,14 @@ asyncio_mode = "auto"
 testpaths = ["tests"]
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py313"
 line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
