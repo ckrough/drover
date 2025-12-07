@@ -1,6 +1,6 @@
 ---
 name: document_classification
-version: "1.0"
+version: "1.1"
 description: Classify documents by domain, category, doctype, vendor, date, and subject
 ---
 # Document Classification Task
@@ -43,7 +43,7 @@ You are a document classification assistant. Analyze the provided document conte
   "category": "banking",
   "doctype": "statement",
   "vendor": "Chase Bank",
-  "date": "01/31/2025",
+  "date": "20250131",
   "subject": "checking account"
 }
 ```
@@ -60,7 +60,7 @@ You are a document classification assistant. Analyze the provided document conte
   "category": "expenses",
   "doctype": "receipt",
   "vendor": "City Hospital",
-  "date": "January 10, 2025",
+  "date": "20250110",
   "subject": "surgical procedure"
 }
 ```
@@ -77,7 +77,7 @@ You are a document classification assistant. Analyze the provided document conte
   "category": "property",
   "doctype": "policy",
   "vendor": "State Farm Insurance",
-  "date": "January 1, 2025",
+  "date": "20250101",
   "subject": "homeowners coverage"
 }
 ```
@@ -94,7 +94,7 @@ You are a document classification assistant. Analyze the provided document conte
   "category": "tax",
   "doctype": "statement",
   "vendor": "Acme Corporation",
-  "date": "January 31, 2025",
+  "date": "20250131",
   "subject": "W-2 wages"
 }
 ```
@@ -111,7 +111,7 @@ You are a document classification assistant. Analyze the provided document conte
   "category": "estate",
   "doctype": "agreement",
   "vendor": "Smith Law Firm",
-  "date": "December 1, 2024",
+  "date": "20241201",
   "subject": "will"
 }
 ```
@@ -128,7 +128,7 @@ You are a document classification assistant. Analyze the provided document conte
   "category": "real_estate",
   "doctype": "deed",
   "vendor": "123 Main Street",
-  "date": "March 5, 2025",
+  "date": "20250305",
   "subject": "ownership_transfer"
 }
 ```
@@ -145,7 +145,7 @@ You are a document classification assistant. Analyze the provided document conte
   "category": "home_improvement",
   "doctype": "receipt",
   "vendor": "Home Depot",
-  "date": "01/15/2025",
+  "date": "20250115",
   "subject": "building_materials"
 }
 ```
@@ -162,7 +162,7 @@ You are a document classification assistant. Analyze the provided document conte
   "category": "household",
   "doctype": "receipt",
   "vendor": "Bed Bath & Beyond",
-  "date": "02/10/2025",
+  "date": "20250210",
   "subject": "bedding and household items"
 }
 ```
@@ -179,7 +179,7 @@ You are a document classification assistant. Analyze the provided document conte
   "category": "compensation",
   "doctype": "paystub",
   "vendor": "Acme Corporation",
-  "date": "January 20, 2025",
+  "date": "20250120",
   "subject": "biweekly paystub"
 }
 ```
@@ -196,7 +196,7 @@ You are a document classification assistant. Analyze the provided document conte
   "category": "energy",
   "doctype": "statement",
   "vendor": "Pacific Gas & Electric",
-  "date": "February 5, 2025",
+  "date": "20250205",
   "subject": "electric service"
 }
 ```
@@ -213,7 +213,7 @@ You are a document classification assistant. Analyze the provided document conte
   "category": "tuition",
   "doctype": "invoice",
   "vendor": "State University",
-  "date": "December 15, 2024",
+  "date": "20241215",
   "subject": "spring semester tuition"
 }
 ```
@@ -230,7 +230,7 @@ You are a document classification assistant. Analyze the provided document conte
   "category": "vehicles",
   "doctype": "title",
   "vendor": "California DMV",
-  "date": "March 1, 2025",
+  "date": "20250301",
   "subject": "vehicle title"
 }
 ```
@@ -246,9 +246,9 @@ You are a document classification assistant. Analyze the provided document conte
   "domain": "food",
   "category": "recipes",
   "doctype": "recipe",
-  "vendor_raw": "King Arthur Baking",
-  "date_raw": "11/18/22",
-  "subject_raw": "cranberry-orange babka"
+  "vendor": "King Arthur Baking",
+  "date": "20221118",
+  "subject": "cranberry-orange babka"
 }
 ```
 
@@ -274,6 +274,3 @@ Respond with a JSON object containing these exact fields:
 ```
 
 Respond ONLY with the JSON object, no additional text.
-
-## Examples
-

@@ -6,6 +6,7 @@ Integrates with LangChain to classify documents using various AI providers
 
 import json
 import re
+from collections.abc import Callable
 from importlib.resources import files
 from pathlib import Path
 from typing import Any
@@ -16,11 +17,27 @@ from langchain_core.messages import HumanMessage
 from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
 from pydantic import ValidationError
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from drover.config import AIProvider, TaxonomyMode
+from drover.logging import get_logger
 from drover.metrics import create_metrics_callback
 from drover.models import RawClassification
 from drover.taxonomy.base import BaseTaxonomy
+
+logger = get_logger(__name__)
+
+# Exceptions that should trigger a retry (transient failures)
+RETRYABLE_EXCEPTIONS = (
+    ConnectionError,
+    TimeoutError,
+    OSError,  # Catches network-related OS errors
+)
 
 
 class ClassificationError(Exception):
@@ -120,6 +137,12 @@ class DocumentClassifier:
         taxonomy: BaseTaxonomy,
         taxonomy_mode: TaxonomyMode = TaxonomyMode.FALLBACK,
         template_path: Path | None = None,
+        temperature: float = 0.0,
+        max_tokens: int | None = 1000,
+        timeout: int = 60,
+        max_retries: int = 3,
+        retry_min_wait: float = 2.0,
+        retry_max_wait: float = 10.0,
     ) -> None:
         """Initialize classifier.
 
@@ -129,12 +152,24 @@ class DocumentClassifier:
             taxonomy: Taxonomy for classification constraints.
             taxonomy_mode: How to handle unknown values (strict/fallback).
             template_path: Custom prompt template path.
+            temperature: LLM temperature (0.0 for deterministic output).
+            max_tokens: Maximum tokens in response.
+            timeout: Request timeout in seconds.
+            max_retries: Maximum retry attempts for transient failures.
+            retry_min_wait: Minimum wait between retries in seconds.
+            retry_max_wait: Maximum wait between retries in seconds.
         """
         self.provider = provider
         self.model = model
         self.taxonomy = taxonomy
         self.taxonomy_mode = taxonomy_mode
         self.template = PromptTemplate(template_path)
+        self.temperature = temperature
+        self.max_tokens = max_tokens
+        self.timeout = timeout
+        self.max_retries = max_retries
+        self.retry_min_wait = retry_min_wait
+        self.retry_max_wait = retry_max_wait
         self._llm: BaseChatModel | None = None
 
     def _get_llm(self) -> BaseChatModel:
@@ -144,17 +179,77 @@ class DocumentClassifier:
 
         match self.provider:
             case AIProvider.OLLAMA:
-                self._llm = ChatOllama(model=self.model)
+                self._llm = ChatOllama(
+                    model=self.model,
+                    temperature=self.temperature,
+                    num_predict=self.max_tokens,
+                    format="json",
+                    timeout=self.timeout,
+                )
             case AIProvider.OPENAI:
-                self._llm = ChatOpenAI(model=self.model)
+                self._llm = ChatOpenAI(
+                    model=self.model,
+                    temperature=self.temperature,
+                    max_tokens=self.max_tokens,
+                    timeout=self.timeout,
+                    model_kwargs={"response_format": {"type": "json_object"}},
+                )
             case AIProvider.ANTHROPIC:
                 from langchain_anthropic import ChatAnthropic
 
-                self._llm = ChatAnthropic(model=self.model)
+                self._llm = ChatAnthropic(
+                    model=self.model,
+                    temperature=self.temperature,
+                    max_tokens=self.max_tokens,
+                    timeout=float(self.timeout),
+                )
             case _:
                 raise ValueError(f"Unsupported provider: {self.provider}")
 
         return self._llm
+
+    def _make_retry_decorator(self) -> Callable:
+        """Create a retry decorator with configured parameters."""
+        return retry(
+            stop=stop_after_attempt(self.max_retries),
+            wait=wait_exponential(
+                multiplier=1,
+                min=self.retry_min_wait,
+                max=self.retry_max_wait,
+            ),
+            retry=retry_if_exception_type(RETRYABLE_EXCEPTIONS),
+            reraise=True,
+        )
+
+    async def _invoke_with_retry(
+        self,
+        message: HumanMessage,
+        config: dict[str, Any] | None,
+    ) -> str:
+        """Invoke LLM with retry logic for transient failures.
+
+        Args:
+            message: The message to send to the LLM.
+            config: Optional invoke config (e.g., callbacks).
+
+        Returns:
+            The LLM response content as string.
+
+        Raises:
+            Original exception after max retries exhausted.
+        """
+        llm = self._get_llm()
+
+        # Apply retry decorator dynamically based on config
+        @self._make_retry_decorator()
+        async def _invoke():
+            if config is not None:
+                response = await llm.ainvoke([message], config=config)
+            else:
+                response = await llm.ainvoke([message])
+            return str(response.content)
+
+        return await _invoke()
 
     async def classify(
         self,
@@ -176,6 +271,13 @@ class DocumentClassifier:
             LLMParseError: If LLM output cannot be parsed.
             TaxonomyValidationError: If strict mode validation fails.
         """
+        logger.info(
+            "classification_started",
+            provider=self.provider.value,
+            model=self.model,
+            content_length=len(content),
+        )
+
         taxonomy_menu = self.taxonomy.to_prompt_menu()
         prompt = self.template.render(
             taxonomy_menu=taxonomy_menu,
@@ -192,7 +294,6 @@ class DocumentClassifier:
         if collect_metrics:
             metrics_callback = create_metrics_callback(self.provider.value, self.model)
 
-        llm = self._get_llm()
         message = HumanMessage(content=prompt)
 
         # In LangChain 0.3+ callbacks should be passed via the runnable config,
@@ -202,19 +303,23 @@ class DocumentClassifier:
         if metrics_callback is not None:
             invoke_config = {"callbacks": [metrics_callback]}
 
-        if invoke_config is not None:
-            response = await llm.ainvoke([message], config=invoke_config)
-        else:
-            response = await llm.ainvoke([message])
-
-        raw_response = response.content
+        raw_response = await self._invoke_with_retry(message, invoke_config)
         if capture_debug and debug_info is not None:
-            debug_info["response"] = str(raw_response)
+            debug_info["response"] = raw_response
         if collect_metrics and metrics_callback is not None and debug_info is not None:
             debug_info["metrics"] = metrics_callback.metrics.model_dump()
 
-        classification = self._parse_response(str(raw_response))
+        classification = self._parse_response(raw_response)
         normalized = self._normalize_classification(classification)
+
+        logger.info(
+            "classification_complete",
+            domain=normalized.domain,
+            category=normalized.category,
+            doctype=normalized.doctype,
+            provider=self.provider.value,
+            model=self.model,
+        )
 
         return normalized, debug_info
 
@@ -275,7 +380,7 @@ class DocumentClassifier:
         escape = False
 
         for idx, ch in enumerate(text):
-            if ch == "\"" and not escape:
+            if ch == '"' and not escape:
                 in_string = not in_string
             if ch == "\\" and not escape:
                 escape = True
@@ -294,9 +399,8 @@ class DocumentClassifier:
                     depth -= 1
                     if depth == 0 and start_idx is not None:
                         end_idx = idx + 1
-                        if (
-                            best_span is None
-                            or (end_idx - start_idx) > (best_span[1] - best_span[0])
+                        if best_span is None or (end_idx - start_idx) > (
+                            best_span[1] - best_span[0]
                         ):
                             best_span = (start_idx, end_idx)
 

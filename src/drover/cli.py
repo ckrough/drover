@@ -17,6 +17,7 @@ from drover.config import (
     SampleStrategy,
     TaxonomyMode,
 )
+from drover.logging import configure_logging
 from drover.models import ClassificationErrorResult as ClassificationErrorModel
 from drover.models import ClassificationResult
 from drover.service import ClassificationService
@@ -152,6 +153,9 @@ def classify(
 
     if on_error is None:
         config = config.with_overrides(on_error=ErrorMode.CONTINUE if batch else ErrorMode.FAIL)
+
+    # Configure structured logging (JSON format by default)
+    configure_logging(level=config.log_level, json_output=True)
 
     exit_code = asyncio.run(_classify_files(files, config, batch))
     sys.exit(exit_code)

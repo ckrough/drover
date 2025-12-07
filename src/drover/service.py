@@ -19,10 +19,13 @@ from drover.classifier import (
 )
 from drover.config import DroverConfig, ErrorMode
 from drover.loader import DocumentLoader, DocumentLoadError
+from drover.logging import get_logger
 from drover.models import ClassificationErrorResult, ClassificationResult, ErrorCode
 from drover.naming import get_naming_policy
 from drover.path_builder import PathBuilder, PathConstraintError
 from drover.taxonomy import get_taxonomy
+
+logger = get_logger(__name__)
 
 Result = ClassificationResult | ClassificationErrorResult
 ResultCallback = Callable[[Result], None]
@@ -50,6 +53,12 @@ class ClassificationService:
             model=config.ai.model,
             taxonomy=self._taxonomy,
             taxonomy_mode=config.taxonomy_mode,
+            temperature=config.ai.temperature,
+            max_tokens=config.ai.max_tokens,
+            timeout=config.ai.timeout,
+            max_retries=config.ai.max_retries,
+            retry_min_wait=config.ai.retry_min_wait,
+            retry_max_wait=config.ai.retry_max_wait,
         )
         self._path_builder = PathBuilder(naming_policy=self._naming_policy)
 
@@ -105,6 +114,8 @@ class ClassificationService:
         """Classify a single file and map errors to result models."""
         cfg = self.config
 
+        logger.debug("file_processing_started", file=str(file_path))
+
         try:
             loaded = await self._loader.load(file_path)
 
@@ -122,39 +133,75 @@ class ClassificationService:
             if cfg.metrics and debug_info and "metrics" in debug_info:
                 result.metrics = debug_info["metrics"]
 
+            logger.debug(
+                "file_processing_complete",
+                file=str(file_path),
+                suggested_path=result.suggested_path,
+            )
+
             return result
 
         except DocumentLoadError as e:
+            logger.warning(
+                "file_load_failed",
+                file=str(file_path),
+                error=str(e),
+            )
             return ClassificationErrorResult.from_exception(
                 file_path.name,
                 ErrorCode.DOCUMENT_LOAD_FAILED,
                 e,
             )
         except LLMParseError as e:
+            logger.warning(
+                "llm_parse_failed",
+                file=str(file_path),
+                error=str(e),
+            )
             return ClassificationErrorResult.from_exception(
                 file_path.name,
                 ErrorCode.LLM_PARSE_ERROR,
                 e,
             )
         except TaxonomyValidationError as e:
+            logger.warning(
+                "taxonomy_validation_failed",
+                file=str(file_path),
+                error=str(e),
+            )
             return ClassificationErrorResult.from_exception(
                 file_path.name,
                 ErrorCode.TAXONOMY_VALIDATION_FAILED,
                 e,
             )
         except PathConstraintError as e:
+            logger.warning(
+                "path_constraint_failed",
+                file=str(file_path),
+                error=str(e),
+            )
             return ClassificationErrorResult.from_exception(
                 file_path.name,
                 ErrorCode.FILENAME_POLICY_VIOLATION,
                 e,
             )
         except ClassificationError as e:
+            logger.error(
+                "llm_api_error",
+                file=str(file_path),
+                error=str(e),
+            )
             return ClassificationErrorResult.from_exception(
                 file_path.name,
                 ErrorCode.LLM_API_ERROR,
                 e,
             )
         except Exception as e:  # pragma: no cover - defensive fallback
+            logger.exception(
+                "unexpected_error",
+                file=str(file_path),
+                error=str(e),
+            )
             return ClassificationErrorResult.from_exception(
                 file_path.name,
                 ErrorCode.UNEXPECTED_ERROR,

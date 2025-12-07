@@ -123,6 +123,28 @@ class TestDroverConfig:
         assert env_data["max_pages"] == 15
         assert env_data["concurrency"] == 4
 
+    def test_from_env_ai_retry_settings(self) -> None:
+        """Test loading AI retry settings from environment."""
+        with patch.dict(
+            os.environ,
+            {
+                "DROVER_AI_TEMPERATURE": "0.7",
+                "DROVER_AI_MAX_TOKENS": "2000",
+                "DROVER_AI_TIMEOUT": "120",
+                "DROVER_AI_MAX_RETRIES": "5",
+                "DROVER_AI_RETRY_MIN_WAIT": "1.0",
+                "DROVER_AI_RETRY_MAX_WAIT": "30.0",
+            },
+        ):
+            env_data = DroverConfig.from_env()
+
+        assert env_data["ai"]["temperature"] == 0.7
+        assert env_data["ai"]["max_tokens"] == 2000
+        assert env_data["ai"]["timeout"] == 120
+        assert env_data["ai"]["max_retries"] == 5
+        assert env_data["ai"]["retry_min_wait"] == 1.0
+        assert env_data["ai"]["retry_max_wait"] == 30.0
+
     def test_deep_merge(self) -> None:
         """Test deep merge of dictionaries."""
         base = {"ai": {"provider": "ollama", "model": "llama3"}, "taxonomy": "household"}
@@ -152,9 +174,75 @@ class TestAIConfig:
         config = AIConfig()
         assert config.provider == AIProvider.OLLAMA
         assert config.model == "llama3.2:latest"
+        assert config.temperature == 0.0
+        assert config.max_tokens == 1000
+        assert config.timeout == 60
+        assert config.max_retries == 3
+        assert config.retry_min_wait == 2.0
+        assert config.retry_max_wait == 10.0
 
     def test_custom_values(self) -> None:
         """Test custom AI config values."""
         config = AIConfig(provider=AIProvider.OPENAI, model="gpt-4-turbo")
         assert config.provider == AIProvider.OPENAI
         assert config.model == "gpt-4-turbo"
+
+    def test_temperature_bounds(self) -> None:
+        """Test temperature validation bounds."""
+        import pytest
+
+        config = AIConfig(temperature=0.5)
+        assert config.temperature == 0.5
+
+        config = AIConfig(temperature=2.0)
+        assert config.temperature == 2.0
+
+        with pytest.raises(ValueError):
+            AIConfig(temperature=-0.1)
+
+        with pytest.raises(ValueError):
+            AIConfig(temperature=2.1)
+
+    def test_retry_wait_validation_valid(self) -> None:
+        """Test valid retry wait range."""
+        config = AIConfig(retry_min_wait=1.0, retry_max_wait=5.0)
+        assert config.retry_min_wait == 1.0
+        assert config.retry_max_wait == 5.0
+
+        # Equal values are valid
+        config = AIConfig(retry_min_wait=3.0, retry_max_wait=3.0)
+        assert config.retry_min_wait == 3.0
+        assert config.retry_max_wait == 3.0
+
+    def test_retry_wait_validation_invalid(self) -> None:
+        """Test invalid retry wait range raises error."""
+        import pytest
+
+        with pytest.raises(ValueError, match="retry_min_wait.*must be <= retry_max_wait"):
+            AIConfig(retry_min_wait=10.0, retry_max_wait=5.0)
+
+    def test_timeout_validation(self) -> None:
+        """Test timeout must be positive."""
+        import pytest
+
+        config = AIConfig(timeout=30)
+        assert config.timeout == 30
+
+        with pytest.raises(ValueError):
+            AIConfig(timeout=0)
+
+    def test_max_retries_bounds(self) -> None:
+        """Test max_retries validation bounds."""
+        import pytest
+
+        config = AIConfig(max_retries=1)
+        assert config.max_retries == 1
+
+        config = AIConfig(max_retries=10)
+        assert config.max_retries == 10
+
+        with pytest.raises(ValueError):
+            AIConfig(max_retries=0)
+
+        with pytest.raises(ValueError):
+            AIConfig(max_retries=11)

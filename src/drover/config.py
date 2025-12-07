@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Self
 
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from drover.sampling import SampleStrategy
 
@@ -54,6 +54,22 @@ class AIConfig(BaseModel):
 
     provider: AIProvider = Field(default=AIProvider.OLLAMA)
     model: str = Field(default="llama3.2:latest")
+    temperature: float = Field(default=0.0, ge=0.0, le=2.0)
+    max_tokens: int | None = Field(default=1000, ge=1)
+    timeout: int = Field(default=60, ge=1, description="Request timeout in seconds")
+    max_retries: int = Field(default=3, ge=1, le=10)
+    retry_min_wait: float = Field(default=2.0, ge=0.1)
+    retry_max_wait: float = Field(default=10.0, ge=1.0)
+
+    @model_validator(mode="after")
+    def validate_retry_wait_range(self) -> Self:
+        """Validate that retry_min_wait <= retry_max_wait."""
+        if self.retry_min_wait > self.retry_max_wait:
+            raise ValueError(
+                f"retry_min_wait ({self.retry_min_wait}) must be <= "
+                f"retry_max_wait ({self.retry_max_wait})"
+            )
+        return self
 
 
 class DroverConfig(BaseModel):
@@ -97,6 +113,12 @@ class DroverConfig(BaseModel):
         env_map = {
             "DROVER_AI_PROVIDER": ("ai", "provider"),
             "DROVER_AI_MODEL": ("ai", "model"),
+            "DROVER_AI_TEMPERATURE": ("ai", "temperature"),
+            "DROVER_AI_MAX_TOKENS": ("ai", "max_tokens"),
+            "DROVER_AI_TIMEOUT": ("ai", "timeout"),
+            "DROVER_AI_MAX_RETRIES": ("ai", "max_retries"),
+            "DROVER_AI_RETRY_MIN_WAIT": ("ai", "retry_min_wait"),
+            "DROVER_AI_RETRY_MAX_WAIT": ("ai", "retry_max_wait"),
             "DROVER_TAXONOMY": ("taxonomy",),
             "DROVER_TAXONOMY_MODE": ("taxonomy_mode",),
             "DROVER_NAMING_STYLE": ("naming_style",),
@@ -108,18 +130,30 @@ class DroverConfig(BaseModel):
             "DROVER_DEBUG_DIR": ("debug_dir",),
         }
 
+        # Fields that need numeric conversion
+        int_fields = {"max_pages", "concurrency", "max_tokens", "timeout", "max_retries"}
+        float_fields = {"temperature", "retry_min_wait", "retry_max_wait"}
+
         result: dict = {}
         for env_var, path in env_map.items():
             if value := os.environ.get(env_var):
+                field_name = path[-1]  # Last element is the field name
                 if len(path) == 2:
                     if path[0] not in result:
                         result[path[0]] = {}
-                    result[path[0]][path[1]] = value
-                else:
-                    if path[0] in ("max_pages", "concurrency"):
-                        result[path[0]] = int(value)
+                    if field_name in int_fields:
+                        result[path[0]][field_name] = int(value)
+                    elif field_name in float_fields:
+                        result[path[0]][field_name] = float(value)
                     else:
-                        result[path[0]] = value
+                        result[path[0]][field_name] = value
+                else:
+                    if field_name in int_fields:
+                        result[field_name] = int(value)
+                    elif field_name in float_fields:
+                        result[field_name] = float(value)
+                    else:
+                        result[field_name] = value
         return result
 
     @classmethod
