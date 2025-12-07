@@ -52,3 +52,6 @@ tmp/
 # OS
 .DS_Store
 Thumbs.db
+
+# project resources
+design/
