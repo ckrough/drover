@@ -252,6 +252,74 @@ You are a document classification assistant. Analyze the provided document conte
 }
 ```
 
+### Apartment Lease
+
+**Input:**
+> Residential Lease Agreement - Sunrise Apartments, Unit 204. Tenant: Sarah Johnson. Monthly rent: $1,850. Lease term: 12 months starting March 1, 2025. Security deposit: $1,850. Pet deposit: $300. Landlord: Sunrise Property Management. Address: 789 Oak Street, Apt 204.
+
+**Output:**
+```json
+{
+  "domain": "housing",
+  "category": "rentals",
+  "doctype": "lease",
+  "vendor": "Sunrise Property Management",
+  "date": "20250301",
+  "subject": "apartment lease"
+}
+```
+
+### Property Listing
+
+**Input:**
+> MLS #2025-45678 - 456 Maple Avenue. 3 bed, 2 bath single family home. 1,850 sq ft. Built 1995. List price: $425,000. Listed by: Coldwell Banker Realty. Agent: Michael Chen. Days on market: 14. Open house: Sunday, February 15, 2025.
+
+**Output:**
+```json
+{
+  "domain": "housing",
+  "category": "search",
+  "doctype": "listing",
+  "vendor": "Coldwell Banker Realty",
+  "date": "20250215",
+  "subject": "456 maple avenue"
+}
+```
+
+### Consulting Client Contract
+
+**Input:**
+> Professional Services Agreement between TechStart Inc. and Jane Smith Consulting LLC. Effective date: January 15, 2025. Scope: Software architecture review and recommendations. Compensation: $150/hour, not to exceed $15,000. Term: 3 months. Contact: Tom Wilson, CTO.
+
+**Output:**
+```json
+{
+  "domain": "career",
+  "category": "clients",
+  "doctype": "contract",
+  "vendor": "TechStart Inc",
+  "date": "20250115",
+  "subject": "architecture consulting"
+}
+```
+
+### Travel Trip Record
+
+**Input:**
+> Trip Confirmation - Hawaiian Airlines. Confirmation: HA7X2K9. Passenger: John Smith. Departing: San Francisco (SFO) to Honolulu (HNL), March 10, 2025, Flight HA21. Returning: March 17, 2025, Flight HA22. Hotel: Hilton Hawaiian Village, 7 nights.
+
+**Output:**
+```json
+{
+  "domain": "lifestyle",
+  "category": "trips",
+  "doctype": "itinerary",
+  "vendor": "Hawaiian Airlines",
+  "date": "20250310",
+  "subject": "hawaii vacation"
+}
+```
+
 ## Document Content
 
 ```

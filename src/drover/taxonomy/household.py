@@ -30,6 +30,7 @@ class HouseholdTaxonomy(BaseTaxonomy):
         "lifestyle",
         "pets",
         "reference",
+        "housing",
         "other",
     }
 
@@ -138,10 +139,14 @@ class HouseholdTaxonomy(BaseTaxonomy):
         },
         "career": {
             "applications",
+            "clients",
             "consulting",
+            "documentation",
             "employers",
             "interviewing",
             "job_search",
+            "leadership",
+            "meetings",
             "performance_reviews",
             "presentations",
             "professional_development",
@@ -165,7 +170,9 @@ class HouseholdTaxonomy(BaseTaxonomy):
         "lifestyle": {
             "goals",
             "interests",
+            "planning",
             "travel",
+            "trips",
             "volunteering",
             "other",
         },
@@ -176,6 +183,14 @@ class HouseholdTaxonomy(BaseTaxonomy):
         },
         "reference": {
             "manuals",
+            "topics",
+            "other",
+        },
+        "housing": {
+            "properties",
+            "reference",
+            "rentals",
+            "search",
             "other",
         },
         "other": {
@@ -231,6 +246,12 @@ class HouseholdTaxonomy(BaseTaxonomy):
         "vaccination_record",
         "adoption_papers",
         "id_card",
+        "paystub",
+        "lease",
+        "listing",
+        "offer",
+        "closing_statement",
+        "hoa_statement",
         "other",
     }
 
@@ -241,9 +262,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
         "banking": "financial",
         "home": "property",
         "house": "property",
-        "real_estate": "property",
-        "realestate": "property",
-        "housing": "property",
         "health": "medical",
         "healthcare": "medical",
         "doctor": "medical",
@@ -253,7 +271,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
         "lawyer": "legal",
         "work": "employment",
         "job": "employment",
-        "career": "employment",
         "school": "education",
         "college": "education",
         "university": "education",
@@ -266,6 +283,14 @@ class HouseholdTaxonomy(BaseTaxonomy):
         "federal": "government",
         "state": "government",
         "bills": "utilities",
+        # housing domain aliases
+        "real_estate": "housing",
+        "realestate": "housing",
+        "rental": "housing",
+        "rentals": "housing",
+        "apartment": "housing",
+        "lease": "housing",
+        # other
         "misc": "other",
         "miscellaneous": "other",
         "unknown": "other",
@@ -285,6 +310,7 @@ class HouseholdTaxonomy(BaseTaxonomy):
         ("financial", "stocks"): "investments",
         ("financial", "bonds"): "investments",
         ("financial", "brokerage"): "investments",
+        ("financial", "equities"): "investments",
         ("financial", "401k"): "retirement",
         ("financial", "ira"): "retirement",
         ("financial", "pension"): "retirement",
@@ -309,6 +335,20 @@ class HouseholdTaxonomy(BaseTaxonomy):
         ("insurance", "homeowners"): "home",
         ("insurance", "property"): "home",
         ("insurance", "medical"): "health",
+        # housing domain
+        ("housing", "apartment"): "rentals",
+        ("housing", "lease"): "rentals",
+        ("housing", "real_estate"): "properties",
+        ("housing", "mortgage"): "properties",
+        ("housing", "home"): "properties",
+        # career domain
+        ("career", "client"): "clients",
+        ("career", "meeting"): "meetings",
+        ("career", "docs"): "documentation",
+        # lifestyle domain
+        ("lifestyle", "trip"): "trips",
+        ("lifestyle", "vacation"): "trips",
+        ("lifestyle", "travel_planning"): "planning",
     }
 
     DOCTYPE_ALIASES: ClassVar[dict[str, str]] = {
@@ -319,8 +359,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
         "payment": "receipt",
         "purchase": "receipt",
         "transaction": "receipt",
-        "lease": "agreement",
-        "rental_agreement": "agreement",
         "service_agreement": "agreement",
         "correspondence": "letter",
         "mail": "letter",
@@ -357,6 +395,28 @@ class HouseholdTaxonomy(BaseTaxonomy):
         "cv": "resume",
         "shot_record": "immunization_record",
         "travel_plan": "itinerary",
+        # paystub aliases
+        "pay_stub": "paystub",
+        "paycheck": "paystub",
+        "earnings_statement": "paystub",
+        # lease aliases
+        "rental_agreement": "lease",
+        "apartment_lease": "lease",
+        "rental_lease": "lease",
+        # listing aliases
+        "property_listing": "listing",
+        "mls_listing": "listing",
+        "real_estate_listing": "listing",
+        # offer aliases
+        "purchase_offer": "offer",
+        "real_estate_offer": "offer",
+        # closing aliases
+        "closing_docs": "closing_statement",
+        "settlement_statement": "closing_statement",
+        "hud1": "closing_statement",
+        # hoa aliases
+        "hoa_dues": "hoa_statement",
+        "hoa_bill": "hoa_statement",
         "unknown": "other",
     }
 
