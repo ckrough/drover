@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from drover.classifier import DocumentClassifier, RETRYABLE_EXCEPTIONS
+from drover.classifier import RETRYABLE_EXCEPTIONS, DocumentClassifier
 from drover.config import AIProvider, TaxonomyMode
 from drover.taxonomy.household import HouseholdTaxonomy
 

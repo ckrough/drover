@@ -2,7 +2,7 @@
 
 from langchain_core.outputs import LLMResult
 
-from drover.metrics import AIMetrics, MetricsCallback, create_metrics_callback
+from drover.metrics import MetricsCallback, create_metrics_callback
 
 
 def test_create_metrics_callback_uses_provider_and_model() -> None:

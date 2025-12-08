@@ -58,6 +58,16 @@ class TaxonomyValidationError(ClassificationError):
     pass
 
 
+class TemplateError(ClassificationError):
+    """Raised when prompt template loading or validation fails."""
+
+    pass
+
+
+# Required placeholders that must be present in prompt templates
+REQUIRED_PLACEHOLDERS = {"{taxonomy_menu}", "{document_content}"}
+
+
 class PromptTemplate:
     """Loads and renders prompt templates from Markdown files."""
 
@@ -75,19 +85,35 @@ class PromptTemplate:
         self._frontmatter: dict | None = None
 
     def _load(self) -> None:
-        """Load and parse template file."""
+        """Load and parse template file.
+
+        Raises:
+            TemplateError: If file cannot be read or parsed.
+        """
         if self._content is not None:
             return
 
-        if hasattr(self.template_path, "read_text"):
-            raw = self.template_path.read_text()
-        else:
-            raw = Path(self.template_path).read_text()
+        try:
+            if hasattr(self.template_path, "read_text"):
+                raw = self.template_path.read_text(encoding="utf-8")
+            else:
+                raw = Path(self.template_path).read_text(encoding="utf-8")
+        except FileNotFoundError:
+            raise TemplateError(f"Template file not found: {self.template_path}")
+        except PermissionError:
+            raise TemplateError(f"Permission denied reading template: {self.template_path}")
+        except UnicodeDecodeError as e:
+            raise TemplateError(f"Template encoding error (expected UTF-8): {e}")
+        except OSError as e:
+            raise TemplateError(f"Failed to read template file: {e}")
 
         if raw.startswith("---"):
             parts = raw.split("---", 2)
             if len(parts) >= 3:
-                self._frontmatter = yaml.safe_load(parts[1]) or {}
+                try:
+                    self._frontmatter = yaml.safe_load(parts[1]) or {}
+                except yaml.YAMLError as e:
+                    raise TemplateError(f"Invalid YAML frontmatter: {e}")
                 self._content = parts[2].strip()
             else:
                 self._frontmatter = {}
@@ -95,6 +121,8 @@ class PromptTemplate:
         else:
             self._frontmatter = {}
             self._content = raw
+
+        self._validate_placeholders()
 
     @property
     def content(self) -> str:
@@ -121,6 +149,19 @@ class PromptTemplate:
         for key, value in kwargs.items():
             content = content.replace(f"{{{key}}}", str(value))
         return content
+
+    def _validate_placeholders(self) -> None:
+        """Validate that required placeholders are present.
+
+        Raises:
+            TemplateError: If required placeholders are missing.
+        """
+        content = self._content or ""
+        missing = [p for p in REQUIRED_PLACEHOLDERS if p not in content]
+        if missing:
+            raise TemplateError(
+                f"Template missing required placeholders: {', '.join(sorted(missing))}"
+            )
 
 
 class DocumentClassifier:

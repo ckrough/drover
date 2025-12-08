@@ -1,14 +1,12 @@
 """Tests for the ClassificationService orchestration layer."""
 
 from pathlib import Path
-from typing import List
 
 import pytest
 
 from drover.config import DroverConfig, ErrorMode
 from drover.models import ClassificationErrorResult, ClassificationResult
 from drover.service import ClassificationService
-from drover.taxonomy.household import HouseholdTaxonomy
 
 
 @pytest.mark.asyncio
@@ -34,7 +32,7 @@ async def test_classification_service_error_modes_continue(tmp_path: Path) -> No
 
     missing = tmp_path / "does_not_exist.pdf"
 
-    results: List[ClassificationResult | ClassificationErrorResult] = []
+    results: list[ClassificationResult | ClassificationErrorResult] = []
 
     def collect(result: ClassificationResult | ClassificationErrorResult) -> None:
         results.append(result)

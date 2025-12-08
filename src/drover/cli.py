@@ -109,6 +109,12 @@ def main() -> None:
     is_flag=True,
     help="Process multiple files, output JSONL.",
 )
+@click.option(
+    "--prompt",
+    "prompt_path",
+    type=click.Path(exists=True, path_type=Path),
+    help="Custom prompt template file (Markdown with {taxonomy_menu}, {document_content}).",
+)
 def classify(
     files: tuple[Path, ...],
     config_path: Path | None,
@@ -126,6 +132,7 @@ def classify(
     debug_dir: Path | None,
     log_level: str | None,
     batch: bool,
+    prompt_path: Path | None,
 ) -> None:
     """Classify documents and suggest organized file paths.
 
@@ -149,6 +156,7 @@ def classify(
         capture_debug=capture_debug,
         debug_dir=debug_dir,
         log_level=log_level,
+        prompt=prompt_path,
     )
 
     if on_error is None:
@@ -177,12 +185,15 @@ async def _classify_files(
         Exit code (0=success, 1=partial failure, 2=complete failure).
     """
     log = config.log_level
+    prompt_source = str(config.prompt) if config.prompt else "default"
 
     if log == LogLevel.VERBOSE:
         console.print(f"[dim]Using {config.ai.provider} with model {config.ai.model}[/dim]")
+        console.print(f"[dim]Prompt template: {prompt_source}[/dim]")
     if log == LogLevel.DEBUG:
         console.print(f"[dim]Debug: Processing {len(files)} file(s)[/dim]")
         console.print(f"[dim]Debug: Provider={config.ai.provider}, Model={config.ai.model}[/dim]")
+        console.print(f"[dim]Debug: Prompt={prompt_source}[/dim]")
 
     try:
         service = ClassificationService(config)

@@ -89,6 +89,7 @@ class DroverConfig(BaseModel):
     debug_dir: Path | None = Field(
         default=None, description="Directory for debug prompt/response files"
     )
+    prompt: Path | None = Field(default=None, description="Custom prompt template file path")
 
     @classmethod
     def default_config_paths(cls) -> list[Path]:
@@ -128,6 +129,7 @@ class DroverConfig(BaseModel):
             "DROVER_ON_ERROR": ("on_error",),
             "DROVER_CONCURRENCY": ("concurrency",),
             "DROVER_DEBUG_DIR": ("debug_dir",),
+            "DROVER_PROMPT": ("prompt",),
         }
 
         # Fields that need numeric conversion

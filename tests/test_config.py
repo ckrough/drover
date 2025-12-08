@@ -1,6 +1,7 @@
 """Tests for configuration management."""
 
 import os
+from pathlib import Path
 from unittest.mock import patch
 
 from drover.config import (
@@ -164,6 +165,29 @@ class TestDroverConfig:
         assert isinstance(paths, list)
         assert len(paths) > 0
         assert any("drover.yaml" in str(p) for p in paths)
+
+    def test_prompt_default_none(self) -> None:
+        """Test prompt defaults to None."""
+        config = DroverConfig()
+        assert config.prompt is None
+
+    def test_prompt_from_dict(self) -> None:
+        """Test setting prompt from dictionary."""
+        data = {"prompt": "/path/to/custom.md"}
+        config = DroverConfig.model_validate(data)
+        assert config.prompt == Path("/path/to/custom.md")
+
+    def test_prompt_with_overrides(self) -> None:
+        """Test prompt CLI override."""
+        config = DroverConfig()
+        new_config = config.with_overrides(prompt=Path("/custom/prompt.md"))
+        assert new_config.prompt == Path("/custom/prompt.md")
+
+    def test_prompt_from_env(self) -> None:
+        """Test loading prompt from environment."""
+        with patch.dict(os.environ, {"DROVER_PROMPT": "/env/prompt.md"}):
+            env_data = DroverConfig.from_env()
+        assert env_data["prompt"] == "/env/prompt.md"
 
 
 class TestAIConfig:

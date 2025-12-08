@@ -16,6 +16,7 @@ from drover.classifier import (
     DocumentClassifier,
     LLMParseError,
     TaxonomyValidationError,
+    TemplateError,
 )
 from drover.config import DroverConfig, ErrorMode
 from drover.loader import DocumentLoader, DocumentLoadError
@@ -53,6 +54,7 @@ class ClassificationService:
             model=config.ai.model,
             taxonomy=self._taxonomy,
             taxonomy_mode=config.taxonomy_mode,
+            template_path=config.prompt,
             temperature=config.ai.temperature,
             max_tokens=config.ai.max_tokens,
             timeout=config.ai.timeout,
@@ -183,6 +185,17 @@ class ClassificationService:
             return ClassificationErrorResult.from_exception(
                 file_path.name,
                 ErrorCode.FILENAME_POLICY_VIOLATION,
+                e,
+            )
+        except TemplateError as e:
+            logger.error(
+                "template_error",
+                file=str(file_path),
+                error=str(e),
+            )
+            return ClassificationErrorResult.from_exception(
+                file_path.name,
+                ErrorCode.TEMPLATE_ERROR,
                 e,
             )
         except ClassificationError as e:
