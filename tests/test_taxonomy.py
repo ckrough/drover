@@ -57,7 +57,7 @@ class TestHouseholdTaxonomy:
         """Test direct category matching."""
         assert taxonomy.canonical_category("financial", "banking") == "banking"
         assert taxonomy.canonical_category("financial", "taxes") == "taxes"
-        assert taxonomy.canonical_category("financial", "receipts") == "receipts"
+        assert taxonomy.canonical_category("financial", "loans") == "loans"
         assert taxonomy.canonical_category("property", "mortgage") == "mortgage"
         assert taxonomy.canonical_category("property", "properties") == "properties"
         assert taxonomy.canonical_category("medical", "dental") == "dental"
@@ -152,7 +152,7 @@ class TestHouseholdTaxonomy:
         assert categories == sorted(categories)
         assert "banking" in categories
         assert "taxes" in categories
-        assert "receipts" in categories
+        assert "loans" in categories
         # Spot-check domains
         career_categories = taxonomy.categories_for_domain("career")
         assert "applications" in career_categories

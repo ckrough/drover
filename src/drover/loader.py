@@ -177,9 +177,7 @@ class DocumentLoader:
         """
         texts = []
         for page_elements in pages:
-            page_text = "\n".join(
-                str(el) for el in page_elements if str(el).strip()
-            )
+            page_text = "\n".join(str(el) for el in page_elements if str(el).strip())
             if page_text.strip():
                 texts.append(page_text)
         return "\n\n".join(texts)

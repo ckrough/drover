@@ -137,7 +137,7 @@ class DocumentClassifier:
         taxonomy: BaseTaxonomy,
         taxonomy_mode: TaxonomyMode = TaxonomyMode.FALLBACK,
         template_path: Path | None = None,
-        temperature: float = 0.0,
+        temperature: float = 0.1,
         max_tokens: int | None = 1000,
         timeout: int = 60,
         max_retries: int = 3,
@@ -324,48 +324,67 @@ class DocumentClassifier:
         return normalized, debug_info
 
     def _parse_response(self, response: str) -> dict:
-        """Parse LLM response as JSON.
+        """Parse LLM response as JSON with field validation.
 
         Args:
             response: Raw LLM response text.
 
         Returns:
-            Parsed JSON dictionary.
+            Parsed JSON dictionary with all required fields.
 
         Raises:
-            LLMParseError: If JSON parsing fails.
+            LLMParseError: If JSON parsing fails or required fields missing.
         """
         response = response.strip()
+        parsed = None
 
         try:
-            return json.loads(response)
+            parsed = json.loads(response)
         except json.JSONDecodeError:
             pass
 
         # Handle template-style double-brace wrappers like `{{ ... }}`
-        if response.startswith("{{") and response.endswith("}}"):
+        if parsed is None and response.startswith("{{") and response.endswith("}}"):
             candidate = "{" + response[2:-2].strip() + "}"
             try:
-                return json.loads(candidate)
+                parsed = json.loads(candidate)
             except json.JSONDecodeError:
                 response = candidate
 
-        code_match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", response)
-        if code_match:
-            block = code_match.group(1).strip()
-            try:
-                return json.loads(block)
-            except json.JSONDecodeError:
-                pass
+        if parsed is None:
+            code_match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", response)
+            if code_match:
+                block = code_match.group(1).strip()
+                try:
+                    parsed = json.loads(block)
+                except json.JSONDecodeError:
+                    pass
 
-        candidate = self._extract_largest_json_object(response)
-        if candidate is not None:
-            try:
-                return json.loads(candidate)
-            except json.JSONDecodeError:
-                pass
+        if parsed is None:
+            candidate = self._extract_largest_json_object(response)
+            if candidate is not None:
+                try:
+                    parsed = json.loads(candidate)
+                except json.JSONDecodeError:
+                    pass
 
-        raise LLMParseError(f"Could not parse JSON from response: {response[:200]}...")
+        if parsed is None:
+            raise LLMParseError(f"Could not parse JSON from response: {response[:200]}...")
+
+        # Validate required fields
+        required_fields = {"domain", "category", "doctype", "vendor", "date", "subject"}
+        missing = required_fields - set(parsed.keys())
+        if missing:
+            raise LLMParseError(f"LLM response missing required fields: {missing}")
+
+        # Validate field types
+        for field in required_fields:
+            if not isinstance(parsed[field], str):
+                raise LLMParseError(
+                    f"Field '{field}' must be string, got {type(parsed[field]).__name__}"
+                )
+
+        return parsed
 
     def _extract_largest_json_object(self, text: str) -> str | None:
         """Extract the largest balanced JSON object substring from text.

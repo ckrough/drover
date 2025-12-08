@@ -42,8 +42,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "retirement",
             "taxes",
             "loans",
-            "receipts",
-            "statements",
             "other",
         },
         "property": {
