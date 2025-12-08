@@ -38,6 +38,23 @@ def configure_logging(
         force=True,
     )
 
+    # Suppress noisy third-party loggers (pdfminer, unstructured, etc.)
+    # pdfminer.six outputs verbose debug info (nexttoken, do_keyword, etc.)
+    noisy_loggers = [
+        "pdfminer",
+        "pdfminer.pdfpage",
+        "pdfminer.pdfinterp",
+        "pdfminer.converter",
+        "pdfminer.cmapdb",
+        "pdfminer.psparser",
+        "pdfminer.pdfdocument",
+        "pdfminer.pdfparser",
+        "unstructured",
+        "PIL",
+    ]
+    for logger_name in noisy_loggers:
+        logging.getLogger(logger_name).setLevel(logging.ERROR)
+
     # Build processor chain
     processors: list[structlog.types.Processor] = [
         structlog.contextvars.merge_contextvars,
