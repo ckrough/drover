@@ -56,3 +56,7 @@ Thumbs.db
 # project resources
 design/
 debug/
+
+# Evaluation framework
+eval/documents/
+eval/results/
