@@ -1,0 +1,92 @@
+# Example Experiment Manifest
+# Copy this file and customize for your evaluation runs.
+#
+# Usage:
+#   python scripts/eval_runner.py run eval/my_experiment.yaml
+#   python scripts/eval_runner.py report eval/results/my_experiment-*.jsonl
+
+name: "example-model-comparison"
+description: "Example experiment comparing models on test documents"
+
+# Models to test - each document will be classified by each model
+models:
+  - provider: ollama
+    model: llama3.2:latest
+  # - provider: openai
+  #   model: gpt-4o-mini
+  # - provider: anthropic
+  #   model: claude-sonnet-4-20250514
+
+# Shared configuration applied to all runs (optional)
+# These override drover defaults but can be further overridden per-model if needed
+config:
+  taxonomy: household
+  taxonomy_mode: fallback
+  sample_strategy: adaptive
+  max_pages: 10
+  # prompt: path/to/custom-prompt.md  # Custom prompt template (optional)
+
+# Test documents with ground truth labels
+# Place your test documents in eval/documents/ and reference them here
+documents:
+  # Example entry - uncomment and modify for your documents:
+  #
+  # - path: eval/documents/invoice-acme-2024.pdf
+  #   expected:
+  #     domain: financial
+  #     category: bills
+  #     doctype: invoice
+  #     vendor: acme-corp
+  #     date: "20240115"
+  #     subject: office-supplies
+  #
+  # - path: eval/documents/medical-statement.pdf
+  #   expected:
+  #     domain: medical
+  #     category: billing
+  #     doctype: statement
+  #     vendor: kaiser-permanente
+  #     date: "20240201"
+  #     subject: annual-physical
+
+  # Sample test documents
+  - path: eval/samples/invoice.pdf
+    expected:
+      domain: financial
+      category: records
+      doctype: invoice
+      vendor: "TechServices Inc."
+      date: "20241115"
+      subject: "cloud infrastructure consulting"
+  - path: eval/samples/medical_bill.pdf
+    expected:
+      domain: medical
+      category: billing
+      doctype: invoice
+      vendor: "Northern Virginia Medical Center"
+      date: "20241101"
+      subject: "Medical Services"
+  - path: eval/samples/consulting_plan.pdf
+    expected:
+      domain: career
+      category: consulting
+      doctype: documentation
+      vendor: none
+      date: "20241205"
+      subject: "consulting plan"
+  - path: eval/samples/receipt.pdf
+    expected:
+      domain: financial
+      category: banking
+      doctype: receipt
+      vendor: "PetSmart"
+      date: "20241208"
+      subject: "pet supplies"
+  - path: eval/samples/user_manual.pdf
+    expected:
+      domain: household
+      category: other
+      doctype: manual
+      vendor: smarthub
+      date: "202409"
+      subject: "SmartHub 3000"
