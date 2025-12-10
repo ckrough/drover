@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Drover is a document classification CLI that uses LLMs to analyze documents and suggest organized filesystem paths. It supports multiple AI providers (Ollama, OpenAI, Anthropic) through LangChain.
+Drover is a document classification CLI that uses LLMs to analyze documents and suggest organized filesystem paths. It supports multiple AI providers (Ollama, OpenAI, Anthropic, OpenRouter) through LangChain.
 
 ## Python Environment Setup
 
@@ -147,8 +147,9 @@ def test_parse_response_direct_json() -> None:
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `DROVER_AI_PROVIDER` | AI provider (ollama, openai, anthropic) | `ollama` |
+| `DROVER_AI_PROVIDER` | AI provider (ollama, openai, anthropic, openrouter) | `ollama` |
 | `DROVER_AI_MODEL` | Model name | `llama3.2:latest` |
+| `OPENROUTER_API_KEY` | API key for OpenRouter (required when provider=openrouter) | `sk-or-...` |
 | `DROVER_TAXONOMY` | Taxonomy to use | `household` |
 | `DROVER_TAXONOMY_MODE` | Validation mode (strict, fallback) | `fallback` |
 | `DROVER_NAMING_STYLE` | Naming policy | `nara` |

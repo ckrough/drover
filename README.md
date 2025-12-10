@@ -13,8 +13,12 @@ pip install -e ".[dev]"
 ## Usage
 
 ```bash
-# Classify a single document
+# Classify a single document (using local Ollama)
 drover classify document.pdf --ai-provider ollama --ai-model llama3.1:latest
+
+# Using OpenRouter (requires OPENROUTER_API_KEY env var)
+export OPENROUTER_API_KEY="sk-or-..."
+drover classify document.pdf --ai-provider openrouter --ai-model anthropic/claude-3.5-sonnet
 
 # Batch processing
 drover classify *.pdf --batch

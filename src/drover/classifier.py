@@ -5,6 +5,7 @@ Integrates with LangChain to classify documents using various AI providers
 """
 
 import json
+import os
 import re
 from collections.abc import Callable
 from importlib.resources import files
@@ -243,6 +244,24 @@ class DocumentClassifier:
                     temperature=self.temperature,
                     max_tokens=self.max_tokens,
                     timeout=float(self.timeout),
+                )
+            case AIProvider.OPENROUTER:
+                # OpenRouter needs explicit API key since we override base_url;
+                # LangChain only auto-reads OPENAI_API_KEY for default endpoints
+                api_key = os.environ.get("OPENROUTER_API_KEY")
+                if not api_key:
+                    raise ValueError(
+                        "OPENROUTER_API_KEY environment variable must be set "
+                        "when using the 'openrouter' provider"
+                    )
+                self._llm = ChatOpenAI(
+                    model=self.model,
+                    base_url="https://openrouter.ai/api/v1",
+                    api_key=api_key,
+                    temperature=self.temperature,
+                    max_tokens=self.max_tokens,
+                    timeout=self.timeout,
+                    model_kwargs={"response_format": {"type": "json_object"}},
                 )
             case _:
                 raise ValueError(f"Unsupported provider: {self.provider}")

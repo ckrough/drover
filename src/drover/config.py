@@ -24,6 +24,7 @@ class AIProvider(StrEnum):
     OLLAMA = "ollama"
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
+    OPENROUTER = "openrouter"
 
 
 class TaxonomyMode(StrEnum):

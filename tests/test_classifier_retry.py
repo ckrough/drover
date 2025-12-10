@@ -1,5 +1,6 @@
 """Tests for retry logic in DocumentClassifier."""
 
+import os
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -171,3 +172,47 @@ class TestInvokeWithRetry:
 
         # Should only try once since ValueError is not retryable
         assert mock_llm.ainvoke.call_count == 1
+
+
+class TestOpenRouterProvider:
+    """Tests for OpenRouter provider initialization."""
+
+    def test_openrouter_requires_api_key(self) -> None:
+        """OpenRouter provider should fail if OPENROUTER_API_KEY is not set."""
+        # Ensure env var is not set
+        old_key = os.environ.pop("OPENROUTER_API_KEY", None)
+        try:
+            classifier = _make_classifier(
+                provider=AIProvider.OPENROUTER,
+                model="anthropic/claude-3.5-sonnet",
+            )
+
+            with pytest.raises(ValueError, match="OPENROUTER_API_KEY"):
+                classifier._get_llm()
+        finally:
+            # Restore env var if it was set
+            if old_key is not None:
+                os.environ["OPENROUTER_API_KEY"] = old_key
+
+    def test_openrouter_with_api_key_creates_llm(self) -> None:
+        """OpenRouter provider should create LLM when API key is set."""
+        old_key = os.environ.get("OPENROUTER_API_KEY")
+        try:
+            os.environ["OPENROUTER_API_KEY"] = "test-key"
+            classifier = _make_classifier(
+                provider=AIProvider.OPENROUTER,
+                model="anthropic/claude-3.5-sonnet",
+            )
+
+            llm = classifier._get_llm()
+
+            # Verify it's a ChatOpenAI instance with correct base_url
+            from langchain_openai import ChatOpenAI
+
+            assert isinstance(llm, ChatOpenAI)
+        finally:
+            # Restore original env var state
+            if old_key is not None:
+                os.environ["OPENROUTER_API_KEY"] = old_key
+            else:
+                os.environ.pop("OPENROUTER_API_KEY", None)
