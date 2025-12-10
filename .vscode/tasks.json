@@ -1,0 +1,34 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Eval: workbench-tuning",
+      "type": "shell",
+      "command": "source .venv/bin/activate && python scripts/eval_runner.py run eval/workbench-tuning.yaml -v",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Eval Report",
+      "type": "shell",
+      "command": "source .venv/bin/activate && python scripts/eval_runner.py report ${input:reportPath}",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "reportPath",
+      "type": "promptString",
+      "description": "Path to eval results file or directory"
+    }
+  ]
+}
