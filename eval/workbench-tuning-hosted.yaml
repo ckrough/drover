@@ -14,12 +14,16 @@ description: "Classification experiment using Anthropic Claude Sonnet 4.5 for Wo
 models:
   - provider: anthropic
     model: claude-sonnet-4-5-20250929
-  - provider: ollama
-    model: llama3.2:latest
-  - provider: ollama
-    model: deepseek-r1:1.5b
-  - provider: ollama
-    model: qwen3:latest
+  - provider: anthropic
+    model: claude-haiku-4-5-20251001
+  - provider: anthropic
+    model: claude-opus-4-5-20251101
+  - provider: openrouter
+    model: x-ai/grok-4.1-fast
+  - provider: openrouter
+    model: google/gemini-2.5-flash
+  - provider: openrouter
+    model: openai/gpt-oss-120b
 
 # Configuration - enables debug output for Workbench
 config:
@@ -36,34 +40,34 @@ documents:
     expected:
       domain: medical
       category: expense
-      doctype: invoice
+      doctype: statement
       vendor: "Northern Virginia Medical Center"
-      date: "20241101"
-      subject: "Medical Services"
+      date: "20241022"
+      subject: "office visit lab tests"
 
   - path: eval/samples/consulting_plan.pdf
     expected:
       domain: career
       category: consulting
-      doctype: documentation
+      doctype: plan
       vendor: none
       date: "20241205"
-      subject: "consulting plan"
+      subject: "consultancy business launch"
 
   - path: eval/samples/receipt.pdf
     expected:
-      domain: financial
-      category: banking
+      domain: pets
+      category: expense
       doctype: receipt
       vendor: "PetSmart"
       date: "20241208"
-      subject: "pet supplies"
+      subject: "dog food and supplies"
 
   - path: eval/samples/user_manual.pdf
     expected:
       domain: household
-      category: other
+      category: home_network
       doctype: manual
-      vendor: smarthub
-      date: "202409"
+      vendor: SmartHub
+      date: "20240901"
       subject: "SmartHub 3000"
