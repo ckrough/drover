@@ -1,0 +1,69 @@
+# Anthropic Workbench Experiment Manifest
+# This experiment runs classification tests using Claude Sonnet 4.5
+# and captures debug outputs (prompts/responses) for Workbench analysis.
+#
+# Usage:
+#   export ANTHROPIC_API_KEY="your-key-here"
+#   python scripts/eval_runner.py run eval/workbench-tuning.yaml -v
+#   python scripts/eval_runner.py report eval/results/anthropic-workbench-tuning-*.jsonl
+
+name: "anthropic-workbench-tuning"
+description: "Classification experiment using Anthropic Claude Sonnet 4.5 for Workbench analysis"
+
+# Model to test
+models:
+  - provider: anthropic
+    model: claude-sonnet-4-5-20250929
+  - provider: ollama
+    model: llama3.2:latest
+  - provider: ollama
+    model: deepseek-r1:1.5b
+  - provider: ollama
+    model: qwen3:latest
+
+# Configuration - enables debug output for Workbench
+config:
+  taxonomy: household
+  taxonomy_mode: fallback
+  sample_strategy: adaptive
+  max_pages: 10
+  capture_debug: true
+  debug_dir: eval/results/debug
+
+# Test documents with ground truth labels
+documents:
+  - path: eval/samples/medical_bill.pdf
+    expected:
+      domain: medical
+      category: expense
+      doctype: invoice
+      vendor: "Northern Virginia Medical Center"
+      date: "20241101"
+      subject: "Medical Services"
+
+  - path: eval/samples/consulting_plan.pdf
+    expected:
+      domain: career
+      category: consulting
+      doctype: documentation
+      vendor: none
+      date: "20241205"
+      subject: "consulting plan"
+
+  - path: eval/samples/receipt.pdf
+    expected:
+      domain: financial
+      category: banking
+      doctype: receipt
+      vendor: "PetSmart"
+      date: "20241208"
+      subject: "pet supplies"
+
+  - path: eval/samples/user_manual.pdf
+    expected:
+      domain: household
+      category: other
+      doctype: manual
+      vendor: smarthub
+      date: "202409"
+      subject: "SmartHub 3000"
