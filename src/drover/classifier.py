@@ -377,6 +377,13 @@ class DocumentClassifier:
             LLMParseError: If JSON parsing fails or required fields missing.
         """
         response = response.strip()
+
+        # Handle chain-of-thought format with <classification_analysis> tags
+        # The JSON object follows the closing tag
+        close_tag = "</classification_analysis>"
+        if close_tag in response:
+            response = response.split(close_tag, 1)[1].strip()
+
         parsed = None
 
         try:

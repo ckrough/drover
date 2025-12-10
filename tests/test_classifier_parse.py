@@ -79,3 +79,41 @@ def test_parse_response_double_brace_wrapper() -> None:
 
     assert result["domain"] == "financial"
     assert result["category"] == "banking"
+
+
+def test_parse_response_classification_analysis_tags() -> None:
+    """LLM produces chain-of-thought inside <classification_analysis> tags."""
+    classifier = _make_classifier()
+    payload = """<classification_analysis>
+## Step 1: Extract Key Information
+
+- **Organizations:** "First National Bank"
+- **Dates:** "Statement Date: January 15, 2025"
+- **Document structure:** Bank statement format
+
+## Step 2: Evaluate Dates by Priority
+
+The statement date January 15, 2025 is Priority 2.
+Converting: January = 01, 15, 2025 → 20250115
+
+## Step 3-7: Additional analysis...
+
+Final verification complete.
+</classification_analysis>
+{
+  "domain": "financial",
+  "category": "banking",
+  "doctype": "statement",
+  "vendor": "First National Bank",
+  "date": "20250115",
+  "subject": "account summary"
+}"""
+
+    result = classifier._parse_response(payload)
+
+    assert result["domain"] == "financial"
+    assert result["category"] == "banking"
+    assert result["doctype"] == "statement"
+    assert result["vendor"] == "First National Bank"
+    assert result["date"] == "20250115"
+    assert result["subject"] == "account summary"

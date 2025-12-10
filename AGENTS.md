@@ -12,7 +12,7 @@ Drover is a document classification CLI that uses LLMs to analyze documents and 
 - **ALWAYS** use the `.venv` virtual environment in the project root
 - **NEVER** install packages globally with pip
 - Activate before any Python operations: `source .venv/bin/activate`
-- If `.venv` doesn't exist, run: `./scripts/setup-venv.sh`
+- If `.venv` doesn't exist, run: `venv-setup --non-interactive`
 
 ### Python Version
 - Use Python 3.13+ for all new projects

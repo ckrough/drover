@@ -9,16 +9,22 @@ from drover.models import (
 
 
 def test_classification_result_success():
-    """Test creating a successful classification result."""
+    """Test creating a successful classification result.
+
+    Example shows functional-domain-first principle: pet supply receipt
+    goes to pets/expenses domain, not financial domain.
+    """
     result = ClassificationResult(
         original="receipt.pdf",
-        suggested_path="financial/shopping/receipt/receipt-acme-groceries-20250601.pdf",
-        domain="financial",
-        category="shopping",
+        suggested_path=(
+            "pets/expenses/receipt/receipt-petsmart-food_supplies-20250601.pdf"
+        ),
+        domain="pets",
+        category="expenses",
         doctype="receipt",
-        vendor="acme",
+        vendor="petsmart",
         date="20250601",
-        subject="groceries",
+        subject="food supplies",
     )
     assert result.error is False
     assert result.error_code is None

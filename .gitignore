@@ -54,7 +54,6 @@ tmp/
 Thumbs.db
 
 # project resources
-design/
 debug/
 
 # Evaluation framework
