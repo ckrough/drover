@@ -81,10 +81,20 @@ class SharedConfig(BaseModel):
     sample_strategy: SampleStrategy = SampleStrategy.ADAPTIVE
     max_pages: int = 10
     prompt: Path | None = None
+    capture_debug: bool = False
+    debug_dir: Path | None = None
 
     @field_validator("prompt", mode="before")
     @classmethod
     def expand_prompt_path(cls, v: str | Path | None) -> Path | None:
+        """Convert string to Path and expand user."""
+        if v is None:
+            return None
+        return Path(v).expanduser()
+
+    @field_validator("debug_dir", mode="before")
+    @classmethod
+    def expand_debug_dir_path(cls, v: str | Path | None) -> Path | None:
         """Convert string to Path and expand user."""
         if v is None:
             return None
@@ -174,6 +184,8 @@ async def run_single_classification(
         sample_strategy=shared_config.sample_strategy,
         max_pages=shared_config.max_pages,
         prompt=shared_config.prompt,
+        capture_debug=shared_config.capture_debug,
+        debug_dir=shared_config.debug_dir,
     )
 
     service = ClassificationService(config)
