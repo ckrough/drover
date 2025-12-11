@@ -34,6 +34,8 @@ pip install -e .
 
 ```
 src/drover/
+├── __init__.py         # Package init, version definition
+├── __main__.py         # Entry point for python -m drover
 ├── cli.py              # Entry point, Click commands
 ├── config.py           # Configuration management (Pydantic models)
 ├── loader.py           # DocumentLoader - text extraction from documents
@@ -43,6 +45,7 @@ src/drover/
 ├── service.py          # High-level service orchestration
 ├── metrics.py          # Classification metrics tracking
 ├── sampling.py         # Page sampling strategies
+├── logging.py          # Structured logging configuration (structlog)
 ├── prompts/            # Prompt templates (classification.md)
 ├── taxonomy/           # Taxonomy plugin system
 │   ├── base.py         # BaseTaxonomy abstract class
@@ -145,16 +148,23 @@ def test_parse_response_direct_json() -> None:
 
 ## Environment Variables
 
-| Variable | Description | Example |
+| Variable | Description | Default |
 |----------|-------------|---------|
 | `DROVER_AI_PROVIDER` | AI provider (ollama, openai, anthropic, openrouter) | `ollama` |
 | `DROVER_AI_MODEL` | Model name | `llama3.2:latest` |
-| `OPENROUTER_API_KEY` | API key for OpenRouter (required when provider=openrouter) | `sk-or-...` |
+| `DROVER_AI_TEMPERATURE` | LLM temperature (0.0-2.0) | `0.0` |
+| `DROVER_AI_MAX_TOKENS` | Maximum tokens in LLM response | `1000` |
+| `DROVER_AI_TIMEOUT` | Request timeout in seconds | `60` |
+| `DROVER_AI_MAX_RETRIES` | Maximum retry attempts | `3` |
+| `DROVER_AI_RETRY_MIN_WAIT` | Minimum wait between retries (seconds) | `2.0` |
+| `DROVER_AI_RETRY_MAX_WAIT` | Maximum wait between retries (seconds) | `10.0` |
+| `OPENROUTER_API_KEY` | API key for OpenRouter (required when provider=openrouter) | — |
 | `DROVER_TAXONOMY` | Taxonomy to use | `household` |
 | `DROVER_TAXONOMY_MODE` | Validation mode (strict, fallback) | `fallback` |
 | `DROVER_NAMING_STYLE` | Naming policy | `nara` |
 | `DROVER_SAMPLE_STRATEGY` | Page sampling strategy | `adaptive` |
 | `DROVER_MAX_PAGES` | Max pages to sample | `10` |
+| `DROVER_PROMPT` | Custom prompt template file path | — |
 | `DROVER_LOG_LEVEL` | Logging (quiet, verbose, debug) | `quiet` |
 | `DROVER_ON_ERROR` | Error handling (fail, continue, skip) | `fail` |
 | `DROVER_CONCURRENCY` | Parallel processing | `1` |
