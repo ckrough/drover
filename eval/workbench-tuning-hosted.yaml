@@ -50,7 +50,7 @@ documents:
       domain: career
       category: consulting
       doctype: plan
-      vendor: none
+      vendor: unknown
       date: "20241205"
       subject: "consultancy business launch"
 
@@ -68,6 +68,6 @@ documents:
       domain: household
       category: home_network
       doctype: manual
-      vendor: SmartHub
+      vendor: unknown
       date: "20240901"
       subject: "SmartHub 3000"

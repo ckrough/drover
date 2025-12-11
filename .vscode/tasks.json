@@ -2,9 +2,9 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Run Eval: workbench-tuning",
+      "label": "Run Eval: prompt-tuning",
       "type": "shell",
-      "command": "source .venv/bin/activate && python scripts/eval_runner.py run eval/workbench-tuning.yaml -v",
+      "command": "source .venv/bin/activate && python scripts/eval_runner.py run ${input:testSpec} -v",
       "group": "test",
       "presentation": {
         "reveal": "always",
@@ -29,6 +29,11 @@
       "id": "reportPath",
       "type": "promptString",
       "description": "Path to eval results file or directory"
+    },
+    {
+      "id": "testSpec",
+      "type": "promptString",
+      "description": "Path to test configuration file"
     }
   ]
 }
