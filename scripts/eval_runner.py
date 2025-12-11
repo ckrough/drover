@@ -80,6 +80,7 @@ class SharedConfig(BaseModel):
     taxonomy_mode: TaxonomyMode = TaxonomyMode.FALLBACK
     sample_strategy: SampleStrategy = SampleStrategy.ADAPTIVE
     max_pages: int = 10
+    max_tokens: int = 4000
     prompt: Path | None = None
     capture_debug: bool = False
     debug_dir: Path | None = None
@@ -178,6 +179,7 @@ async def run_single_classification(
         ai=AIConfig(
             provider=model_config.provider,
             model=model_config.model,
+            max_tokens=shared_config.max_tokens,
         ),
         taxonomy=shared_config.taxonomy,
         taxonomy_mode=shared_config.taxonomy_mode,

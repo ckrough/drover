@@ -209,6 +209,8 @@ class DroverConfig(BaseModel):
             data["ai"]["provider"] = kwargs.pop("ai_provider")
         if "ai_model" in kwargs and kwargs["ai_model"] is not None:
             data["ai"]["model"] = kwargs.pop("ai_model")
+        if "ai_max_tokens" in kwargs and kwargs["ai_max_tokens"] is not None:
+            data["ai"]["max_tokens"] = kwargs.pop("ai_max_tokens")
 
         for key, value in kwargs.items():
             if value is not None and key in data:

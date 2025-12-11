@@ -50,6 +50,11 @@ def main() -> None:
     help="Model name for the AI provider.",
 )
 @click.option(
+    "--ai-max-tokens",
+    type=int,
+    help="Maximum tokens in LLM response (default: 1000).",
+)
+@click.option(
     "--taxonomy",
     "taxonomy_name",
     help="Taxonomy to use for classification.",
@@ -120,6 +125,7 @@ def classify(
     config_path: Path | None,
     ai_provider: str | None,
     ai_model: str | None,
+    ai_max_tokens: int | None,
     taxonomy_name: str | None,
     taxonomy_mode: str | None,
     naming_style: str | None,
@@ -145,6 +151,7 @@ def classify(
     config = config.with_overrides(
         ai_provider=ai_provider,
         ai_model=ai_model,
+        ai_max_tokens=ai_max_tokens,
         taxonomy=taxonomy_name,
         taxonomy_mode=taxonomy_mode,
         naming_style=naming_style,
