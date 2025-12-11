@@ -4,11 +4,12 @@ version = "0.1.0"
 description = "Document classification CLI that classifies files into organized folder structures"
 readme = "README.md"
 requires-python = ">=3.13"
-license = {text = "MIT"}
+license = { text = "MIT" }
 dependencies = [
     "langchain>=0.3",
     "langchain-openai>=0.2",
     "langchain-ollama>=0.2",
+    "langchain-anthropic>=0.2",
     "click>=8.1",
     "pydantic>=2.0",
     "pyyaml>=6.0",
@@ -18,10 +19,6 @@ dependencies = [
     "structlog>=24.0",
 ]
 
-[project.optional-dependencies]
-anthropic = [
-    "langchain-anthropic>=0.2",
-]
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.24",
@@ -59,4 +56,4 @@ disallow_untyped_defs = false
 
 [tool.bandit]
 exclude_dirs = ["tests", ".venv"]
-skips = ["B101"]  # Skip assert warnings (used in tests)
+skips = ["B101"]                  # Skip assert warnings (used in tests)
