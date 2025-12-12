@@ -6,7 +6,16 @@ sampling strategies for handling large documents efficiently.
 
 import asyncio
 import mimetypes
+import os
 from pathlib import Path
+
+# Disable unstructured telemetry and auto-downloads BEFORE importing the library.
+# This prevents network calls to packages.unstructured.io (Scarf analytics)
+# and NLTK data servers. Both DO_NOT_TRACK and SCARF_NO_ANALYTICS are required
+# to fully disable telemetry. See: https://github.com/Unstructured-IO/unstructured/issues/3459
+os.environ.setdefault("DO_NOT_TRACK", "true")
+os.environ.setdefault("SCARF_NO_ANALYTICS", "true")
+os.environ.setdefault("AUTO_DOWNLOAD_NLTK", "false")
 
 from pydantic import BaseModel, Field
 from unstructured.partition.auto import partition
