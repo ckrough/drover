@@ -78,6 +78,7 @@ class PathBuilder:
         return ClassificationResult(
             original=original_path.name,
             suggested_path=suggested_path,
+            suggested_filename=filename,
             domain=classification.domain,
             category=classification.category,
             doctype=classification.doctype,

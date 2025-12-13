@@ -24,6 +24,7 @@ class ClassificationResult(BaseModel):
 
     original: str = Field(description="Original filename")
     suggested_path: str = Field(description="Suggested file path")
+    suggested_filename: str = Field(description="Suggested filename only")
     domain: str = Field(description="Top-level domain (e.g., financial, medical)")
     category: str = Field(description="Category within domain (e.g., banking, tax)")
     doctype: str = Field(description="Document type (e.g., statement, receipt)")
