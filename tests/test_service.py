@@ -60,6 +60,7 @@ async def test_debug_dir_writes_files(tmp_path: Path, monkeypatch: pytest.Monkey
             ClassificationResult(
                 original="doc.txt",
                 suggested_path=str(doc_path),
+                suggested_filename="statement-vendor-subject-20250101.txt",
                 domain="financial",
                 category="banking",
                 doctype="statement",

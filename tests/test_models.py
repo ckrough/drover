@@ -19,6 +19,7 @@ def test_classification_result_success():
         suggested_path=(
             "pets/expenses/receipt/receipt-petsmart-food_supplies-20250601.pdf"
         ),
+        suggested_filename="receipt-petsmart-food_supplies-20250601.pdf",
         domain="pets",
         category="expenses",
         doctype="receipt",
