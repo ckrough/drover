@@ -17,6 +17,7 @@ dependencies = [
     "rich>=13.0",
     "tenacity>=8.2",
     "structlog>=24.0",
+    "xattr>=1.0.0",
 ]
 
 [project.optional-dependencies]
