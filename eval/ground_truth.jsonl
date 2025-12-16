@@ -1,0 +1,16 @@
+# Ground Truth Dataset for Classification Evaluation
+# Format: One JSON object per line (JSONL)
+# Required fields: filename, domain, category, doctype
+# Optional fields: vendor, date, subject, notes
+#
+# Instructions:
+# 1. Place test documents in eval/documents/
+# 2. Add corresponding entries here with expected classifications
+# 3. Run: drover eval --ground-truth eval/ground_truth.jsonl
+#
+# Example entries (remove or replace with your own):
+{"filename": "sample_bank_statement.pdf", "domain": "financial", "category": "banking", "doctype": "statement", "vendor": "Chase", "date": "20250101", "notes": "Monthly checking account statement"}
+{"filename": "sample_electric_bill.pdf", "domain": "financial", "category": "utilities", "doctype": "bill", "vendor": "Pacific Gas & Electric", "date": "20250115", "notes": "Monthly electric bill"}
+{"filename": "sample_tax_w2.pdf", "domain": "financial", "category": "tax", "doctype": "form", "vendor": "Internal Revenue Service", "date": "20250131", "notes": "W-2 wage statement"}
+{"filename": "sample_insurance_policy.pdf", "domain": "legal", "category": "insurance", "doctype": "policy", "vendor": "State Farm", "notes": "Auto insurance policy declaration"}
+{"filename": "sample_medical_receipt.pdf", "domain": "medical", "category": "billing", "doctype": "receipt", "vendor": "Kaiser Permanente", "date": "20250105", "notes": "Copay receipt for doctor visit"}

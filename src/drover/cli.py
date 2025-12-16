@@ -478,5 +478,167 @@ def _output_tag_result(result: ActionPlan | ActionResult, log_level: LogLevel) -
             console.print(f"[blue]○[/blue] Would tag {result.file.name}: {result.description}")
 
 
+@main.command()
+@click.option(
+    "--ground-truth",
+    "ground_truth_path",
+    required=True,
+    type=click.Path(exists=True, path_type=Path),
+    help="Path to ground truth JSONL file.",
+)
+@click.option(
+    "--documents-dir",
+    type=click.Path(exists=True, path_type=Path),
+    help="Directory containing test documents. Defaults to ground_truth_dir/documents.",
+)
+@click.option(
+    "--config",
+    "config_path",
+    type=click.Path(exists=True, path_type=Path),
+    help="Path to configuration file.",
+)
+@click.option(
+    "--ai-provider",
+    type=click.Choice([p.value for p in AIProvider]),
+    help="AI provider to use for classification.",
+)
+@click.option(
+    "--ai-model",
+    help="Model name for the AI provider.",
+)
+@click.option(
+    "--taxonomy",
+    "taxonomy_name",
+    help="Taxonomy to use for classification.",
+)
+@click.option(
+    "--output",
+    "output_format",
+    type=click.Choice(["summary", "json"]),
+    default="summary",
+    help="Output format (default: summary).",
+)
+@click.option(
+    "--log",
+    type=click.Choice([level.value for level in LogLevel]),
+    default="quiet",
+    help="Logging verbosity.",
+)
+def evaluate(
+    ground_truth_path: Path,
+    documents_dir: Path | None,
+    config_path: Path | None,
+    ai_provider: str | None,
+    ai_model: str | None,
+    taxonomy_name: str | None,
+    output_format: str,
+    log: str,
+) -> None:
+    """Evaluate classification accuracy against ground truth.
+
+    Runs classification on test documents and compares results to
+    expected values in the ground truth file. Outputs accuracy metrics
+    for domain, category, and doctype classification.
+
+    Example:
+
+        drover evaluate --ground-truth eval/ground_truth.jsonl --ai-model gpt-4o
+    """
+    exit_code = asyncio.run(
+        _evaluate_async(
+            ground_truth_path=ground_truth_path,
+            documents_dir=documents_dir,
+            config_path=config_path,
+            ai_provider=ai_provider,
+            ai_model=ai_model,
+            taxonomy_name=taxonomy_name,
+            output_format=output_format,
+            log=LogLevel(log),
+        )
+    )
+    sys.exit(exit_code)
+
+
+async def _evaluate_async(
+    ground_truth_path: Path,
+    documents_dir: Path | None,
+    config_path: Path | None,
+    ai_provider: str | None,
+    ai_model: str | None,
+    taxonomy_name: str | None,
+    output_format: str,
+    log: LogLevel,
+) -> int:
+    """Async implementation of evaluate command."""
+    from drover.classifier import DocumentClassifier
+    from drover.evaluation import ClassificationEvaluator
+    from drover.loader import DocumentLoader
+    from drover.taxonomy.loader import get_taxonomy
+
+    configure_logging(log)
+
+    try:
+        config = DroverConfig.load(config_path)
+    except Exception as e:
+        if log != LogLevel.QUIET:
+            console.print(f"[red]Configuration error: {e}[/red]")
+        return 2
+
+    # Apply CLI overrides
+    provider = AIProvider(ai_provider) if ai_provider else config.ai.provider
+    model = ai_model or config.ai.model
+    taxonomy_key = taxonomy_name or config.taxonomy
+
+    if log != LogLevel.QUIET:
+        console.print(f"[blue]Evaluating with {provider.value}/{model}...[/blue]")
+
+    try:
+        taxonomy = get_taxonomy(taxonomy_key)
+    except ValueError as e:
+        if log != LogLevel.QUIET:
+            console.print(f"[red]Taxonomy error: {e}[/red]")
+        return 2
+
+    classifier = DocumentClassifier(
+        provider=provider,
+        model=model,
+        taxonomy=taxonomy,
+        taxonomy_mode=config.taxonomy_mode,
+        temperature=config.ai.temperature,
+        max_tokens=config.ai.max_tokens,
+        timeout=config.ai.timeout,
+        max_retries=config.ai.max_retries,
+        retry_min_wait=config.ai.retry_min_wait,
+        retry_max_wait=config.ai.retry_max_wait,
+    )
+
+    loader = DocumentLoader(
+        sample_strategy=config.sample_strategy,
+        max_pages=config.max_pages,
+    )
+
+    try:
+        evaluator = ClassificationEvaluator(
+            ground_truth_path=ground_truth_path,
+            documents_dir=documents_dir,
+        )
+    except FileNotFoundError as e:
+        if log != LogLevel.QUIET:
+            console.print(f"[red]{e}[/red]")
+        return 1
+
+    results = await evaluator.evaluate(classifier, loader=loader)
+
+    if output_format == "json":
+        click.echo(json.dumps(results.to_dict(), indent=2))
+    else:
+        console.print(results.summary())
+
+    # Return non-zero if accuracy is poor (useful for CI)
+    if results.domain_accuracy < 0.5:
+        return 1
+    return 0
+
+
 if __name__ == "__main__":
     main()
