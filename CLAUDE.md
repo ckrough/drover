@@ -32,16 +32,17 @@ pip install -e .
 src/drover/
 ├── __init__.py         # Package init, version definition
 ├── __main__.py         # Entry point for python -m drover
-├── cli.py              # Click CLI commands (classify, tag)
+├── cli.py              # Click CLI commands (classify, tag, evaluate)
 ├── config.py           # Configuration management (Pydantic models)
 ├── loader.py           # DocumentLoader - text extraction from documents
-├── classifier.py       # LLM-based DocumentClassifier
+├── classifier.py       # LLM-based DocumentClassifier (uses structured output)
 ├── path_builder.py     # PathBuilder - generates organized paths
 ├── models.py           # Data models (RawClassification, ClassificationResult)
 ├── service.py          # High-level service orchestration
-├── metrics.py          # Classification metrics tracking
+├── metrics.py          # Classification metrics tracking (incl. cache metrics)
 ├── sampling.py         # Page sampling strategies
 ├── logging.py          # Structured logging configuration (structlog)
+├── evaluation.py       # Classification evaluation framework
 ├── prompts/            # Prompt templates
 │   └── classification.md
 ├── taxonomy/           # Taxonomy plugin system
@@ -71,6 +72,9 @@ drover classify document.pdf --ai-provider ollama --ai-model llama3.2:latest
 drover tag document.pdf --dry-run
 drover tag document.pdf --tag-fields domain,category --tag-mode replace
 
+# Run CLI - evaluate command
+drover evaluate eval/ground_truth.jsonl --ai-model gpt-4o
+
 # Run all tests
 pytest
 
@@ -92,7 +96,7 @@ bandit -r src/ -f json --severity-level medium --confidence-level medium --quiet
 ### Core Pipeline Flow
 1. **CLI** (`cli.py`) → Entry point, orchestrates the pipeline
 2. **DocumentLoader** (`loader.py`) → Extracts text from documents with sampling strategies
-3. **DocumentClassifier** (`classifier.py`) → Sends content to LLM with taxonomy-constrained prompts
+3. **DocumentClassifier** (`classifier.py`) → Uses LangChain's `with_structured_output()` for reliable extraction
 4. **PathBuilder** (`path_builder.py`) → Generates `{domain}/{category}/{doctype}/{filename}` paths
 
 ### Plugin Systems
@@ -162,3 +166,13 @@ def test_parse_response_direct_json() -> None:
 5. **Config precedence:** CLI > config file > environment > defaults
 
 6. **Async:** ClassificationService is async. Use `pytest-asyncio` for tests.
+
+7. **Structured output:** Classifier uses `with_structured_output()` for reliable JSON extraction. Falls back to regex parsing if structured output fails.
+
+8. **Prompt caching:** Anthropic models use prompt caching for the taxonomy menu (~2000 tokens). Check `cache_read_input_tokens` in metrics.
+
+9. **Streaming:** Use `classify_streaming()` for real-time token output in interactive contexts.
+
+10. **Evaluation:** Use `drover evaluate` to measure accuracy against ground truth. See `evaluation.py` for the framework.
+
+11. **ADRs:** Architectural decisions are documented in `docs/adr/`.
