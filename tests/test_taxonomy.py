@@ -42,7 +42,7 @@ class TestHouseholdTaxonomy:
         assert taxonomy.canonical_domain("home") == "property"
         assert taxonomy.canonical_domain("health") == "medical"
         assert taxonomy.canonical_domain("healthcare") == "medical"
-        assert taxonomy.canonical_domain("car") == "vehicles"
+        assert taxonomy.canonical_domain("car") == "household"
         # housing domain aliases
         assert taxonomy.canonical_domain("real_estate") == "housing"
         assert taxonomy.canonical_domain("rental") == "housing"
@@ -62,7 +62,6 @@ class TestHouseholdTaxonomy:
         assert taxonomy.canonical_category("property", "improvement") == "improvement"
         assert taxonomy.canonical_category("medical", "primary_care") == "primary_care"
         assert taxonomy.canonical_category("legal", "identification") == "identification"
-        assert taxonomy.canonical_category("vehicles", "reference") == "reference"
         assert taxonomy.canonical_category("career", "application") == "application"
         assert taxonomy.canonical_category("food", "recipe") == "recipe"
         assert taxonomy.canonical_category("household", "maintenance") == "maintenance"
@@ -80,8 +79,8 @@ class TestHouseholdTaxonomy:
         assert taxonomy.canonical_category("career", "client") == "client"
         assert taxonomy.canonical_category("career", "meeting") == "meeting"
         # lifestyle domain aliases
-        assert taxonomy.canonical_category("lifestyle", "trip") == "trips"
-        assert taxonomy.canonical_category("lifestyle", "vacation") == "trips"
+        assert taxonomy.canonical_category("lifestyle", "trip") == "travel"
+        assert taxonomy.canonical_category("lifestyle", "vacation") == "travel"
         assert taxonomy.canonical_category("lifestyle", "travel_planning") == "planning"
 
     def test_canonical_category_unknown(self, taxonomy: HouseholdTaxonomy) -> None:
@@ -159,7 +158,6 @@ class TestHouseholdTaxonomy:
         assert "maintenance" in household_categories
         lifestyle_categories = taxonomy.categories_for_domain("lifestyle")
         assert "travel" in lifestyle_categories
-        assert "trips" in lifestyle_categories
         assert "planning" in lifestyle_categories
         pets_categories = taxonomy.categories_for_domain("pets")
         assert "medical" in pets_categories
