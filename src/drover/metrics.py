@@ -35,6 +35,13 @@ class AIMetrics(BaseModel):
     total_tokens: int = Field(default=0, description="Sum of input + output tokens")
     latency_ms: float = Field(default=0.0, description="Request latency in milliseconds")
     cost_usd: float | None = Field(default=None, description="Estimated cost in USD")
+    # Anthropic prompt caching metrics
+    cache_creation_input_tokens: int = Field(
+        default=0, description="Tokens written to cache (first request)"
+    )
+    cache_read_input_tokens: int = Field(
+        default=0, description="Tokens read from cache (subsequent requests)"
+    )
 
 
 class MetricsCallback(BaseCallbackHandler):
@@ -81,6 +88,12 @@ class MetricsCallback(BaseCallbackHandler):
                 self._metrics.total_tokens = (
                     self._metrics.input_tokens + self._metrics.output_tokens
                 )
+
+            # Anthropic prompt caching metrics (only present when caching is used)
+            self._metrics.cache_creation_input_tokens = token_usage.get(
+                "cache_creation_input_tokens", 0
+            )
+            self._metrics.cache_read_input_tokens = token_usage.get("cache_read_input_tokens", 0)
 
         self._metrics.cost_usd = self._calculate_cost()
 

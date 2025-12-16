@@ -5,15 +5,15 @@ import pytest
 
 from drover.classifier import DocumentClassifier
 from drover.config import AIProvider, TaxonomyMode
+from drover.models import RawClassification
 from drover.taxonomy.household import HouseholdTaxonomy
 
 
-class _StubLLM:
-    """Minimal async stub that records how it is invoked.
+class _StubStructuredLLM:
+    """Minimal async stub for structured output LLM that records invocations.
 
-    This avoids importing real LangChain LLMs while still verifying that
-    callbacks are passed via the runnable config instead of as a direct
-    keyword argument.
+    This simulates LangChain's with_structured_output() behavior by returning
+    a dict with 'raw', 'parsed', and 'parsing_error' keys.
     """
 
     def __init__(self) -> None:
@@ -26,7 +26,7 @@ class _StubLLM:
         self.last_config = config
         self.last_kwargs = kwargs
 
-        class _Response:
+        class _RawResponse:
             def __init__(self) -> None:
                 self.content = (
                     '{"domain": "financial", "category": "banking", '
@@ -34,7 +34,19 @@ class _StubLLM:
                     '"date": "20250101", "subject": "checking"}'
                 )
 
-        return _Response()
+        # Simulate structured output with include_raw=True
+        return {
+            "raw": _RawResponse(),
+            "parsed": RawClassification(
+                domain="financial",
+                category="banking",
+                doctype="statement",
+                vendor="Bank",
+                date="20250101",
+                subject="checking",
+            ),
+            "parsing_error": None,
+        }
 
 
 @pytest.mark.asyncio
@@ -54,8 +66,9 @@ async def test_classify_passes_callbacks_via_config(monkeypatch) -> None:
         taxonomy_mode=TaxonomyMode.FALLBACK,
     )
 
-    stub_llm = _StubLLM()
-    monkeypatch.setattr(classifier, "_get_llm", lambda: stub_llm)
+    stub_llm = _StubStructuredLLM()
+    # Mock the _get_structured_llm method since classify() now uses structured output
+    monkeypatch.setattr(classifier, "_get_structured_llm", lambda: stub_llm)
 
     classification, debug_info = await classifier.classify(
         "some document text", capture_debug=True, collect_metrics=True
@@ -67,6 +80,7 @@ async def test_classify_passes_callbacks_via_config(monkeypatch) -> None:
     assert debug_info is not None
     assert "metrics" in debug_info
 
+    # Verify callbacks were passed via config, not as kwargs
     assert stub_llm.last_config is not None
     assert "callbacks" in stub_llm.last_config
     assert stub_llm.last_kwargs == {}
