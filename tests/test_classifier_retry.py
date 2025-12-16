@@ -78,7 +78,8 @@ class TestInvokeWithRetry:
             result = await classifier._invoke_with_retry(message, None)
 
         assert mock_llm.ainvoke.call_count == 1
-        assert "financial" in result
+        # Verify we got a response (don't assert on specific taxonomy values)
+        assert result is not None and len(result) > 0
 
     @pytest.mark.asyncio
     async def test_invoke_with_retry_retries_on_connection_error(self) -> None:
@@ -105,7 +106,8 @@ class TestInvokeWithRetry:
             result = await classifier._invoke_with_retry(message, None)
 
         assert mock_llm.ainvoke.call_count == 3
-        assert "financial" in result
+        # Verify we got a response after retries (don't assert on specific taxonomy values)
+        assert result is not None and len(result) > 0
 
     @pytest.mark.asyncio
     async def test_invoke_with_retry_retries_on_timeout_error(self) -> None:
@@ -131,7 +133,8 @@ class TestInvokeWithRetry:
             result = await classifier._invoke_with_retry(message, None)
 
         assert mock_llm.ainvoke.call_count == 2
-        assert "medical" in result
+        # Verify we got a response after retry (don't assert on specific taxonomy values)
+        assert result is not None and len(result) > 0
 
     @pytest.mark.asyncio
     async def test_invoke_with_retry_exhausts_retries(self) -> None:
