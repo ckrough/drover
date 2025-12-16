@@ -40,6 +40,7 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "investment",
             "loan",
             "other",
+            "payment",
             "retirement",
             "tax",
         },
