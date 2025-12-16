@@ -132,6 +132,46 @@ drover tag --tag-mode replace document.pdf
 drover tag *.pdf --log-level verbose
 ```
 
+### `drover evaluate`
+
+Evaluate classification accuracy against ground truth data.
+
+```bash
+drover evaluate [OPTIONS] GROUND_TRUTH_PATH
+```
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--documents-dir PATH` | Directory containing test documents (default: `documents/` next to ground truth file) |
+| `--config PATH` | Configuration file path |
+| `--ai-provider {ollama,openai,anthropic,openrouter}` | AI provider |
+| `--ai-model MODEL` | Model name |
+| `--taxonomy NAME` | Taxonomy for classification |
+| `--output-format {summary,json}` | Output format (default: summary) |
+| `--log-level {quiet,verbose,debug}` | Logging verbosity |
+
+**Ground Truth Format (JSONL):**
+
+```jsonl
+{"filename": "bank_statement.pdf", "domain": "financial", "category": "banking", "doctype": "statement"}
+{"filename": "electric_bill.pdf", "domain": "utilities", "category": "electric", "doctype": "bill", "vendor": "pge"}
+```
+
+**Examples:**
+
+```bash
+# Run evaluation with summary output
+drover evaluate eval/ground_truth.jsonl
+
+# Compare models with JSON output
+drover evaluate eval/ground_truth.jsonl --ai-model gpt-4o --output-format json
+
+# Specify documents directory
+drover evaluate eval/ground_truth.jsonl --documents-dir ./test_docs/
+```
+
 ## Configuration
 
 ### Config File Locations
@@ -211,6 +251,8 @@ Requires `ANTHROPIC_API_KEY` environment variable.
 export ANTHROPIC_API_KEY="sk-ant-..."
 drover classify doc.pdf --ai-provider anthropic --ai-model claude-sonnet-4-20250514
 ```
+
+**Cost Optimization:** Drover automatically enables [prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) for Anthropic models. The taxonomy menu (~2000 tokens) is cached, reducing costs by up to 90% on subsequent requests.
 
 ### OpenRouter
 
@@ -322,6 +364,13 @@ With `--batch`, each line is a separate JSON object:
 | `CONFIG_ERROR` | Invalid configuration |
 | `FILENAME_POLICY_VIOLATION` | Generated filename violates policy |
 | `UNEXPECTED_ERROR` | Unhandled error |
+
+## Architecture
+
+For architectural decisions and design rationale, see:
+
+- [ADR-001: Chain-of-Thought Prompting](docs/adr/001-chain-of-thought-prompting.md) - 7-step reasoning for accurate classification
+- [ADR-002: Privacy-First Design](docs/adr/002-privacy-first-design.md) - Local-first, zero telemetry approach
 
 ## Contributing
 

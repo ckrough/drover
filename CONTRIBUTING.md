@@ -62,9 +62,10 @@ src/drover/
 ├── path_builder.py     # PathBuilder - generates organized paths
 ├── models.py           # Data models (RawClassification, ClassificationResult)
 ├── service.py          # High-level service orchestration
-├── metrics.py          # Classification metrics tracking
+├── metrics.py          # Classification metrics tracking (incl. cache metrics)
 ├── sampling.py         # Page sampling strategies
 ├── logging.py          # Structured logging configuration (structlog)
+├── evaluation.py       # Classification evaluation framework
 ├── prompts/            # Prompt templates
 │   └── classification.md
 ├── taxonomy/           # Taxonomy plugin system
@@ -93,7 +94,7 @@ src/drover/
    └── Extracts text from documents with sampling strategies
 
 3. DocumentClassifier (classifier.py)
-   └── Sends content to LLM with taxonomy-constrained prompts
+   └── Sends content to LLM using structured output for reliable extraction
 
 4. PathBuilder (path_builder.py)
    └── Generates {domain}/{category}/{doctype}/{filename} paths
@@ -412,3 +413,70 @@ CLI options override config file, which overrides environment variables, which o
 - ClassificationService uses async for I/O-bound LLM calls
 - Use `pytest-asyncio` with `asyncio_mode = "auto"`
 - Tests can use `async def test_...()` directly
+
+## LLM Integration Patterns
+
+### Structured Output
+
+The classifier uses LangChain's `with_structured_output()` for reliable JSON extraction:
+
+```python
+# classifier.py uses this pattern
+llm_with_schema = self._get_llm().with_structured_output(RawClassification)
+classification = await llm_with_schema.ainvoke(message, config=invoke_config)
+```
+
+This eliminates brittle regex-based JSON parsing and provides automatic Pydantic validation.
+
+### Prompt Caching (Anthropic)
+
+For Anthropic models, prompt caching is enabled automatically via the `anthropic-beta: prompt-caching-2024-07-31` header. The taxonomy menu (~2000 tokens) is cached, reducing costs by up to 90% on subsequent requests.
+
+Cache metrics are tracked in `ClassificationMetrics`:
+- `cache_creation_input_tokens`: Tokens written to cache (first request)
+- `cache_read_input_tokens`: Tokens read from cache (subsequent requests)
+
+### Streaming Classification
+
+For interactive use cases, `classify_streaming()` provides real-time token output:
+
+```python
+async def on_token(token: str) -> None:
+    print(token, end="", flush=True)
+
+result = await classifier.classify_streaming(content, on_token=on_token)
+```
+
+## Evaluation Framework
+
+The `evaluation.py` module enables systematic measurement of classification accuracy:
+
+```python
+from drover.evaluation import ClassificationEvaluator
+
+evaluator = ClassificationEvaluator(ground_truth_path="eval/ground_truth.jsonl")
+results = await evaluator.evaluate(classifier)
+print(f"Domain accuracy: {results.domain_accuracy:.1%}")
+```
+
+### Ground Truth Format
+
+JSONL file with expected classifications:
+
+```jsonl
+{"filename": "bank.pdf", "domain": "financial", "category": "banking", "doctype": "statement"}
+{"filename": "bill.pdf", "domain": "utilities", "category": "electric", "doctype": "bill"}
+```
+
+### Running Evaluations
+
+```bash
+drover evaluate eval/ground_truth.jsonl --ai-model gpt-4o --output-format json
+```
+
+## Architecture Decision Records
+
+Design decisions are documented in `docs/adr/`:
+
+- [ADR-001](docs/adr/001-chain-of-thought-prompting.md): Chain-of-thought prompting strategy
+- [ADR-002](docs/adr/002-privacy-first-design.md): Privacy-first design principles
