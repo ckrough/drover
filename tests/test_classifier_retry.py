@@ -1,6 +1,7 @@
 """Tests for retry logic in DocumentClassifier."""
 
 import os
+import socket
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -37,9 +38,33 @@ class TestRetryableExceptions:
         """TimeoutError should trigger retry."""
         assert TimeoutError in RETRYABLE_EXCEPTIONS
 
-    def test_retryable_exceptions_includes_os_error(self) -> None:
-        """OSError should trigger retry (for network errors)."""
-        assert OSError in RETRYABLE_EXCEPTIONS
+    def test_retryable_exceptions_includes_socket_timeout(self) -> None:
+        """socket.timeout should trigger retry for TCP-level timeouts."""
+        assert socket.timeout in RETRYABLE_EXCEPTIONS
+
+    def test_retryable_exceptions_includes_connection_reset_error(self) -> None:
+        """ConnectionResetError should trigger retry."""
+        assert ConnectionResetError in RETRYABLE_EXCEPTIONS
+
+    def test_retryable_exceptions_includes_connection_refused_error(self) -> None:
+        """ConnectionRefusedError should trigger retry."""
+        assert ConnectionRefusedError in RETRYABLE_EXCEPTIONS
+
+    def test_retryable_exceptions_includes_broken_pipe_error(self) -> None:
+        """BrokenPipeError should trigger retry."""
+        assert BrokenPipeError in RETRYABLE_EXCEPTIONS
+
+    def test_retryable_exceptions_excludes_broad_os_error(self) -> None:
+        """OSError should NOT be in retryable exceptions (too broad)."""
+        assert OSError not in RETRYABLE_EXCEPTIONS
+
+    def test_retryable_exceptions_excludes_permission_error(self) -> None:
+        """PermissionError should NOT be retried (not transient)."""
+        assert PermissionError not in RETRYABLE_EXCEPTIONS
+
+    def test_retryable_exceptions_excludes_file_not_found_error(self) -> None:
+        """FileNotFoundError should NOT be retried (not transient)."""
+        assert FileNotFoundError not in RETRYABLE_EXCEPTIONS
 
 
 class TestRetryDecorator:
@@ -174,6 +199,30 @@ class TestInvokeWithRetry:
                 await classifier._invoke_with_retry(message, None)
 
         # Should only try once since ValueError is not retryable
+        assert mock_llm.ainvoke.call_count == 1
+
+    @pytest.mark.asyncio
+    async def test_invoke_with_retry_permission_error_not_retried(self) -> None:
+        """PermissionError (an OSError subclass) should NOT be retried.
+
+        This verifies that we don't retry broad OS errors that are not
+        network-related. PermissionError indicates a fundamental access
+        issue that won't be resolved by retrying.
+        """
+        classifier = _make_classifier(max_retries=3)
+
+        mock_llm = MagicMock()
+        mock_llm.ainvoke = AsyncMock(side_effect=PermissionError("Access denied"))
+
+        with patch.object(classifier, "_get_llm", return_value=mock_llm):
+            from langchain_core.messages import HumanMessage
+
+            message = HumanMessage(content="test")
+
+            with pytest.raises(PermissionError, match="Access denied"):
+                await classifier._invoke_with_retry(message, None)
+
+        # Should only try once - PermissionError is not retryable
         assert mock_llm.ainvoke.call_count == 1
 
 

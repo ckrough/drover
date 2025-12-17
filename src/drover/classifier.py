@@ -10,6 +10,7 @@ with fallback parsing for edge cases.
 import json
 import os
 import re
+import socket
 from collections.abc import Callable
 from importlib.resources import files
 from pathlib import Path
@@ -37,11 +38,24 @@ from drover.taxonomy.base import BaseTaxonomy
 
 logger = get_logger(__name__)
 
-# Exceptions that should trigger a retry (transient failures)
+# Exceptions that should trigger a retry (transient network failures).
+# These are specific exceptions that indicate the request can be retried:
+# - ConnectionError: Base class for connection issues (includes Reset, Refused, Aborted)
+# - TimeoutError: Request exceeded time limit
+# - socket.timeout: TCP-level socket timeout
+# - ConnectionResetError: Server dropped the connection (errno 104)
+# - ConnectionRefusedError: Server not accepting connections (errno 111)
+# - BrokenPipeError: Writing to a closed connection (errno 32)
+#
+# Note: We explicitly avoid broad OSError which would catch non-retryable errors
+# like PermissionError, FileNotFoundError, or "disk full" (errno 28).
 RETRYABLE_EXCEPTIONS = (
     ConnectionError,
     TimeoutError,
-    OSError,  # Catches network-related OS errors
+    socket.timeout,
+    ConnectionResetError,
+    ConnectionRefusedError,
+    BrokenPipeError,
 )
 
 
