@@ -20,7 +20,7 @@ ai:
   #   openai: gpt-4o, gpt-4o-mini, gpt-4-turbo
   #   anthropic: claude-sonnet-4-20250514, claude-3-5-haiku-20241022
   #   openrouter: anthropic/claude-sonnet-4, openai/gpt-4o
-  model: qwen3-vl:latest
+  model: qwen3:latest
 
   # Temperature for LLM responses (0.0 = deterministic, 2.0 = creative)
   temperature: 0.0
