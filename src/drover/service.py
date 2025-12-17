@@ -213,7 +213,7 @@ class ClassificationService:
                 ErrorCode.LLM_API_ERROR,
                 e,
             )
-        except Exception as e:  # pragma: no cover - defensive fallback
+        except Exception as e:  # defensive fallback for unexpected errors
             logger.exception(
                 "unexpected_error",
                 file=str(file_path),
