@@ -46,9 +46,19 @@ RETRYABLE_EXCEPTIONS = (
 
 
 class ClassificationError(Exception):
-    """Raised when classification fails."""
+    """Raised when classification fails.
 
-    pass
+    Attributes:
+        debug_info: Optional dict containing prompt and response for debugging.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        debug_info: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.debug_info = debug_info
 
 
 class LLMParseError(ClassificationError):
@@ -487,12 +497,22 @@ class DocumentClassifier:
                 error=str(parsing_error) if parsing_error else "No parsed result",
             )
             if raw_response is None:
-                raise LLMParseError("Structured output failed and no raw response available")
-            classification_dict = self._parse_response(raw_response)
-            classification = RawClassification.model_validate(classification_dict)
+                raise LLMParseError(
+                    "Structured output failed and no raw response available",
+                    debug_info=debug_info,
+                )
+            try:
+                classification_dict = self._parse_response(raw_response)
+                classification = RawClassification.model_validate(classification_dict)
+            except ClassificationError as e:
+                # Re-raise with debug_info attached
+                raise type(e)(str(e), debug_info=debug_info) from e
 
-        # Normalize through taxonomy
-        normalized = self._normalize_classification(classification)
+        # Normalize through taxonomy - wrap to preserve debug_info on failure
+        try:
+            normalized = self._normalize_classification(classification)
+        except ClassificationError as e:
+            raise type(e)(str(e), debug_info=debug_info) from e
 
         logger.info(
             "classification_complete",

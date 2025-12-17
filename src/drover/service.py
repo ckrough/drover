@@ -160,6 +160,7 @@ class ClassificationService:
                 file=str(file_path),
                 error=str(e),
             )
+            self._save_debug_from_exception(file_path, e)
             return ClassificationErrorResult.from_exception(
                 file_path.name,
                 ErrorCode.LLM_PARSE_ERROR,
@@ -171,6 +172,7 @@ class ClassificationService:
                 file=str(file_path),
                 error=str(e),
             )
+            self._save_debug_from_exception(file_path, e)
             return ClassificationErrorResult.from_exception(
                 file_path.name,
                 ErrorCode.TAXONOMY_VALIDATION_FAILED,
@@ -193,6 +195,7 @@ class ClassificationService:
                 file=str(file_path),
                 error=str(e),
             )
+            self._save_debug_from_exception(file_path, e)
             return ClassificationErrorResult.from_exception(
                 file_path.name,
                 ErrorCode.TEMPLATE_ERROR,
@@ -204,6 +207,7 @@ class ClassificationService:
                 file=str(file_path),
                 error=str(e),
             )
+            self._save_debug_from_exception(file_path, e)
             return ClassificationErrorResult.from_exception(
                 file_path.name,
                 ErrorCode.LLM_API_ERROR,
@@ -220,6 +224,20 @@ class ClassificationService:
                 ErrorCode.UNEXPECTED_ERROR,
                 e,
             )
+
+    def _save_debug_from_exception(self, file_path: Path, exc: ClassificationError) -> None:
+        """Save debug info from an exception if capture_debug is enabled.
+
+        Extracts debug_info from ClassificationError exceptions (which may
+        contain prompt and response data) and saves to disk for debugging
+        failed classifications.
+        """
+        if not self.config.capture_debug:
+            return
+
+        debug_info = getattr(exc, "debug_info", None)
+        if debug_info is not None:
+            self._save_debug_files(file_path, debug_info)
 
     def _save_debug_files(self, file_path: Path, debug_info: dict[str, object]) -> None:
         """Save debug information (prompt/response) to disk.
