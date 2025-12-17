@@ -2,6 +2,7 @@
 
 from enum import StrEnum
 from pathlib import Path
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -34,7 +35,7 @@ class ClassificationResult(BaseModel):
     error: bool = Field(default=False, description="Whether classification failed")
     error_code: ErrorCode | None = Field(default=None, description="Error code if failed")
     error_message: str | None = Field(default=None, description="Error message if failed")
-    metrics: dict | None = Field(
+    metrics: dict[str, Any] | None = Field(
         default=None, description="AI metrics for this classification, if collected"
     )
 
@@ -46,7 +47,7 @@ class ClassificationErrorResult(BaseModel):
     error: bool = Field(default=True)
     error_code: ErrorCode = Field(description="Error code")
     error_message: str = Field(description="Human-readable error message")
-    metrics: dict | None = Field(
+    metrics: dict[str, Any] | None = Field(
         default=None, description="AI metrics for this classification, if collected"
     )
 

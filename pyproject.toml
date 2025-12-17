@@ -53,9 +53,33 @@ select = ["E", "F", "I", "N", "W", "UP"]
 
 [tool.mypy]
 python_version = "3.13"
+strict = true
 warn_return_any = true
 warn_unused_configs = true
-disallow_untyped_defs = false
+# Allow untyped calls to third-party libraries with incomplete stubs
+disallow_untyped_calls = false
+
+# Third-party libraries without complete type stubs
+[[tool.mypy.overrides]]
+module = [
+    "yaml",
+    "xattr",
+    "unstructured.*",
+    "structlog.*",
+    "tenacity.*",
+]
+ignore_missing_imports = true
+
+# LangChain has incorrect type stubs (e.g., ChatOpenAI's max_tokens is valid at runtime)
+[[tool.mypy.overrides]]
+module = [
+    "langchain_core.*",
+    "langchain_openai.*",
+    "langchain_ollama.*",
+    "langchain_anthropic.*",
+]
+ignore_missing_imports = true
+ignore_errors = true
 
 [tool.bandit]
 exclude_dirs = ["tests", ".venv"]

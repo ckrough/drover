@@ -238,9 +238,9 @@ class ClassificationEvaluator:
         category_confusion: dict[str, dict[str, int]] = {}
         doctype_confusion: dict[str, dict[str, int]] = {}
 
-        for file_path in test_files:
-            file_path = Path(file_path)
-            filename = file_path.name
+        for fp in test_files:
+            resolved_path = Path(fp)
+            filename = resolved_path.name
 
             # Get ground truth
             actual = self.ground_truth.get(filename)
@@ -253,8 +253,8 @@ class ClassificationEvaluator:
 
             # Load and classify document
             try:
-                content = loader.load(file_path)
-                predicted, _ = await classifier.classify(content)
+                loaded_doc = await loader.load(resolved_path)
+                predicted, _ = await classifier.classify(loaded_doc.content)
             except Exception as e:
                 logger.error(
                     "classification_error",
