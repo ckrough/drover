@@ -10,7 +10,7 @@ Precedence (highest to lowest):
 import os
 from enum import StrEnum
 from pathlib import Path
-from typing import Self
+from typing import Any, Self
 
 import yaml
 from pydantic import BaseModel, Field, model_validator
@@ -110,7 +110,7 @@ class DroverConfig(BaseModel):
         return cls.model_validate(data)
 
     @classmethod
-    def from_env(cls) -> dict:
+    def from_env(cls) -> dict[str, Any]:
         """Extract configuration from environment variables."""
         env_map = {
             "DROVER_AI_PROVIDER": ("ai", "provider"),
@@ -137,7 +137,7 @@ class DroverConfig(BaseModel):
         int_fields = {"max_pages", "concurrency", "max_tokens", "timeout", "max_retries"}
         float_fields = {"temperature", "retry_min_wait", "retry_max_wait"}
 
-        result: dict = {}
+        result: dict[str, Any] = {}
         for env_var, path in env_map.items():
             if value := os.environ.get(env_var):
                 field_name = path[-1]  # Last element is the field name
@@ -169,7 +169,7 @@ class DroverConfig(BaseModel):
         Returns:
             Merged configuration from file + environment + defaults.
         """
-        file_data: dict = {}
+        file_data: dict[str, Any] = {}
 
         if config_path and config_path.exists():
             with config_path.open() as f:
@@ -187,7 +187,7 @@ class DroverConfig(BaseModel):
         return cls.model_validate(merged)
 
     @staticmethod
-    def _deep_merge(base: dict, override: dict) -> dict:
+    def _deep_merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
         """Deep merge two dictionaries, with override taking precedence."""
         result = base.copy()
         for key, value in override.items():
@@ -197,7 +197,7 @@ class DroverConfig(BaseModel):
                 result[key] = value
         return result
 
-    def with_overrides(self, **kwargs) -> Self:
+    def with_overrides(self, **kwargs: Any) -> Self:
         """Return new config with CLI overrides applied.
 
         Accepts flattened kwargs like ai_provider, ai_model which get

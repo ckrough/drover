@@ -8,6 +8,7 @@ import asyncio
 import mimetypes
 import os
 from pathlib import Path
+from typing import Any
 
 # Disable unstructured telemetry and auto-downloads BEFORE importing the library.
 # This prevents network calls to packages.unstructured.io (Scarf analytics)
@@ -149,7 +150,7 @@ class DocumentLoader:
             mime_type=mime_type,
         )
 
-    def _group_by_page(self, elements: list) -> list[list]:
+    def _group_by_page(self, elements: list[Any]) -> list[list[Any]]:
         """Group elements by their page number.
 
         Args:
@@ -161,7 +162,7 @@ class DocumentLoader:
         if not elements:
             return []
 
-        pages: dict[int, list] = {}
+        pages: dict[int, list[Any]] = {}
         for el in elements:
             page_num = getattr(el.metadata, "page_number", 1) or 1
             if page_num not in pages:
@@ -175,7 +176,7 @@ class DocumentLoader:
         max_page = max(pages.keys())
         return [pages.get(i, []) for i in range(1, max_page + 1) if pages.get(i)]
 
-    def _extract_text(self, pages: list[list]) -> str:
+    def _extract_text(self, pages: list[list[Any]]) -> str:
         """Extract text content from grouped elements.
 
         Args:
@@ -191,7 +192,7 @@ class DocumentLoader:
                 texts.append(page_text)
         return "\n\n".join(texts)
 
-    def _apply_sampling(self, pages: list[list], total_pages: int) -> list[list]:
+    def _apply_sampling(self, pages: list[list[Any]], total_pages: int) -> list[list[Any]]:
         """Apply sampling strategy to document pages.
 
         Args:

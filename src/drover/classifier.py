@@ -13,8 +13,9 @@ import re
 import socket
 from collections.abc import Callable
 from importlib.resources import files
+from importlib.resources.abc import Traversable
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import yaml
 from langchain_core.language_models import BaseChatModel
@@ -106,12 +107,15 @@ class PromptTemplate:
         Args:
             template_path: Path to template file, or None to use default.
         """
+        self._resource_path: Traversable | None = None
         if template_path is None:
-            template_path = files("drover.prompts").joinpath("classification.md")
+            self._resource_path = files("drover.prompts").joinpath("classification.md")
+            self.template_path: Path | None = None
+        else:
+            self.template_path = template_path
 
-        self.template_path = template_path
         self._content: str | None = None
-        self._frontmatter: dict | None = None
+        self._frontmatter: dict[str, Any] | None = None
 
     def _load(self) -> None:
         """Load and parse template file.
@@ -122,15 +126,24 @@ class PromptTemplate:
         if self._content is not None:
             return
 
+        # Determine which source to read from
+        if self._resource_path is not None:
+            source_desc = str(self._resource_path)
+        elif self.template_path is not None:
+            source_desc = str(self.template_path)
+        else:
+            raise TemplateError("No template path configured")
+
         try:
-            if hasattr(self.template_path, "read_text"):
-                raw = self.template_path.read_text(encoding="utf-8")
+            if self._resource_path is not None:
+                raw = self._resource_path.read_text(encoding="utf-8")
             else:
-                raw = Path(self.template_path).read_text(encoding="utf-8")
+                # self.template_path is guaranteed non-None here
+                raw = self.template_path.read_text(encoding="utf-8")  # type: ignore[union-attr]
         except FileNotFoundError:
-            raise TemplateError(f"Template file not found: {self.template_path}")
+            raise TemplateError(f"Template file not found: {source_desc}")
         except PermissionError:
-            raise TemplateError(f"Permission denied reading template: {self.template_path}")
+            raise TemplateError(f"Permission denied reading template: {source_desc}")
         except UnicodeDecodeError as e:
             raise TemplateError(f"Template encoding error (expected UTF-8): {e}")
         except OSError as e:
@@ -160,7 +173,7 @@ class PromptTemplate:
         return self._content or ""
 
     @property
-    def frontmatter(self) -> dict:
+    def frontmatter(self) -> dict[str, Any]:
         """Get template frontmatter metadata."""
         self._load()
         return self._frontmatter or {}
@@ -241,7 +254,7 @@ class DocumentClassifier:
         self.retry_min_wait = retry_min_wait
         self.retry_max_wait = retry_max_wait
         self._llm: BaseChatModel | None = None
-        self._structured_llm: Runnable | None = None
+        self._structured_llm: Runnable[Any, Any] | None = None
 
     def _get_llm(self) -> BaseChatModel:
         """Get or create base LLM instance.
@@ -254,17 +267,19 @@ class DocumentClassifier:
 
         match self.provider:
             case AIProvider.OLLAMA:
+                # LangChain stubs don't include timeout parameter
                 self._llm = ChatOllama(
                     model=self.model,
                     temperature=self.temperature,
                     num_predict=self.max_tokens,
-                    timeout=self.timeout,
+                    timeout=self.timeout,  # type: ignore[call-arg]
                 )
             case AIProvider.OPENAI:
+                # LangChain stubs don't include max_tokens but it works at runtime
                 self._llm = ChatOpenAI(
                     model=self.model,
                     temperature=self.temperature,
-                    max_tokens=self.max_tokens,
+                    max_tokens=self.max_tokens,  # type: ignore[call-arg]
                     timeout=self.timeout,
                 )
             case AIProvider.ANTHROPIC:
@@ -273,7 +288,8 @@ class DocumentClassifier:
                 # Enable prompt caching beta for cost optimization
                 # The taxonomy menu is ~2000 tokens and identical across all
                 # documents, making it ideal for caching (up to 90% cost reduction)
-                self._llm = ChatAnthropic(
+                # LangChain stubs don't include model/max_tokens/extra_headers
+                self._llm = ChatAnthropic(  # type: ignore[call-arg]
                     model=self.model,
                     temperature=self.temperature,
                     max_tokens=self.max_tokens,
@@ -289,12 +305,13 @@ class DocumentClassifier:
                         "OPENROUTER_API_KEY environment variable must be set "
                         "when using the 'openrouter' provider"
                     )
+                # LangChain stubs don't include max_tokens
                 self._llm = ChatOpenAI(
                     model=self.model,
                     base_url="https://openrouter.ai/api/v1",
-                    api_key=api_key,
+                    api_key=api_key,  # type: ignore[arg-type]
                     temperature=self.temperature,
-                    max_tokens=self.max_tokens,
+                    max_tokens=self.max_tokens,  # type: ignore[call-arg]
                     timeout=self.timeout,
                 )
             case _:
@@ -302,7 +319,7 @@ class DocumentClassifier:
 
         return self._llm
 
-    def _get_structured_llm(self) -> Runnable:
+    def _get_structured_llm(self) -> Runnable[Any, Any]:
         """Get LLM with structured output for RawClassification schema.
 
         Uses LangChain's with_structured_output() for reliable JSON extraction.
@@ -349,7 +366,7 @@ class DocumentClassifier:
 
         return self._structured_llm
 
-    def _make_retry_decorator(self) -> Callable:
+    def _make_retry_decorator(self) -> Callable[..., Any]:
         """Create a retry decorator with configured parameters."""
         return retry(
             stop=stop_after_attempt(self.max_retries),
@@ -385,13 +402,18 @@ class DocumentClassifier:
         structured_llm = self._get_structured_llm()
 
         @self._make_retry_decorator()
-        async def _invoke():
+        async def _invoke() -> dict[str, Any]:
             if config is not None:
-                return await structured_llm.ainvoke([message], config=config)
+                result = await structured_llm.ainvoke(
+                    [message],
+                    config=config,  # type: ignore[arg-type]
+                )
             else:
-                return await structured_llm.ainvoke([message])
+                result = await structured_llm.ainvoke([message])
+            # Result is a dict-like object from LangChain structured output
+            return cast(dict[str, Any], result)
 
-        return await _invoke()
+        return cast(dict[str, Any], await _invoke())
 
     async def _invoke_with_retry(
         self,
@@ -416,14 +438,17 @@ class DocumentClassifier:
         llm = self._get_llm()
 
         @self._make_retry_decorator()
-        async def _invoke():
+        async def _invoke() -> str:
             if config is not None:
-                response = await llm.ainvoke([message], config=config)
+                response = await llm.ainvoke(
+                    [message],
+                    config=config,  # type: ignore[arg-type]
+                )
             else:
                 response = await llm.ainvoke([message])
             return str(response.content)
 
-        return await _invoke()
+        return cast(str, await _invoke())
 
     async def classify(
         self,
@@ -464,8 +489,8 @@ class DocumentClassifier:
         debug_info: dict[str, Any] | None = None
         if capture_debug or collect_metrics:
             debug_info = {}
-        if capture_debug:
-            debug_info["prompt"] = prompt
+            if capture_debug:
+                debug_info["prompt"] = prompt
 
         metrics_callback = None
         if collect_metrics:
@@ -607,7 +632,7 @@ class DocumentClassifier:
 
         return normalized
 
-    def _parse_response(self, response: str) -> dict:
+    def _parse_response(self, response: str) -> dict[str, Any]:
         """Parse LLM response as JSON with field validation.
 
         Args:
@@ -652,10 +677,10 @@ class DocumentClassifier:
                     pass
 
         if parsed is None:
-            candidate = self._extract_largest_json_object(response)
-            if candidate is not None:
+            extracted = self._extract_largest_json_object(response)
+            if extracted is not None:
                 try:
-                    parsed = json.loads(candidate)
+                    parsed = json.loads(extracted)
                 except json.JSONDecodeError:
                     pass
 
@@ -675,7 +700,7 @@ class DocumentClassifier:
                     f"Field '{field}' must be string, got {type(parsed[field]).__name__}"
                 )
 
-        return parsed
+        return cast(dict[str, Any], parsed)
 
     def _extract_largest_json_object(self, text: str) -> str | None:
         """Extract the largest balanced JSON object substring from text.
@@ -719,7 +744,9 @@ class DocumentClassifier:
 
         return text[best_span[0] : best_span[1]]
 
-    def _normalize_classification(self, raw: dict | RawClassification) -> RawClassification:
+    def _normalize_classification(
+        self, raw: dict[str, Any] | RawClassification
+    ) -> RawClassification:
         """Normalize classification through taxonomy.
 
         Args:

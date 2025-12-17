@@ -19,12 +19,12 @@ from drover.config import (
     DroverConfig,
     ErrorMode,
     LogLevel,
-    SampleStrategy,
     TaxonomyMode,
 )
 from drover.logging import configure_logging
 from drover.models import ClassificationErrorResult as ClassificationErrorModel
 from drover.models import ClassificationResult
+from drover.sampling import SampleStrategy
 from drover.service import ClassificationService
 
 console = Console(stderr=True)
@@ -613,7 +613,7 @@ async def _evaluate_async(
     )
 
     loader = DocumentLoader(
-        sample_strategy=config.sample_strategy,
+        strategy=config.sample_strategy,
         max_pages=config.max_pages,
     )
 
