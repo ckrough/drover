@@ -1,0 +1,28 @@
+# Integration Test Configuration
+#
+# Copy this file to config.yaml and configure for your local LLM.
+# The config.yaml file is gitignored and will not be committed.
+#
+# To run integration tests:
+#   pytest tests/integration/ -m integration
+#
+# To run unit tests only (default CI behavior):
+#   pytest tests/ --ignore=tests/integration
+
+ai:
+  # Option 1: Local Ollama (recommended for testing)
+  provider: ollama
+  model: llama3.2:latest
+
+  # Option 2: OpenAI (requires OPENAI_API_KEY env var)
+  # provider: openai
+  # model: gpt-4o-mini
+
+  # Option 3: Anthropic (requires ANTHROPIC_API_KEY env var)
+  # provider: anthropic
+  # model: claude-3-haiku-20240307
+
+  # Common settings
+  temperature: 0.0
+  max_tokens: 1000
+  timeout: 120
