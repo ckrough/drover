@@ -59,4 +59,3 @@ debug/
 # Evaluation framework
 eval/documents/
 eval/results/
-uv.lock
