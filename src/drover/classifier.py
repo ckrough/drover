@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any, cast
 
 import yaml
+from json_repair import repair_json
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage
 from langchain_core.runnables import Runnable
@@ -635,6 +636,8 @@ class DocumentClassifier:
     def _parse_response(self, response: str) -> dict[str, Any]:
         """Parse LLM response as JSON with field validation.
 
+        Uses json-repair library for robust handling of malformed JSON from LLMs.
+
         Args:
             response: Raw LLM response text.
 
@@ -654,6 +657,7 @@ class DocumentClassifier:
 
         parsed = None
 
+        # Try direct JSON parsing first (fastest path)
         try:
             parsed = json.loads(response)
         except json.JSONDecodeError:
@@ -667,6 +671,7 @@ class DocumentClassifier:
             except json.JSONDecodeError:
                 response = candidate
 
+        # Try extracting JSON from markdown code blocks
         if parsed is None:
             code_match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", response)
             if code_match:
@@ -674,15 +679,23 @@ class DocumentClassifier:
                 try:
                     parsed = json.loads(block)
                 except json.JSONDecodeError:
-                    pass
+                    # Try json-repair on the code block
+                    try:
+                        repaired = repair_json(block, return_objects=True)
+                        if isinstance(repaired, dict):
+                            parsed = repaired
+                    except Exception:
+                        pass
 
+        # Use json-repair as final fallback - handles malformed JSON,
+        # surrounding text, trailing commas, unquoted keys, etc.
         if parsed is None:
-            extracted = self._extract_largest_json_object(response)
-            if extracted is not None:
-                try:
-                    parsed = json.loads(extracted)
-                except json.JSONDecodeError:
-                    pass
+            try:
+                repaired = repair_json(response, return_objects=True)
+                if isinstance(repaired, dict):
+                    parsed = repaired
+            except Exception:
+                pass
 
         if parsed is None:
             raise LLMParseError(f"Could not parse JSON from response: {response[:200]}...")
@@ -701,48 +714,6 @@ class DocumentClassifier:
                 )
 
         return cast(dict[str, Any], parsed)
-
-    def _extract_largest_json_object(self, text: str) -> str | None:
-        """Extract the largest balanced JSON object substring from text.
-
-        This uses a simple brace depth counter and is tolerant of
-        surrounding non-JSON commentary.
-        """
-        best_span: tuple[int, int] | None = None
-        depth = 0
-        start_idx: int | None = None
-        in_string = False
-        escape = False
-
-        for idx, ch in enumerate(text):
-            if ch == '"' and not escape:
-                in_string = not in_string
-            if ch == "\\" and not escape:
-                escape = True
-            else:
-                escape = False
-
-            if in_string:
-                continue
-
-            if ch == "{":
-                if depth == 0:
-                    start_idx = idx
-                depth += 1
-            elif ch == "}":
-                if depth > 0:
-                    depth -= 1
-                    if depth == 0 and start_idx is not None:
-                        end_idx = idx + 1
-                        if best_span is None or (end_idx - start_idx) > (
-                            best_span[1] - best_span[0]
-                        ):
-                            best_span = (start_idx, end_idx)
-
-        if best_span is None:
-            return None
-
-        return text[best_span[0] : best_span[1]]
 
     def _normalize_classification(
         self, raw: dict[str, Any] | RawClassification
