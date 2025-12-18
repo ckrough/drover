@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/drover-logo.png" alt="Drover logo" width="200">
+</p>
+
 # Drover
 
 Document classification CLI that herds files into organized folder structures.
