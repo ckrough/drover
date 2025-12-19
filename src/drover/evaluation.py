@@ -13,7 +13,7 @@ import json
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, Field
 
@@ -21,6 +21,14 @@ from drover.classifier import DocumentClassifier
 from drover.loader import DocumentLoader
 from drover.logging import get_logger
 from drover.models import RawClassification
+
+if TYPE_CHECKING:
+    from drover.nli_classifier import NLIDocumentClassifier
+
+# Either classifier path is acceptable to the evaluator. Both expose the same
+# minimal surface used here: `classify(content) -> (RawClassification, ...)`,
+# `.model`, and `.provider`. PEP 695 `type` keeps the NLI import deferred.
+type EvaluableClassifier = DocumentClassifier | NLIDocumentClassifier
 
 logger = get_logger(__name__)
 
@@ -197,7 +205,7 @@ class ClassificationEvaluator:
 
     async def evaluate(
         self,
-        classifier: DocumentClassifier,
+        classifier: EvaluableClassifier,
         test_files: Sequence[str | Path] | None = None,
         loader: DocumentLoader | None = None,
     ) -> EvaluationResult:
@@ -371,8 +379,8 @@ class ClassificationEvaluator:
 
 
 async def compare_models(
-    classifier_a: DocumentClassifier,
-    classifier_b: DocumentClassifier,
+    classifier_a: EvaluableClassifier,
+    classifier_b: EvaluableClassifier,
     ground_truth_path: str | Path,
     documents_dir: str | Path | None = None,
 ) -> tuple[EvaluationResult, EvaluationResult]:

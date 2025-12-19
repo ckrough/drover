@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Callable, Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from drover.classifier import (
     ClassificationError,
@@ -18,13 +19,23 @@ from drover.classifier import (
     TaxonomyValidationError,
     TemplateError,
 )
-from drover.config import DroverConfig, ErrorMode
+from drover.config import AIProvider, DroverConfig, ErrorMode, ExtractorType
 from drover.loader import DocumentLoader, DocumentLoadError
 from drover.logging import get_logger
 from drover.models import ClassificationErrorResult, ClassificationResult, ErrorCode
 from drover.naming import get_naming_policy
+from drover.nli_classifier import (
+    NLIClassificationError,
+    NLIImportError,
+)
+from drover.nli_classifier import (
+    TaxonomyValidationError as NLITaxonomyValidationError,
+)
 from drover.path_builder import PathBuilder, PathConstraintError
 from drover.taxonomy import get_taxonomy
+
+if TYPE_CHECKING:
+    from drover.nli_classifier import NLIDocumentClassifier
 
 logger = get_logger(__name__)
 
@@ -49,20 +60,60 @@ class ClassificationService:
             strategy=config.sample_strategy,
             max_pages=config.max_pages,
         )
-        self._classifier = DocumentClassifier(
-            provider=config.ai.provider,
-            model=config.ai.model,
-            taxonomy=self._taxonomy,
-            taxonomy_mode=config.taxonomy_mode,
-            template_path=config.prompt,
-            temperature=config.ai.temperature,
-            max_tokens=config.ai.max_tokens,
-            timeout=config.ai.timeout,
-            max_retries=config.ai.max_retries,
-            retry_min_wait=config.ai.retry_min_wait,
-            retry_max_wait=config.ai.retry_max_wait,
-        )
+        self._classifier = self._create_classifier()
         self._path_builder = PathBuilder(naming_policy=self._naming_policy)
+
+    def _create_classifier(self) -> DocumentClassifier | NLIDocumentClassifier:
+        """Create classifier based on configured provider.
+
+        Returns:
+            DocumentClassifier for LLM providers, NLIDocumentClassifier for NLI_LOCAL.
+        """
+        cfg = self.config
+
+        if cfg.ai.provider == AIProvider.NLI_LOCAL:
+            return self._create_nli_classifier()
+
+        return DocumentClassifier(
+            provider=cfg.ai.provider,
+            model=cfg.ai.model,
+            taxonomy=self._taxonomy,
+            taxonomy_mode=cfg.taxonomy_mode,
+            template_path=cfg.prompt,
+            temperature=cfg.ai.temperature,
+            max_tokens=cfg.ai.max_tokens,
+            timeout=cfg.ai.timeout,
+            max_retries=cfg.ai.max_retries,
+            retry_min_wait=cfg.ai.retry_min_wait,
+            retry_max_wait=cfg.ai.retry_max_wait,
+        )
+
+    def _create_nli_classifier(self) -> NLIDocumentClassifier:
+        """Create NLI classifier with configured extractor."""
+        from drover.extractors import HybridExtractor, RegexExtractor
+        from drover.nli_classifier import NLIDocumentClassifier
+
+        cfg = self.config
+        nli_cfg = cfg.nli
+
+        # Create extractor based on config
+        if nli_cfg.extractor == ExtractorType.HYBRID and nli_cfg.fallback_model:
+            from drover.extractors import create_ollama_extractor
+
+            extractor = create_ollama_extractor(model=nli_cfg.fallback_model)
+        elif nli_cfg.extractor == ExtractorType.HYBRID:
+            extractor = HybridExtractor()  # No LLM fallback configured
+        else:
+            extractor = RegexExtractor()
+
+        return NLIDocumentClassifier(
+            taxonomy=self._taxonomy,
+            taxonomy_mode=cfg.taxonomy_mode,
+            extractor=extractor,
+            model_name=nli_cfg.model_name,
+            device=nli_cfg.device,
+            max_tokens=nli_cfg.max_tokens,
+        )
 
     async def classify_files(
         self,
@@ -211,6 +262,39 @@ class ClassificationService:
             return ClassificationErrorResult.from_exception(
                 file_path.name,
                 ErrorCode.LLM_API_ERROR,
+                e,
+            )
+        except NLIImportError as e:
+            logger.error(
+                "nli_import_error",
+                file=str(file_path),
+                error=str(e),
+            )
+            return ClassificationErrorResult.from_exception(
+                file_path.name,
+                ErrorCode.CONFIG_ERROR,
+                e,
+            )
+        except NLITaxonomyValidationError as e:
+            logger.warning(
+                "nli_taxonomy_validation_failed",
+                file=str(file_path),
+                error=str(e),
+            )
+            return ClassificationErrorResult.from_exception(
+                file_path.name,
+                ErrorCode.TAXONOMY_VALIDATION_FAILED,
+                e,
+            )
+        except NLIClassificationError as e:
+            logger.error(
+                "nli_classification_error",
+                file=str(file_path),
+                error=str(e),
+            )
+            return ClassificationErrorResult.from_exception(
+                file_path.name,
+                ErrorCode.LLM_API_ERROR,  # Reuse for NLI errors
                 e,
             )
         except Exception as e:  # defensive fallback for unexpected errors

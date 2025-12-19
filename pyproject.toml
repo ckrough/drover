@@ -30,6 +30,11 @@ dev = [
     "bandit>=1.7.5",
     "mypy>=1.8.0",
 ]
+nli = [
+    "transformers>=4.35,<5.0",
+    "torch>=2.0,<3.0",
+    "sentencepiece>=0.2,<1.0",
+]
 
 [project.scripts]
 drover = "drover.cli:main"
@@ -111,6 +116,15 @@ module = [
 ]
 ignore_missing_imports = true
 ignore_errors = true
+
+# NLI dependencies (optional)
+[[tool.mypy.overrides]]
+module = [
+    "transformers.*",
+    "torch.*",
+    "sentencepiece.*",
+]
+ignore_missing_imports = true
 
 [tool.bandit]
 exclude_dirs = ["tests", ".venv"]
