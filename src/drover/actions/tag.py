@@ -6,6 +6,7 @@ import plistlib
 import sys
 from enum import StrEnum
 from pathlib import Path
+from types import ModuleType
 from typing import TYPE_CHECKING
 
 from drover.actions.base import ActionPlan, ActionResult
@@ -42,6 +43,8 @@ class TagManager:
     as a binary plist. Each tag is stored as "TagName\\n0" where the
     suffix indicates the color index (0 = no color, 1-7 = colors).
     """
+
+    _xattr: ModuleType  # xattr module, lazily imported on macOS only
 
     def __init__(self) -> None:
         """Initialize TagManager, checking platform compatibility."""
