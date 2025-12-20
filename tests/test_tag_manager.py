@@ -7,7 +7,6 @@ import pytest
 
 from drover.actions.tag import (
     TagAction,
-    TagError,
     TagManager,
     TagMode,
     compute_final_tags,
@@ -175,9 +174,7 @@ class TestTagsFromResult:
     def test_all_fields(self) -> None:
         """All available fields work correctly."""
         result = self._make_result()
-        tags = tags_from_result(
-            result, ["domain", "category", "doctype", "vendor", "date"]
-        )
+        tags = tags_from_result(result, ["domain", "category", "doctype", "vendor", "date"])
 
         assert tags == ["financial", "banking", "statement", "chase", "2024"]
 
