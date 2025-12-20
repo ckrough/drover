@@ -57,4 +57,4 @@ Testing with household documents showed:
 ## Related
 - `prompts/classification.md` - Prompt template with CoT steps
 - `test_classifier_parse.py::test_parse_response_classification_analysis_tags` - Tests for CoT parsing
-- `classifier.py:400-404` - CoT tag extraction in `_parse_response()`
+- `classifier.py:_parse_response()` - CoT tag extraction (handles `<classification_analysis>` tags)
