@@ -55,7 +55,7 @@ ai:
 # Optional: cloud provider for better accuracy
 # ai:
 #   provider: anthropic
-#   model: claude-3-5-sonnet-latest
+#   model: claude-sonnet-4-20250514
 ```
 
 ### Environment Variables for Secrets

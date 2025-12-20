@@ -21,7 +21,10 @@ def _make_classifier() -> DocumentClassifier:
 
 def test_parse_response_direct_json() -> None:
     classifier = _make_classifier()
-    payload = '{"domain": "financial", "category": "banking", "doctype": "statement", "vendor": "Bank", "date": "20250101", "subject": "checking"}'
+    payload = (
+        '{"domain": "financial", "category": "banking", "doctype": "statement", '
+        '"vendor": "Bank", "date": "20250101", "subject": "checking"}'
+    )
 
     result = classifier._parse_response(payload)
 
@@ -31,11 +34,12 @@ def test_parse_response_direct_json() -> None:
 
 def test_parse_response_json_in_code_block() -> None:
     classifier = _make_classifier()
+    # Long line intentional - simulates realistic LLM output in code block
     payload = """Here is the answer:
 ```json
 {"domain": "financial", "category": "banking", "doctype": "statement", "vendor": "Bank", "date": "20250101", "subject": "checking"}
 ```
-"""
+"""  # noqa: E501
 
     result = classifier._parse_response(payload)
 
@@ -44,7 +48,11 @@ def test_parse_response_json_in_code_block() -> None:
 
 def test_parse_response_balanced_object_inside_text() -> None:
     classifier = _make_classifier()
-    payload = "Some explanation before {\n  \"domain\": \"financial\",\n  \"category\": \"banking\",\n  \"doctype\": \"statement\",\n  \"vendor\": \"Bank\",\n  \"date\": \"20250101\",\n  \"subject\": \"checking\"\n} and some trailing text."
+    payload = (
+        'Some explanation before {\n  "domain": "financial",\n  "category": "banking",'
+        '\n  "doctype": "statement",\n  "vendor": "Bank",\n  "date": "20250101",'
+        '\n  "subject": "checking"\n} and some trailing text.'
+    )
 
     result = classifier._parse_response(payload)
 
@@ -66,14 +74,14 @@ def test_parse_response_raises_on_invalid_json() -> None:
 def test_parse_response_double_brace_wrapper() -> None:
     """LLM sometimes mirrors `{{ ... }}` examples from the prompt template."""
     classifier = _make_classifier()
-    payload = '''{{
+    payload = """{{
   "domain": "financial",
   "category": "banking",
   "doctype": "statement",
   "vendor": "Bank",
   "date": "20250101",
   "subject": "checking"
-}}'''
+}}"""
 
     result = classifier._parse_response(payload)
 

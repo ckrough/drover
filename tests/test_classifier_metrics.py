@@ -1,5 +1,4 @@
-"""Tests for DocumentClassifier metrics integration with LangChain callbacks.
-"""
+"""Tests for DocumentClassifier metrics integration with LangChain callbacks."""
 
 import pytest
 

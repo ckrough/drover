@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from drover.actions.base import ActionPlan, ActionResult, FileAction
+from drover.actions.base import ActionPlan, ActionResult
 from drover.actions.runner import ActionRunner
 from drover.config import DroverConfig, ErrorMode
 from drover.models import ClassificationResult
@@ -148,9 +148,7 @@ class TestActionRunner:
         action = MockAction()
         runner = ActionRunner(config, action)
 
-        monkeypatch.setattr(
-            runner._service._classifier, "classify", _make_fake_classify(tmp_path)
-        )
+        monkeypatch.setattr(runner._service._classifier, "classify", _make_fake_classify(tmp_path))
 
         outputs: list[ActionPlan | ActionResult] = []
 
@@ -177,9 +175,7 @@ class TestActionRunner:
         action = MockAction()
         runner = ActionRunner(config, action)
 
-        monkeypatch.setattr(
-            runner._service._classifier, "classify", _make_fake_classify(tmp_path)
-        )
+        monkeypatch.setattr(runner._service._classifier, "classify", _make_fake_classify(tmp_path))
 
         outputs: list[ActionPlan | ActionResult] = []
 
@@ -207,9 +203,7 @@ class TestActionRunner:
         action = MockAction(should_fail=True)
         runner = ActionRunner(config, action)
 
-        monkeypatch.setattr(
-            runner._service._classifier, "classify", _make_fake_classify(tmp_path)
-        )
+        monkeypatch.setattr(runner._service._classifier, "classify", _make_fake_classify(tmp_path))
 
         exit_code = await runner.run([doc_path], dry_run=False)
 
@@ -217,9 +211,7 @@ class TestActionRunner:
         assert exit_code == 2
 
     @pytest.mark.asyncio
-    async def test_classification_error_skips_action(
-        self, tmp_path: Path
-    ) -> None:
+    async def test_classification_error_skips_action(self, tmp_path: Path) -> None:
         """Classification errors don't trigger action planning."""
         missing_file = tmp_path / "missing.pdf"
 

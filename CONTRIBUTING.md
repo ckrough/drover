@@ -55,7 +55,7 @@ bandit -r src/ -f json --severity-level medium --confidence-level medium --quiet
 src/drover/
 ├── __init__.py         # Package init, version definition
 ├── __main__.py         # Entry point for python -m drover
-├── cli.py              # Click CLI commands (classify, tag)
+├── cli.py              # Click CLI commands (classify, tag, evaluate)
 ├── config.py           # Configuration management (Pydantic models)
 ├── loader.py           # DocumentLoader - text extraction from documents
 ├── classifier.py       # LLM-based DocumentClassifier
@@ -465,7 +465,7 @@ JSONL file with expected classifications:
 
 ```jsonl
 {"filename": "bank.pdf", "domain": "financial", "category": "banking", "doctype": "statement"}
-{"filename": "bill.pdf", "domain": "utilities", "category": "electric", "doctype": "bill"}
+{"filename": "bill.pdf", "domain": "financial", "category": "utilities", "doctype": "bill"}
 ```
 
 ### Running Evaluations

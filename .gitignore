@@ -25,6 +25,9 @@ wheels/
 venv/
 ENV/
 
+# Python version (pyenv/uv) - use pyproject.toml requires-python instead
+.python-version
+
 # IDE
 .idea/
 .vscode/settings.json.local

@@ -93,7 +93,10 @@ class TestInvokeWithRetry:
 
         mock_llm = MagicMock()
         mock_response = MagicMock()
-        mock_response.content = '{"domain": "financial", "category": "banking", "doctype": "statement", "vendor": "Bank", "date": "20250101", "subject": "test"}'
+        mock_response.content = (
+            '{"domain": "financial", "category": "banking", "doctype": "statement", '
+            '"vendor": "Bank", "date": "20250101", "subject": "test"}'
+        )
         mock_llm.ainvoke = AsyncMock(return_value=mock_response)
 
         with patch.object(classifier, "_get_llm", return_value=mock_llm):
@@ -113,7 +116,10 @@ class TestInvokeWithRetry:
 
         mock_llm = MagicMock()
         mock_response = MagicMock()
-        mock_response.content = '{"domain": "financial", "category": "banking", "doctype": "statement", "vendor": "Bank", "date": "20250101", "subject": "test"}'
+        mock_response.content = (
+            '{"domain": "financial", "category": "banking", "doctype": "statement", '
+            '"vendor": "Bank", "date": "20250101", "subject": "test"}'
+        )
 
         # Fail twice, succeed third time
         mock_llm.ainvoke = AsyncMock(
@@ -141,7 +147,10 @@ class TestInvokeWithRetry:
 
         mock_llm = MagicMock()
         mock_response = MagicMock()
-        mock_response.content = '{"domain": "medical", "category": "records", "doctype": "report", "vendor": "Hospital", "date": "20250101", "subject": "test"}'
+        mock_response.content = (
+            '{"domain": "medical", "category": "records", "doctype": "report", '
+            '"vendor": "Hospital", "date": "20250101", "subject": "test"}'
+        )
 
         # Fail once, succeed second time
         mock_llm.ainvoke = AsyncMock(
@@ -167,9 +176,7 @@ class TestInvokeWithRetry:
         classifier = _make_classifier(max_retries=2)
 
         mock_llm = MagicMock()
-        mock_llm.ainvoke = AsyncMock(
-            side_effect=ConnectionError("Persistent network error")
-        )
+        mock_llm.ainvoke = AsyncMock(side_effect=ConnectionError("Persistent network error"))
 
         with patch.object(classifier, "_get_llm", return_value=mock_llm):
             from langchain_core.messages import HumanMessage
