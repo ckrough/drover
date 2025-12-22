@@ -17,7 +17,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed architecture, code style, an
 - If `.venv` doesn't exist, run: `python -m venv .venv && pip install -e ".[dev]"`
 
 ### Python Version
-- Use Python 3.13+
+- Use Python 3.13.x
 - Check version: `python --version`
 
 ### Before Running Any Python Code

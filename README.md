@@ -20,7 +20,7 @@
   <a href="https://github.com/ckrough/drover/actions/workflows/ci.yml">
     <img src="https://github.com/ckrough/drover/actions/workflows/ci.yml/badge.svg" alt="CI">
   </a>
-  <img src="https://img.shields.io/badge/python-3.13+-blue.svg" alt="Python 3.13+">
+  <img src="https://img.shields.io/badge/python-3.13-blue.svg" alt="Python 3.13">
   <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License: MIT">
 </p>
 
@@ -43,7 +43,7 @@ Drover uses LLMs to analyze documents and suggest consistent, policy-compliant f
 
 ### Prerequisites
 
-- Python 3.13+
+- Python 3.13.x
 - [Ollama](https://ollama.ai/) (for local inference) or API keys for cloud providers
 
 ### Installation
