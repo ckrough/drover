@@ -6,7 +6,7 @@ This guide covers development setup, architecture, and how to extend Drover.
 
 ### Prerequisites
 
-- Python 3.13+
+- Python 3.13.x
 - Virtual environment
 
 ### Environment Setup

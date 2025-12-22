@@ -3,7 +3,7 @@ name = "drover"
 version = "0.1.0"
 description = "Document classification CLI that classifies files into organized folder structures"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.13,<3.14"
 license = { text = "MIT" }
 dependencies = [
     "langchain>=0.3,<1.0",

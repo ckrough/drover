@@ -54,7 +54,7 @@ Establish automated quality gates and consistent development workflows.
 
 ### GitHub Actions CI Pipeline
 - [ ] Create workflow for lint, type-check, and test on PR
-- [ ] Add matrix testing across Python 3.13+
+- [ ] Add matrix testing across OS platforms (Ubuntu, macOS, Windows) with Python 3.13
 - [ ] Configure dependency caching for faster builds
 - [ ] Add security scanning (pip-audit, bandit)
 - [ ] Set up coverage reporting with threshold enforcement
