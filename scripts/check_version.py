@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate version consistency between __init__.py and pyproject.toml.
 
-This script ensures the version in src/agentspaces/__init__.py matches
+This script ensures the version in src/drover/__init__.py matches
 the version in pyproject.toml to prevent version drift.
 
 Exit codes:
@@ -56,7 +56,7 @@ def main() -> int:
     """
     # Determine project root (script is in scripts/ directory)
     project_root = Path(__file__).parent.parent
-    init_file = project_root / "src" / "agentspaces" / "__init__.py"
+    init_file = project_root / "src" / "drover" / "__init__.py"
     pyproject_file = project_root / "pyproject.toml"
 
     # Check files exist
@@ -82,8 +82,8 @@ def main() -> int:
     # Compare versions
     if init_version != pyproject_version:
         print("❌ Version mismatch detected!", file=sys.stderr)
-        print(f"   src/agentspaces/__init__.py: {init_version}", file=sys.stderr)
-        print(f"   pyproject.toml:              {pyproject_version}", file=sys.stderr)
+        print(f"   src/drover/__init__.py: {init_version}", file=sys.stderr)
+        print(f"   pyproject.toml:         {pyproject_version}", file=sys.stderr)
         print(file=sys.stderr)
         print("Please update both files to match.", file=sys.stderr)
         print("See RELEASING.md for version management guidelines.", file=sys.stderr)
