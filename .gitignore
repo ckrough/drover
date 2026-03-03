@@ -65,3 +65,7 @@ eval/results/
 
 # Integration tests (user-specific LLM config)
 tests/integration/config.yaml
+
+# Dolt database files (added by bd init)
+.dolt/
+*.db
