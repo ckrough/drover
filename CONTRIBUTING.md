@@ -7,46 +7,62 @@ This guide covers development setup, architecture, and how to extend Drover.
 ### Prerequisites
 
 - Python 3.13.x
-- Virtual environment
+- [uv](https://docs.astral.sh/uv/) (package and environment manager)
 
 ### Environment Setup
 
-```bash
-# Create and activate virtual environment
-python -m venv .venv
-source .venv/bin/activate
+Drover uses [uv](https://docs.astral.sh/uv/) for dependency management. `uv` creates and manages the project's virtual environment automatically; you do not need to create or activate `.venv` manually.
 
-# Install with dev dependencies
-pip install -e ".[dev]"
+```bash
+# Install uv (macOS / Linux)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Sync project dependencies (creates .venv and installs runtime + dev extras)
+uv sync --all-extras
 ```
+
+`uv run <command>` executes commands inside the project environment without requiring activation. To enter a shell with the environment active, use `uv shell` or `source .venv/bin/activate`.
 
 ### Running Tests
 
 ```bash
 # Run all tests
-pytest
+uv run pytest
 
 # Run a single test file
-pytest tests/test_taxonomy.py
+uv run pytest tests/test_taxonomy.py
 
 # Run a specific test
-pytest tests/test_taxonomy.py::TestHouseholdTaxonomy::test_canonical_domain_alias
+uv run pytest tests/test_taxonomy.py::TestHouseholdTaxonomy::test_canonical_domain_alias
 
 # Run with coverage
-pytest --cov=src/drover --cov-report=term-missing
+uv run pytest --cov=src/drover --cov-report=term-missing
 ```
 
 ### Code Quality
 
 ```bash
 # Lint and format
-ruff check src/ --fix && ruff format src/
+uv run ruff check src/ --fix && uv run ruff format src/
 
 # Type checking
-mypy src/
+uv run mypy src/
 
 # Security scan
-bandit -r src/ -f json --severity-level medium --confidence-level medium --quiet -c pyproject.toml
+uv run bandit -r src/ -f json --severity-level medium --confidence-level medium --quiet -c pyproject.toml
+```
+
+### Managing Dependencies
+
+```bash
+# Add a runtime dependency
+uv add <package>
+
+# Add a dev dependency
+uv add --optional dev <package>
+
+# Upgrade the lockfile
+uv lock --upgrade
 ```
 
 ## Project Structure

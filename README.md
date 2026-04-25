@@ -36,19 +36,22 @@ Drover uses LLMs to analyze documents and suggest consistent, policy-compliant f
 ### Prerequisites
 
 - Python 3.13.x
+- [uv](https://docs.astral.sh/uv/) (package and environment manager)
 - [Ollama](https://ollama.ai/) (for local inference) or API keys for cloud providers
 
 ### Installation
 
 ```bash
-# Clone and install
+# Clone and sync the project (creates .venv and installs dependencies)
 git clone https://github.com/ckrough/drover.git
 cd drover
-pip install -e .
+uv sync
 
 # Download required NLTK data (one-time)
-python -c "import nltk; nltk.download('averaged_perceptron_tagger_eng'); nltk.download('punkt_tab')"
+uv run python -c "import nltk; nltk.download('averaged_perceptron_tagger_eng'); nltk.download('punkt_tab')"
 ```
+
+Run the CLI through `uv run drover ...`, or activate the environment with `source .venv/bin/activate` to call `drover` directly.
 
 ### Classify Your First Document
 
@@ -177,17 +180,19 @@ Drover follows a pipeline architecture with extensible plugin systems:
 
 ```bash
 # Install with dev dependencies
-pip install -e ".[dev]"
+uv sync --all-extras
 
 # Run tests
-pytest
+uv run pytest
 
 # Lint and format
-ruff check src/ --fix && ruff format src/
+uv run ruff check src/ --fix && uv run ruff format src/
 
 # Security scan
-bandit -r src/ -c pyproject.toml
+uv run bandit -r src/ -c pyproject.toml
 ```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full development workflow.
 
 ## Documentation
 
