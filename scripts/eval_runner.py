@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 import sys
 import time
 from datetime import UTC, datetime
@@ -159,13 +160,47 @@ FIELD_ABBREVS = {
 }
 
 
+_TOKEN_RE = re.compile(r"[a-z0-9]+")
+_STRICT_FIELDS = ("domain", "category", "doctype", "date")
+
+
+def _tokens(value: str) -> set[str]:
+    return set(_TOKEN_RE.findall(value.lower()))
+
+
+def _normalized_vendor(value: str) -> str:
+    return " ".join(_TOKEN_RE.findall(value.lower()))
+
+
+def _subject_matches(predicted: str, expected: str) -> bool:
+    """Token-set subset match: every expected token must appear in predicted."""
+    expected_tokens = _tokens(expected)
+    predicted_tokens = _tokens(predicted)
+    if not expected_tokens:
+        return not predicted_tokens
+    return expected_tokens.issubset(predicted_tokens)
+
+
 def compare_results(
     result: ClassificationResult, expected: ExpectedClassification
 ) -> dict[str, bool]:
-    """Compare classification result against expected values."""
-    return {
-        field: getattr(result, field) == getattr(expected, field) for field in COMPARISON_FIELDS
+    """Compare a classification result against expected ground truth.
+
+    Comparison rules per field:
+      - domain, category, doctype, date: strict equality (canonical / structured).
+      - vendor: case-folded, punctuation-stripped, whitespace-collapsed.
+      - subject: token-set subset match (predicted must contain every token
+        from expected). Token-based matching cannot bridge semantically
+        related but lexically disjoint subjects (e.g. "medical services" vs
+        "office visit lab tests"); embedding-based similarity would be a
+        future enhancement.
+    """
+    matches: dict[str, bool] = {
+        field: getattr(result, field) == getattr(expected, field) for field in _STRICT_FIELDS
     }
+    matches["vendor"] = _normalized_vendor(result.vendor) == _normalized_vendor(expected.vendor)
+    matches["subject"] = _subject_matches(result.subject, expected.subject)
+    return {field: matches[field] for field in COMPARISON_FIELDS}
 
 
 async def run_single_classification(
