@@ -66,8 +66,8 @@ documents:
   - path: eval/samples/user_manual.pdf
     expected:
       domain: household
-      category: home_network
+      category: network
       doctype: manual
       vendor: unknown
       date: "20240901"
-      subject: "SmartHub 3000"
+      subject: "smarthub 3000"
