@@ -5,38 +5,24 @@ __pycache__/
 *.so
 .Python
 build/
-develop-eggs/
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
 
 # Virtual environments
 .venv/
 venv/
 ENV/
 
-# Python version (pyenv/uv) - use pyproject.toml requires-python instead
+# Python version (use pyproject.toml requires-python instead)
 .python-version
 
 # IDE
-.idea/
-.vscode/settings.json.local
-.vscode/*.log
-*.swp
-*.swo
+.vscode
 
-# Testing
+# Testing & tooling caches
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
 .coverage
 htmlcov/
 
@@ -44,20 +30,17 @@ htmlcov/
 .env
 .env.local
 
-# Debug output
-*.prompt.txt
-*.response.txt
-debug_output/
-
-# Temporary files
-tmp/
-
 # OS
 .DS_Store
 Thumbs.db
 
-# project resources
+# Temporary files
+tmp/
+
+# Debug output
 debug/
+*.prompt.txt
+*.response.txt
 
 # Evaluation framework
 eval/documents/
@@ -66,6 +49,5 @@ eval/results/
 # Integration tests (user-specific LLM config)
 tests/integration/config.yaml
 
-# Dolt database files (added by bd init)
-.dolt/
-*.db
+# Beads issue tracker
+.beads/
