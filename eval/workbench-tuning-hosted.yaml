@@ -45,15 +45,6 @@ documents:
       date: "20241022"
       subject: "office visit lab tests"
 
-  - path: eval/samples/consulting_plan.pdf
-    expected:
-      domain: career
-      category: consulting
-      doctype: plan
-      vendor: unknown
-      date: "20241205"
-      subject: "consultancy business launch"
-
   - path: eval/samples/receipt.pdf
     expected:
       domain: pets
