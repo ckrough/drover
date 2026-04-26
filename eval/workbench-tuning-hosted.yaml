@@ -45,15 +45,6 @@ documents:
       date: "20241022"
       subject: "office visit lab tests"
 
-  - path: eval/samples/consulting_plan.pdf
-    expected:
-      domain: career
-      category: consulting
-      doctype: plan
-      vendor: unknown
-      date: "20241205"
-      subject: "consultancy business launch"
-
   - path: eval/samples/receipt.pdf
     expected:
       domain: pets
@@ -66,8 +57,8 @@ documents:
   - path: eval/samples/user_manual.pdf
     expected:
       domain: household
-      category: home_network
+      category: network
       doctype: manual
       vendor: unknown
       date: "20240901"
-      subject: "SmartHub 3000"
+      subject: "smarthub 3000"

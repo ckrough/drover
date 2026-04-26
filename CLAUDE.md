@@ -10,20 +10,20 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed architecture, code style, an
 
 ## Python Environment Setup
 
-### Virtual Environment
-- **ALWAYS** use the `.venv` virtual environment in the project root
-- **NEVER** install packages globally with pip
-- Activate before any Python operations: `source .venv/bin/activate`
-- If `.venv` doesn't exist, run: `python -m venv .venv && pip install -e ".[dev]"`
+### Package Manager
+- **ALWAYS** use `uv` for dependency management and command execution
+- **NEVER** install packages globally with `pip`, and do not invoke `pip` directly in this project
+- Use `uv run <command>` to execute project commands without manually activating the venv
+- Use `uv add <package>` (or `uv add --optional dev <package>`) to introduce new dependencies — this updates `pyproject.toml` and `uv.lock` together
 
 ### Python Version
-- Use Python 3.13.x
-- Check version: `python --version`
+- Use Python 3.13.x (pinned in `pyproject.toml`)
+- Check version: `uv run python --version`
 
 ### Before Running Any Python Code
 ```bash
-source .venv/bin/activate
-pip install -e .
+# Sync runtime + dev dependencies into .venv (uv manages it for you)
+uv sync --all-extras
 ```
 
 ## Project Structure
@@ -63,32 +63,35 @@ src/drover/
 
 ```bash
 # Install with dev dependencies
-pip install -e ".[dev]"
+uv sync --all-extras
 
 # Run CLI - classify command
-drover classify document.pdf --ai-provider ollama --ai-model llama3.2:latest
+uv run drover classify document.pdf --ai-provider ollama --ai-model llama3.2:latest
 
 # Run CLI - tag command (macOS only)
-drover tag document.pdf --dry-run
-drover tag document.pdf --tag-fields domain,category --tag-mode replace
+uv run drover tag document.pdf --dry-run
+uv run drover tag document.pdf --tag-fields domain,category --tag-mode replace
 
 # Run CLI - evaluate command
-drover evaluate eval/ground_truth.jsonl --ai-model gpt-4o
+uv run drover evaluate eval/ground_truth.jsonl --ai-model gpt-4o
 
 # Run all tests
-pytest
+uv run pytest
 
 # Run a single test file
-pytest tests/test_taxonomy.py
+uv run pytest tests/test_taxonomy.py
 
 # Run a specific test
-pytest tests/test_taxonomy.py::TestHouseholdTaxonomy::test_canonical_domain_alias
+uv run pytest tests/test_taxonomy.py::TestHouseholdTaxonomy::test_canonical_domain_alias
 
 # Lint and format
-ruff check src/ --fix && ruff format src/
+uv run ruff check src/ --fix && uv run ruff format src/
+
+# Type checking
+uv run mypy src/
 
 # Security scan
-bandit -r src/ -f json --severity-level medium --confidence-level medium --quiet -c pyproject.toml
+uv run bandit -r src/ -f json --severity-level medium --confidence-level medium --quiet -c pyproject.toml
 ```
 
 ## Architecture Quick Reference

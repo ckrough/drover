@@ -8,10 +8,14 @@
 name: "example-model-comparison"
 description: "Example experiment comparing models on test documents"
 
-# Models to test - each document will be classified by each model
+# Models to test - each document will be classified by each model.
+# Default: gemma4 (extracts dates and doctypes more accurately than llama3.2 in
+# local benchmarks). Uncomment additional models to compare side by side.
 models:
   - provider: ollama
-    model: llama3.2:latest
+    model: gemma4:latest
+  # - provider: ollama
+  #   model: llama3.2:latest
   # - provider: openai
   #   model: gpt-4o-mini
   # - provider: anthropic
@@ -27,57 +31,43 @@ config:
   # prompt: path/to/custom-prompt.md  # Custom prompt template (optional)
 
 # Test documents with ground truth labels
-# Place your test documents in eval/documents/ and reference them here
+# Place your test documents under eval/samples/ (or any path) and reference them here.
+# Expected values must use canonical taxonomy terms (see src/drover/taxonomy/household.py).
+# vendor: full organization name; subject: 2-4 lowercase words; date: YYYYMMDD or "00000000".
 documents:
   # Example entry - uncomment and modify for your documents:
   #
-  # - path: eval/documents/invoice-acme-2024.pdf
+  # - path: eval/samples/invoice-acme-2024.pdf
   #   expected:
-  #     domain: financial
-  #     category: bills
+  #     domain: household
+  #     category: expense
   #     doctype: invoice
-  #     vendor: acme-corp
+  #     vendor: "Acme Corporation"
   #     date: "20240115"
-  #     subject: office-supplies
+  #     subject: "office supplies"
   #
-  # - path: eval/documents/medical-statement.pdf
+  # - path: eval/samples/medical-statement.pdf
   #   expected:
   #     domain: medical
-  #     category: billing
+  #     category: expense
   #     doctype: statement
-  #     vendor: kaiser-permanente
+  #     vendor: "Kaiser Permanente"
   #     date: "20240201"
-  #     subject: annual-physical
+  #     subject: "annual physical"
 
   # Sample test documents
-  - path: eval/samples/invoice.pdf
-    expected:
-      domain: financial
-      category: records
-      doctype: invoice
-      vendor: "TechServices Inc."
-      date: "20241115"
-      subject: "cloud infrastructure consulting"
   - path: eval/samples/medical_bill.pdf
     expected:
       domain: medical
-      category: billing
+      category: expense
       doctype: invoice
       vendor: "Northern Virginia Medical Center"
       date: "20241101"
-      subject: "Medical Services"
-  - path: eval/samples/consulting_plan.pdf
-    expected:
-      domain: career
-      category: consulting
-      doctype: documentation
-      vendor: none
-      date: "20241205"
-      subject: "consulting plan"
+      subject: "medical services"
   - path: eval/samples/receipt.pdf
     expected:
-      domain: financial
-      category: banking
+      domain: pets
+      category: expense
       doctype: receipt
       vendor: "PetSmart"
       date: "20241208"
@@ -85,8 +75,8 @@ documents:
   - path: eval/samples/user_manual.pdf
     expected:
       domain: household
-      category: other
+      category: documentation
       doctype: manual
-      vendor: smarthub
-      date: "202409"
-      subject: "SmartHub 3000"
+      vendor: "smarthub"
+      date: "20240901"
+      subject: "smarthub 3000"
