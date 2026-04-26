@@ -7,15 +7,18 @@ Uses LangChain's `with_structured_output()` for reliable JSON extraction,
 with fallback parsing for edge cases.
 """
 
+import contextlib
 import json
 import os
 import re
 import socket
 from collections.abc import Callable
 from importlib.resources import files
-from importlib.resources.abc import Traversable
 from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
+
+if TYPE_CHECKING:
+    from importlib.resources.abc import Traversable
 
 import yaml
 from json_repair import repair_json
@@ -141,14 +144,16 @@ class PromptTemplate:
             else:
                 # self.template_path is guaranteed non-None here
                 raw = self.template_path.read_text(encoding="utf-8")  # type: ignore[union-attr]
-        except FileNotFoundError:
-            raise TemplateError(f"Template file not found: {source_desc}")
-        except PermissionError:
-            raise TemplateError(f"Permission denied reading template: {source_desc}")
+        except FileNotFoundError as e:
+            raise TemplateError(f"Template file not found: {source_desc}") from e
+        except PermissionError as e:
+            raise TemplateError(
+                f"Permission denied reading template: {source_desc}"
+            ) from e
         except UnicodeDecodeError as e:
-            raise TemplateError(f"Template encoding error (expected UTF-8): {e}")
+            raise TemplateError(f"Template encoding error (expected UTF-8): {e}") from e
         except OSError as e:
-            raise TemplateError(f"Failed to read template file: {e}")
+            raise TemplateError(f"Failed to read template file: {e}") from e
 
         if raw.startswith("---"):
             parts = raw.split("---", 2)
@@ -156,7 +161,7 @@ class PromptTemplate:
                 try:
                     self._frontmatter = yaml.safe_load(parts[1]) or {}
                 except yaml.YAMLError as e:
-                    raise TemplateError(f"Invalid YAML frontmatter: {e}")
+                    raise TemplateError(f"Invalid YAML frontmatter: {e}") from e
                 self._content = parts[2].strip()
             else:
                 self._frontmatter = {}
@@ -412,9 +417,9 @@ class DocumentClassifier:
             else:
                 result = await structured_llm.ainvoke([message])
             # Result is a dict-like object from LangChain structured output
-            return cast(dict[str, Any], result)
+            return cast("dict[str, Any]", result)
 
-        return cast(dict[str, Any], await _invoke())
+        return cast("dict[str, Any]", await _invoke())
 
     async def _invoke_with_retry(
         self,
@@ -449,7 +454,7 @@ class DocumentClassifier:
                 response = await llm.ainvoke([message])
             return str(response.content)
 
-        return cast(str, await _invoke())
+        return cast("str", await _invoke())
 
     async def classify(
         self,
@@ -658,10 +663,8 @@ class DocumentClassifier:
         parsed = None
 
         # Try direct JSON parsing first (fastest path)
-        try:
+        with contextlib.suppress(json.JSONDecodeError):
             parsed = json.loads(response)
-        except json.JSONDecodeError:
-            pass
 
         # Handle template-style double-brace wrappers like `{{ ... }}`
         if parsed is None and response.startswith("{{") and response.endswith("}}"):
@@ -698,7 +701,9 @@ class DocumentClassifier:
                 pass
 
         if parsed is None:
-            raise LLMParseError(f"Could not parse JSON from response: {response[:200]}...")
+            raise LLMParseError(
+                f"Could not parse JSON from response: {response[:200]}..."
+            )
 
         # Validate required fields
         required_fields = {"domain", "category", "doctype", "vendor", "date", "subject"}
@@ -713,7 +718,7 @@ class DocumentClassifier:
                     f"Field '{field}' must be string, got {type(parsed[field]).__name__}"
                 )
 
-        return cast(dict[str, Any], parsed)
+        return cast("dict[str, Any]", parsed)
 
     def _normalize_classification(
         self, raw: dict[str, Any] | RawClassification
@@ -738,7 +743,7 @@ class DocumentClassifier:
             try:
                 classification = RawClassification.model_validate(raw)
             except ValidationError as e:
-                raise LLMParseError(f"Invalid classification structure: {e}")
+                raise LLMParseError(f"Invalid classification structure: {e}") from e
 
         normalized_domain = self.taxonomy.canonical_domain(classification.domain)
         if normalized_domain is None:

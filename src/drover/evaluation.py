@@ -124,7 +124,9 @@ class EvaluationResult:
         if mistakes:
             lines.append(f"\nDomain misclassifications ({len(mistakes)}):")
             for c in mistakes[:5]:  # Show first 5
-                lines.append(f"  {c.filename}: {c.actual.domain} -> {c.predicted.domain}")
+                lines.append(
+                    f"  {c.filename}: {c.actual.domain} -> {c.predicted.domain}"
+                )
             if len(mistakes) > 5:
                 lines.append(f"  ... and {len(mistakes) - 5} more")
 
@@ -157,7 +159,9 @@ class ClassificationEvaluator:
         """
         self.ground_truth_path = Path(ground_truth_path)
         self.documents_dir = (
-            Path(documents_dir) if documents_dir else self.ground_truth_path.parent / "documents"
+            Path(documents_dir)
+            if documents_dir
+            else self.ground_truth_path.parent / "documents"
         )
         self.ground_truth: dict[str, GroundTruthEntry] = {}
         self._load_ground_truth()
@@ -165,9 +169,11 @@ class ClassificationEvaluator:
     def _load_ground_truth(self) -> None:
         """Load ground truth entries from JSONL file."""
         if not self.ground_truth_path.exists():
-            raise FileNotFoundError(f"Ground truth file not found: {self.ground_truth_path}")
+            raise FileNotFoundError(
+                f"Ground truth file not found: {self.ground_truth_path}"
+            )
 
-        with open(self.ground_truth_path) as f:
+        with self.ground_truth_path.open() as f:
             for line_num, line in enumerate(f, 1):
                 line = line.strip()
                 if not line or line.startswith("#"):
@@ -306,7 +312,9 @@ class ClassificationEvaluator:
 
             # Update confusion matrices
             self._update_confusion(domain_confusion, actual.domain, predicted.domain)
-            self._update_confusion(category_confusion, actual.category, predicted.category)
+            self._update_confusion(
+                category_confusion, actual.category, predicted.category
+            )
             self._update_confusion(doctype_confusion, actual.doctype, predicted.doctype)
 
             logger.debug(

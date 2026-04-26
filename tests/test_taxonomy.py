@@ -28,7 +28,9 @@ class TestHouseholdTaxonomy:
 
     # --- Domain resolution mechanism tests ---
 
-    def test_canonical_domain_case_insensitive(self, taxonomy: HouseholdTaxonomy) -> None:
+    def test_canonical_domain_case_insensitive(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
         """Case-insensitive matching works for any valid domain."""
         domains = taxonomy.all_domains()
         if domains:
@@ -63,7 +65,9 @@ class TestHouseholdTaxonomy:
         # Use a domain we know exists (first one) but with unknown category
         domains = taxonomy.all_domains()
         if domains:
-            assert taxonomy.canonical_category(domains[0], "unknown_cat_xyz_789") is None
+            assert (
+                taxonomy.canonical_category(domains[0], "unknown_cat_xyz_789") is None
+            )
 
     # --- Doctype resolution mechanism tests ---
 
@@ -87,7 +91,9 @@ class TestHouseholdTaxonomy:
         assert domains == sorted(domains)
         assert len(domains) > 0
 
-    def test_categories_for_domain_returns_sorted_list(self, taxonomy: HouseholdTaxonomy) -> None:
+    def test_categories_for_domain_returns_sorted_list(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
         """categories_for_domain() returns sorted lists for all domains."""
         for domain in taxonomy.all_domains():
             categories = taxonomy.categories_for_domain(domain)
@@ -99,7 +105,9 @@ class TestHouseholdTaxonomy:
         categories = taxonomy.categories_for_domain("nonexistent_domain_xyz")
         assert categories == []
 
-    def test_all_doctypes_returns_sorted_list(self, taxonomy: HouseholdTaxonomy) -> None:
+    def test_all_doctypes_returns_sorted_list(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
         """all_doctypes() returns a sorted, non-empty list."""
         doctypes = taxonomy.all_doctypes()
         assert isinstance(doctypes, list)

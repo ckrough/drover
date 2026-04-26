@@ -87,11 +87,15 @@ class TestSubjectComparison:
 
 class TestVendorComparison:
     def test_identical_vendors_match(self) -> None:
-        matches = compare_results(_result(vendor="PetSmart"), _expected(vendor="PetSmart"))
+        matches = compare_results(
+            _result(vendor="PetSmart"), _expected(vendor="PetSmart")
+        )
         assert matches["vendor"] is True
 
     def test_case_difference_matches(self) -> None:
-        matches = compare_results(_result(vendor="PETSMART"), _expected(vendor="PetSmart"))
+        matches = compare_results(
+            _result(vendor="PETSMART"), _expected(vendor="PetSmart")
+        )
         assert matches["vendor"] is True
 
     def test_punctuation_difference_matches(self) -> None:
@@ -115,11 +119,15 @@ class TestVendorComparison:
 
 class TestStrictFields:
     def test_domain_strict_case(self) -> None:
-        matches = compare_results(_result(domain="financial"), _expected(domain="Financial"))
+        matches = compare_results(
+            _result(domain="financial"), _expected(domain="Financial")
+        )
         assert matches["domain"] is False
 
     def test_category_strict(self) -> None:
-        matches = compare_results(_result(category="banking"), _expected(category="bank"))
+        matches = compare_results(
+            _result(category="banking"), _expected(category="bank")
+        )
         assert matches["category"] is False
 
     def test_date_strict(self) -> None:

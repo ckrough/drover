@@ -148,7 +148,9 @@ class TestActionRunner:
         action = MockAction()
         runner = ActionRunner(config, action)
 
-        monkeypatch.setattr(runner._service._classifier, "classify", _make_fake_classify(tmp_path))
+        monkeypatch.setattr(
+            runner._service._classifier, "classify", _make_fake_classify(tmp_path)
+        )
 
         outputs: list[ActionPlan | ActionResult] = []
 
@@ -175,7 +177,9 @@ class TestActionRunner:
         action = MockAction()
         runner = ActionRunner(config, action)
 
-        monkeypatch.setattr(runner._service._classifier, "classify", _make_fake_classify(tmp_path))
+        monkeypatch.setattr(
+            runner._service._classifier, "classify", _make_fake_classify(tmp_path)
+        )
 
         outputs: list[ActionPlan | ActionResult] = []
 
@@ -203,7 +207,9 @@ class TestActionRunner:
         action = MockAction(should_fail=True)
         runner = ActionRunner(config, action)
 
-        monkeypatch.setattr(runner._service._classifier, "classify", _make_fake_classify(tmp_path))
+        monkeypatch.setattr(
+            runner._service._classifier, "classify", _make_fake_classify(tmp_path)
+        )
 
         exit_code = await runner.run([doc_path], dry_run=False)
 

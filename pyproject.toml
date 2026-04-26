@@ -77,6 +77,11 @@ ignore = [
 [tool.ruff.lint.isort]
 known-first-party = ["drover"]
 
+[tool.ruff.lint.per-file-ignores]
+# Test fakes intentionally match real signatures without using all parameters.
+# Commented-format docs and metacharacter-in-match patterns are also fine in tests.
+"tests/**/*.py" = ["ARG001", "ARG002", "ERA001"]
+
 [tool.mypy]
 python_version = "3.13"
 strict = true

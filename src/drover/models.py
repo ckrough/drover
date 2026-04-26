@@ -33,8 +33,12 @@ class ClassificationResult(BaseModel):
     date: str = Field(description="Document date in YYYYMMDD format")
     subject: str = Field(description="Brief subject description")
     error: bool = Field(default=False, description="Whether classification failed")
-    error_code: ErrorCode | None = Field(default=None, description="Error code if failed")
-    error_message: str | None = Field(default=None, description="Error message if failed")
+    error_code: ErrorCode | None = Field(
+        default=None, description="Error code if failed"
+    )
+    error_message: str | None = Field(
+        default=None, description="Error message if failed"
+    )
     metrics: dict[str, Any] | None = Field(
         default=None, description="AI metrics for this classification, if collected"
     )

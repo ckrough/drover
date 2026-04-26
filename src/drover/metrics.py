@@ -33,7 +33,9 @@ class AIMetrics(BaseModel):
     input_tokens: int = Field(default=0, description="Prompt token count")
     output_tokens: int = Field(default=0, description="Completion token count")
     total_tokens: int = Field(default=0, description="Sum of input + output tokens")
-    latency_ms: float = Field(default=0.0, description="Request latency in milliseconds")
+    latency_ms: float = Field(
+        default=0.0, description="Request latency in milliseconds"
+    )
     cost_usd: float | None = Field(default=None, description="Estimated cost in USD")
     # Anthropic prompt caching metrics
     cache_creation_input_tokens: int = Field(
@@ -65,14 +67,14 @@ class MetricsCallback(BaseCallbackHandler):
 
     def on_llm_start(
         self,
-        serialized: dict[str, Any],
-        prompts: list[str],
-        **kwargs: Any,
+        serialized: dict[str, Any],  # noqa: ARG002 - framework signature
+        prompts: list[str],  # noqa: ARG002 - framework signature
+        **kwargs: Any,  # noqa: ARG002 - framework signature
     ) -> None:
         """Called when LLM starts generating."""
         self._start_time = time.perf_counter()
 
-    def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:
+    def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:  # noqa: ARG002 - framework signature
         """Called when LLM finishes generating."""
         if self._start_time is not None:
             elapsed = time.perf_counter() - self._start_time
@@ -93,7 +95,9 @@ class MetricsCallback(BaseCallbackHandler):
             self._metrics.cache_creation_input_tokens = token_usage.get(
                 "cache_creation_input_tokens", 0
             )
-            self._metrics.cache_read_input_tokens = token_usage.get("cache_read_input_tokens", 0)
+            self._metrics.cache_read_input_tokens = token_usage.get(
+                "cache_read_input_tokens", 0
+            )
 
         self._metrics.cost_usd = self._calculate_cost()
 

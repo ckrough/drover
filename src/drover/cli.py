@@ -5,9 +5,8 @@ from __future__ import annotations
 import asyncio
 import json
 import sys
-from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import click
 from rich.console import Console
@@ -22,10 +21,14 @@ from drover.config import (
     TaxonomyMode,
 )
 from drover.logging import configure_logging
-from drover.models import ClassificationErrorResult as ClassificationErrorModel
-from drover.models import ClassificationResult
 from drover.sampling import SampleStrategy
 from drover.service import ClassificationService
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from drover.models import ClassificationErrorResult as ClassificationErrorModel
+    from drover.models import ClassificationResult
 
 console = Console(stderr=True)
 
@@ -240,7 +243,9 @@ def classify(
     )
 
     if on_error is None:
-        config = config.with_overrides(on_error=ErrorMode.CONTINUE if batch else ErrorMode.FAIL)
+        config = config.with_overrides(
+            on_error=ErrorMode.CONTINUE if batch else ErrorMode.FAIL
+        )
 
     # Configure structured logging (JSON format by default)
     configure_logging(level=config.log_level, json_output=True)
@@ -268,11 +273,15 @@ async def _classify_files(
     prompt_source = str(config.prompt) if config.prompt else "default"
 
     if log == LogLevel.VERBOSE:
-        console.print(f"[dim]Using {config.ai.provider} with model {config.ai.model}[/dim]")
+        console.print(
+            f"[dim]Using {config.ai.provider} with model {config.ai.model}[/dim]"
+        )
         console.print(f"[dim]Prompt template: {prompt_source}[/dim]")
     if log == LogLevel.DEBUG:
         console.print(f"[dim]Debug: Processing {len(files)} file(s)[/dim]")
-        console.print(f"[dim]Debug: Provider={config.ai.provider}, Model={config.ai.model}[/dim]")
+        console.print(
+            f"[dim]Debug: Provider={config.ai.provider}, Model={config.ai.model}[/dim]"
+        )
         console.print(f"[dim]Debug: Prompt={prompt_source}[/dim]")
 
     try:
@@ -408,7 +417,9 @@ def tag(
 
     configure_logging(level=config.log_level, json_output=True)
 
-    exit_code = asyncio.run(_tag_files(files, config, fields, TagMode(tag_mode), dry_run))
+    exit_code = asyncio.run(
+        _tag_files(files, config, fields, TagMode(tag_mode), dry_run)
+    )
     sys.exit(exit_code)
 
 
@@ -434,7 +445,9 @@ async def _tag_files(
     log = config.log_level
 
     if log == LogLevel.VERBOSE:
-        console.print(f"[dim]Using {config.ai.provider} with model {config.ai.model}[/dim]")
+        console.print(
+            f"[dim]Using {config.ai.provider} with model {config.ai.model}[/dim]"
+        )
         console.print(f"[dim]Tag fields: {', '.join(fields)}[/dim]")
         console.print(f"[dim]Tag mode: {mode}[/dim]")
         if dry_run:
@@ -475,7 +488,9 @@ def _output_tag_result(result: ActionPlan | ActionResult, log_level: LogLevel) -
             else:
                 console.print(f"[red]✗[/red] Failed {result.file.name}: {result.error}")
         else:
-            console.print(f"[blue]○[/blue] Would tag {result.file.name}: {result.description}")
+            console.print(
+                f"[blue]○[/blue] Would tag {result.file.name}: {result.description}"
+            )
 
 
 @main.command()

@@ -225,7 +225,9 @@ class ClassificationService:
                 e,
             )
 
-    def _save_debug_from_exception(self, file_path: Path, exc: ClassificationError) -> None:
+    def _save_debug_from_exception(
+        self, file_path: Path, exc: ClassificationError
+    ) -> None:
         """Save debug info from an exception if capture_debug is enabled.
 
         Extracts debug_info from ClassificationError exceptions (which may
