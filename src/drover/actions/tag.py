@@ -2,17 +2,19 @@
 
 from __future__ import annotations
 
+import contextlib
 import plistlib
 import sys
 from enum import StrEnum
-from pathlib import Path
-from types import ModuleType
 from typing import TYPE_CHECKING
 
 from drover.actions.base import ActionPlan, ActionResult
 from drover.logging import get_logger
 
 if TYPE_CHECKING:
+    from pathlib import Path
+    from types import ModuleType
+
     from drover.models import ClassificationResult
 
 logger = get_logger(__name__)
@@ -127,11 +129,8 @@ class TagManager:
         """
         try:
             if not tags:
-                # Remove the attribute if no tags
-                try:
+                with contextlib.suppress(OSError):
                     self._xattr.removexattr(str(path), MACOS_TAG_ATTR)
-                except OSError:
-                    pass  # Attribute didn't exist
                 return
 
             # Add color suffix (0 = no color) to each tag

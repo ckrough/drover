@@ -171,7 +171,7 @@ class DocumentLoader:
 
         # Return pages in order
         if not pages:
-            return [[el for el in elements]]
+            return [list(elements)]
 
         max_page = max(pages.keys())
         return [pages.get(i, []) for i in range(1, max_page + 1) if pages.get(i)]
@@ -192,7 +192,9 @@ class DocumentLoader:
                 texts.append(page_text)
         return "\n\n".join(texts)
 
-    def _apply_sampling(self, pages: list[list[Any]], total_pages: int) -> list[list[Any]]:
+    def _apply_sampling(
+        self, pages: list[list[Any]], total_pages: int
+    ) -> list[list[Any]]:
         """Apply sampling strategy to document pages.
 
         Args:

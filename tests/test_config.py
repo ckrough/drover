@@ -148,7 +148,10 @@ class TestDroverConfig:
 
     def test_deep_merge(self) -> None:
         """Test deep merge of dictionaries."""
-        base = {"ai": {"provider": "ollama", "model": "llama3"}, "taxonomy": "household"}
+        base = {
+            "ai": {"provider": "ollama", "model": "llama3"},
+            "taxonomy": "household",
+        }
         override = {"ai": {"model": "mistral"}, "max_pages": 5}
 
         result = DroverConfig._deep_merge(base, override)
@@ -242,7 +245,9 @@ class TestAIConfig:
         """Test invalid retry wait range raises error."""
         import pytest
 
-        with pytest.raises(ValueError, match="retry_min_wait.*must be <= retry_max_wait"):
+        with pytest.raises(
+            ValueError, match=r"retry_min_wait.*must be <= retry_max_wait"
+        ):
             AIConfig(retry_min_wait=10.0, retry_max_wait=5.0)
 
     def test_timeout_validation(self) -> None:

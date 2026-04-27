@@ -90,7 +90,9 @@ class DroverConfig(BaseModel):
     debug_dir: Path | None = Field(
         default=None, description="Directory for debug prompt/response files"
     )
-    prompt: Path | None = Field(default=None, description="Custom prompt template file path")
+    prompt: Path | None = Field(
+        default=None, description="Custom prompt template file path"
+    )
 
     @classmethod
     def default_config_paths(cls) -> list[Path]:
@@ -134,7 +136,13 @@ class DroverConfig(BaseModel):
         }
 
         # Fields that need numeric conversion
-        int_fields = {"max_pages", "concurrency", "max_tokens", "timeout", "max_retries"}
+        int_fields = {
+            "max_pages",
+            "concurrency",
+            "max_tokens",
+            "timeout",
+            "max_retries",
+        }
         float_fields = {"temperature", "retry_min_wait", "retry_max_wait"}
 
         result: dict[str, Any] = {}
@@ -191,7 +199,11 @@ class DroverConfig(BaseModel):
         """Deep merge two dictionaries, with override taking precedence."""
         result = base.copy()
         for key, value in override.items():
-            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            if (
+                key in result
+                and isinstance(result[key], dict)
+                and isinstance(value, dict)
+            ):
                 result[key] = DroverConfig._deep_merge(result[key], value)
             else:
                 result[key] = value

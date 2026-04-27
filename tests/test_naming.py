@@ -86,7 +86,9 @@ class TestNARAPolicyNaming:
         )
         assert "20240115" in filename
 
-    def test_format_filename_missing_extension_dot(self, policy: NARAPolicyNaming) -> None:
+    def test_format_filename_missing_extension_dot(
+        self, policy: NARAPolicyNaming
+    ) -> None:
         """Test extension without leading dot."""
         filename = policy.format_filename(
             doctype="statement",
@@ -123,7 +125,9 @@ class TestNARAPolicyNaming:
 
     def test_validate_filename_valid(self, policy: NARAPolicyNaming) -> None:
         """Test filename validation passes for valid names."""
-        is_valid, error = policy.validate_filename("statement-chase-checking-20240115.pdf")
+        is_valid, error = policy.validate_filename(
+            "statement-chase-checking-20240115.pdf"
+        )
         assert is_valid
         assert error is None
 

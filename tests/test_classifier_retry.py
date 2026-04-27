@@ -176,7 +176,9 @@ class TestInvokeWithRetry:
         classifier = _make_classifier(max_retries=2)
 
         mock_llm = MagicMock()
-        mock_llm.ainvoke = AsyncMock(side_effect=ConnectionError("Persistent network error"))
+        mock_llm.ainvoke = AsyncMock(
+            side_effect=ConnectionError("Persistent network error")
+        )
 
         with patch.object(classifier, "_get_llm", return_value=mock_llm):
             from langchain_core.messages import HumanMessage

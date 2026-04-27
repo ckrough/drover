@@ -110,7 +110,7 @@ class TestClassificationPipeline:
     ) -> None:
         """Test that metrics collection works with real LLM."""
         loaded = await integration_loader.load(sample_text_file)
-        result, debug_info = await integration_classifier.classify(
+        result, _debug_info = await integration_classifier.classify(
             loaded.content,
             collect_metrics=True,
         )

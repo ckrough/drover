@@ -83,7 +83,9 @@ class NARAPolicyNaming(BaseNamingPolicy):
                 - 3  # Three separators
             )
             if max_subject > 0:
-                norm_subject = norm_subject[:max_subject].rstrip(self.CONSTRAINTS.word_separator)
+                norm_subject = norm_subject[:max_subject].rstrip(
+                    self.CONSTRAINTS.word_separator
+                )
                 components = [norm_doctype, norm_vendor, norm_subject, norm_date]
                 base_name = sep.join(c for c in components if c)
                 filename = f"{base_name}{extension.lower()}"

@@ -33,7 +33,9 @@ def _make_error_result(filename: str) -> ClassificationErrorResult:
     """Create an error classification result for testing."""
     return ClassificationErrorResult.from_exception(
         filename,
-        code=__import__("drover.models", fromlist=["ErrorCode"]).ErrorCode.LLM_PARSE_ERROR,
+        code=__import__(
+            "drover.models", fromlist=["ErrorCode"]
+        ).ErrorCode.LLM_PARSE_ERROR,
         exception=ValueError("Test error"),
     )
 
@@ -75,7 +77,9 @@ async def test_classification_service_error_modes_continue(tmp_path: Path) -> No
 
 
 @pytest.mark.asyncio
-async def test_debug_dir_writes_files(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_debug_dir_writes_files(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """When debug_dir is configured, prompts are written there."""
     doc_path = tmp_path / "doc.txt"
     doc_path.write_text("dummy content")
@@ -86,7 +90,9 @@ async def test_debug_dir_writes_files(tmp_path: Path, monkeypatch: pytest.Monkey
     async def fake_classify(  # type: ignore[override]
         content: str, capture_debug: bool = False, collect_metrics: bool = False
     ) -> tuple[ClassificationResult, dict[str, str] | None]:
-        debug_info = {"prompt": "PROMPT", "response": "RESPONSE"} if capture_debug else None
+        debug_info = (
+            {"prompt": "PROMPT", "response": "RESPONSE"} if capture_debug else None
+        )
         return (
             ClassificationResult(
                 original="doc.txt",
@@ -129,7 +135,9 @@ async def test_debug_capture_on_llm_parse_failure(
     doc_path.write_text("dummy content")
 
     debug_dir = tmp_path / "debug"
-    cfg = DroverConfig(capture_debug=True, debug_dir=debug_dir, on_error=ErrorMode.CONTINUE)
+    cfg = DroverConfig(
+        capture_debug=True, debug_dir=debug_dir, on_error=ErrorMode.CONTINUE
+    )
     service = ClassificationService(cfg)
 
     async def fake_classify_that_fails(
@@ -211,7 +219,9 @@ class TestConcurrencyLimiting:
         exit_code = await service.classify_files(files)
 
         assert exit_code == 0
-        assert peak_concurrent <= 2, f"Peak concurrent was {peak_concurrent}, expected <= 2"
+        assert peak_concurrent <= 2, (
+            f"Peak concurrent was {peak_concurrent}, expected <= 2"
+        )
         # Should have actually used concurrency (peak > 1 with enough files)
         assert peak_concurrent >= 1
 

@@ -15,12 +15,16 @@ class NamingConstraints(BaseModel):
     """Constraints for generated filenames."""
 
     max_filename_length: int = Field(default=255, description="Max filename length")
-    max_component_length: int = Field(default=50, description="Max length per component")
+    max_component_length: int = Field(
+        default=50, description="Max length per component"
+    )
     allowed_chars_pattern: str = Field(
         default=r"[a-z0-9_-]", description="Regex pattern for allowed chars"
     )
     word_separator: str = Field(default="_", description="Separator between words")
-    component_separator: str = Field(default="-", description="Separator between components")
+    component_separator: str = Field(
+        default="-", description="Separator between components"
+    )
 
 
 class BaseNamingPolicy(ABC):
@@ -86,7 +90,9 @@ class BaseNamingPolicy(ABC):
 
         allowed_pattern = constraints.allowed_chars_pattern
         normalized = "".join(
-            c for c in normalized if re.match(allowed_pattern, c) or c == constraints.word_separator
+            c
+            for c in normalized
+            if re.match(allowed_pattern, c) or c == constraints.word_separator
         )
 
         sep = constraints.word_separator
@@ -109,7 +115,9 @@ class BaseNamingPolicy(ABC):
         Returns:
             Normalized vendor string.
         """
-        vendor = re.sub(r"\b(inc|llc|ltd|corp|co|company)\b\.?", "", vendor, flags=re.IGNORECASE)
+        vendor = re.sub(
+            r"\b(inc|llc|ltd|corp|co|company)\b\.?", "", vendor, flags=re.IGNORECASE
+        )
         return self.normalize_component(vendor)
 
     def validate_filename(self, filename: str) -> tuple[bool, str | None]:
@@ -124,7 +132,10 @@ class BaseNamingPolicy(ABC):
         constraints = self.CONSTRAINTS
 
         if len(filename) > constraints.max_filename_length:
-            return False, f"Filename exceeds {constraints.max_filename_length} characters"
+            return (
+                False,
+                f"Filename exceeds {constraints.max_filename_length} characters",
+            )
 
         base_name = filename.rsplit(".", 1)[0] if "." in filename else filename
         allowed_chars = constraints.allowed_chars_pattern

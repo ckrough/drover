@@ -127,10 +127,7 @@ class PathBuilder:
 
         folder_part, _, _ = path.rpartition("/")
 
-        if folder_part:
-            folder_depth = folder_part.count("/") + 1
-        else:
-            folder_depth = 0
+        folder_depth = folder_part.count("/") + 1 if folder_part else 0
 
         if folder_depth > self.constraints.max_folder_depth:
             raise PathConstraintError(

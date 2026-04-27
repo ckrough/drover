@@ -30,7 +30,9 @@ class TestPromptTemplate:
 
         template = PromptTemplate(template_file)
 
-        with pytest.raises(TemplateError, match="missing required placeholders.*taxonomy_menu"):
+        with pytest.raises(
+            TemplateError, match=r"missing required placeholders.*taxonomy_menu"
+        ):
             _ = template.content
 
     def test_load_template_missing_document_content(self, tmp_path: Path) -> None:
@@ -40,7 +42,9 @@ class TestPromptTemplate:
 
         template = PromptTemplate(template_file)
 
-        with pytest.raises(TemplateError, match="missing required placeholders.*document_content"):
+        with pytest.raises(
+            TemplateError, match=r"missing required placeholders.*document_content"
+        ):
             _ = template.content
 
     def test_load_template_missing_both_placeholders(self, tmp_path: Path) -> None:

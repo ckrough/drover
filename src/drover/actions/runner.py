@@ -3,17 +3,17 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 from drover.actions.base import ActionPlan, ActionResult, FileAction
-from drover.config import DroverConfig
 from drover.logging import get_logger
 from drover.models import ClassificationErrorResult, ClassificationResult
 from drover.service import ClassificationService
 
 if TYPE_CHECKING:
-    pass
+    from pathlib import Path
+
+    from drover.config import DroverConfig
 
 logger = get_logger(__name__)
 

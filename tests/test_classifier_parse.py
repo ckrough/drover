@@ -39,7 +39,7 @@ def test_parse_response_json_in_code_block() -> None:
 ```json
 {"domain": "financial", "category": "banking", "doctype": "statement", "vendor": "Bank", "date": "20250101", "subject": "checking"}
 ```
-"""  # noqa: E501
+"""
 
     result = classifier._parse_response(payload)
 
@@ -65,7 +65,7 @@ def test_parse_response_raises_on_invalid_json() -> None:
 
     try:
         classifier._parse_response(payload)
-    except LLMParseError as exc:  # noqa: PT011
+    except LLMParseError as exc:
         assert "Could not parse JSON" in str(exc)
     else:  # pragma: no cover
         raise AssertionError("Expected LLMParseError for invalid JSON response")

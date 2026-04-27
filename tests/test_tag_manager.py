@@ -174,7 +174,9 @@ class TestTagsFromResult:
     def test_all_fields(self) -> None:
         """All available fields work correctly."""
         result = self._make_result()
-        tags = tags_from_result(result, ["domain", "category", "doctype", "vendor", "date"])
+        tags = tags_from_result(
+            result, ["domain", "category", "doctype", "vendor", "date"]
+        )
 
         assert tags == ["financial", "banking", "statement", "chase", "2024"]
 

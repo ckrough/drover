@@ -34,7 +34,9 @@ class TestPathBuilder:
             subject="checking account",
         )
 
-    def test_build_basic(self, builder: PathBuilder, classification: RawClassification) -> None:
+    def test_build_basic(
+        self, builder: PathBuilder, classification: RawClassification
+    ) -> None:
         """Test basic path building."""
         original = Path("/documents/scan001.pdf")
         result = builder.build(classification, original)
@@ -131,7 +133,9 @@ class TestPathBuilder:
         with pytest.raises(PathConstraintError, match="exceeds max length"):
             builder.build(classification, original)
 
-    def test_folder_segments_respect_allowed_chars(self, policy: NARAPolicyNaming) -> None:
+    def test_folder_segments_respect_allowed_chars(
+        self, policy: NARAPolicyNaming
+    ) -> None:
         """Folder components must obey PathConstraints.allowed_chars pattern."""
         # Disallow letters to force a violation on the folder part
         constraints = PathConstraints(allowed_chars="0-9")

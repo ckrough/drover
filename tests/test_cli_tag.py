@@ -1,6 +1,7 @@
 """Tests for the drover tag CLI command."""
 
 import sys
+from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
@@ -40,10 +41,12 @@ class TestTagCommand:
         """Tag command rejects invalid fields."""
         runner = CliRunner()
         with runner.isolated_filesystem():
-            with open("test.txt", "w") as f:
+            with Path("test.txt").open("w") as f:
                 f.write("test content")
 
-            result = runner.invoke(main, ["tag", "--tag-fields", "invalid_field", "test.txt"])
+            result = runner.invoke(
+                main, ["tag", "--tag-fields", "invalid_field", "test.txt"]
+            )
 
         assert result.exit_code != 0
         assert "Invalid tag fields" in result.output
@@ -52,14 +55,19 @@ class TestTagCommand:
         """Tag command accepts all valid fields."""
         runner = CliRunner()
         with runner.isolated_filesystem():
-            with open("test.txt", "w") as f:
+            with Path("test.txt").open("w") as f:
                 f.write("test content")
 
             # Just check that the field validation passes
             # (actual tagging would require mocking the classifier)
             result = runner.invoke(
                 main,
-                ["tag", "--tag-fields", "domain,category,doctype,vendor,date,subject", "--help"],
+                [
+                    "tag",
+                    "--tag-fields",
+                    "domain,category,doctype,vendor,date,subject",
+                    "--help",
+                ],
             )
 
         # Help should work without errors

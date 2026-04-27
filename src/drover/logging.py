@@ -89,4 +89,4 @@ def get_logger(name: str) -> structlog.stdlib.BoundLogger:
     Returns:
         Configured structured logger.
     """
-    return cast(structlog.stdlib.BoundLogger, structlog.get_logger(name))
+    return cast("structlog.stdlib.BoundLogger", structlog.get_logger(name))
