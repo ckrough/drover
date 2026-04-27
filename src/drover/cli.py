@@ -17,6 +17,7 @@ from drover.config import (
     AIProvider,
     DroverConfig,
     ErrorMode,
+    ExtractorType,
     LogLevel,
     TaxonomyMode,
 )
@@ -27,8 +28,10 @@ from drover.service import ClassificationService
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    from drover.extractors.base import BaseExtractor
     from drover.models import ClassificationErrorResult as ClassificationErrorModel
     from drover.models import ClassificationResult
+    from drover.nli_classifier import NLIDocumentClassifier
 
 console = Console(stderr=True)
 
@@ -614,18 +617,47 @@ async def _evaluate_async(
             console.print(f"[red]Taxonomy error: {e}[/red]")
         return 2
 
-    classifier = DocumentClassifier(
-        provider=provider,
-        model=model,
-        taxonomy=taxonomy,
-        taxonomy_mode=config.taxonomy_mode,
-        temperature=config.ai.temperature,
-        max_tokens=config.ai.max_tokens,
-        timeout=config.ai.timeout,
-        max_retries=config.ai.max_retries,
-        retry_min_wait=config.ai.retry_min_wait,
-        retry_max_wait=config.ai.retry_max_wait,
-    )
+    classifier: DocumentClassifier | NLIDocumentClassifier
+    if provider == AIProvider.NLI_LOCAL:
+        from drover.extractors import HybridExtractor, RegexExtractor
+        from drover.nli_classifier import NLIDocumentClassifier
+
+        nli_cfg = config.nli
+        extractor: BaseExtractor
+        if nli_cfg.extractor == ExtractorType.HYBRID and nli_cfg.fallback_model:
+            from drover.extractors import create_ollama_extractor
+
+            extractor = create_ollama_extractor(model=nli_cfg.fallback_model)
+        elif nli_cfg.extractor == ExtractorType.HYBRID:
+            extractor = HybridExtractor()
+        else:
+            extractor = RegexExtractor()
+
+        classifier = NLIDocumentClassifier(
+            taxonomy=taxonomy,
+            taxonomy_mode=config.taxonomy_mode,
+            extractor=extractor,
+            model_name=nli_cfg.model_name,
+            device=nli_cfg.device,
+            max_tokens=nli_cfg.max_tokens,
+            chunk_strategy=nli_cfg.chunk_strategy,
+            chunk_size=nli_cfg.chunk_size,
+            chunk_overlap=nli_cfg.chunk_overlap,
+            aggregation=nli_cfg.aggregation,
+        )
+    else:
+        classifier = DocumentClassifier(
+            provider=provider,
+            model=model,
+            taxonomy=taxonomy,
+            taxonomy_mode=config.taxonomy_mode,
+            temperature=config.ai.temperature,
+            max_tokens=config.ai.max_tokens,
+            timeout=config.ai.timeout,
+            max_retries=config.ai.max_retries,
+            retry_min_wait=config.ai.retry_min_wait,
+            retry_max_wait=config.ai.retry_max_wait,
+        )
 
     loader = DocumentLoader(
         strategy=config.sample_strategy,

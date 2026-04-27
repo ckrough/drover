@@ -35,6 +35,7 @@ from drover.path_builder import PathBuilder, PathConstraintError
 from drover.taxonomy import get_taxonomy
 
 if TYPE_CHECKING:
+    from drover.extractors.base import BaseExtractor
     from drover.nli_classifier import NLIDocumentClassifier
 
 logger = get_logger(__name__)
@@ -97,6 +98,7 @@ class ClassificationService:
         nli_cfg = cfg.nli
 
         # Create extractor based on config
+        extractor: BaseExtractor
         if nli_cfg.extractor == ExtractorType.HYBRID and nli_cfg.fallback_model:
             from drover.extractors import create_ollama_extractor
 
@@ -113,6 +115,10 @@ class ClassificationService:
             model_name=nli_cfg.model_name,
             device=nli_cfg.device,
             max_tokens=nli_cfg.max_tokens,
+            chunk_strategy=nli_cfg.chunk_strategy,
+            chunk_size=nli_cfg.chunk_size,
+            chunk_overlap=nli_cfg.chunk_overlap,
+            aggregation=nli_cfg.aggregation,
         )
 
     async def classify_files(

@@ -12,10 +12,8 @@ from drover.config import TaxonomyMode
 from drover.extractors import ExtractionResult, RegexExtractor
 from drover.models import RawClassification
 from drover.nli_classifier import (
-    CATEGORY_TEMPLATES,
     DOCTYPE_TEMPLATES,
     DOMAIN_TEMPLATES,
-    NLIClassificationError,
     NLIDocumentClassifier,
     NLIImportError,
     TaxonomyValidationError,
@@ -49,7 +47,9 @@ class TestHypothesisGeneration:
         """Create taxonomy instance."""
         return HouseholdTaxonomy()
 
-    def test_domain_hypotheses_cover_all_domains(self, taxonomy: HouseholdTaxonomy) -> None:
+    def test_domain_hypotheses_cover_all_domains(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
         """Domain hypotheses are generated for all domains."""
         hypotheses = generate_domain_hypotheses(taxonomy)
         assert set(hypotheses.keys()) == taxonomy.CANONICAL_DOMAINS
@@ -63,7 +63,9 @@ class TestHypothesisGeneration:
             readable = domain.replace("_", " ")
             assert any(readable in h for h in hyp_list)
 
-    def test_category_hypotheses_domain_specific(self, taxonomy: HouseholdTaxonomy) -> None:
+    def test_category_hypotheses_domain_specific(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
         """Category hypotheses are specific to the given domain."""
         # Get categories for financial domain
         financial_hyps = generate_category_hypotheses(taxonomy, "financial")
@@ -87,15 +89,19 @@ class TestHypothesisGeneration:
             # At least one hypothesis should mention "financial"
             assert any("financial" in h for h in hyp_list)
 
-    def test_doctype_hypotheses_cover_all_doctypes(self, taxonomy: HouseholdTaxonomy) -> None:
+    def test_doctype_hypotheses_cover_all_doctypes(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
         """Doctype hypotheses are generated for all doctypes."""
         hypotheses = generate_doctype_hypotheses(taxonomy)
         assert set(hypotheses.keys()) == taxonomy.CANONICAL_DOCTYPES
 
-    def test_doctype_hypotheses_use_templates(self, taxonomy: HouseholdTaxonomy) -> None:
+    def test_doctype_hypotheses_use_templates(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
         """Each doctype has hypotheses from all templates."""
         hypotheses = generate_doctype_hypotheses(taxonomy)
-        for doctype, hyp_list in hypotheses.items():
+        for hyp_list in hypotheses.values():
             assert len(hyp_list) == len(DOCTYPE_TEMPLATES)
 
 
@@ -161,7 +167,9 @@ class TestRegexExtractor:
 
     # --- Subject extraction tests ---
 
-    def test_extract_subject_first_meaningful_line(self, extractor: RegexExtractor) -> None:
+    def test_extract_subject_first_meaningful_line(
+        self, extractor: RegexExtractor
+    ) -> None:
         """Subject is extracted from first meaningful line."""
         content = "\n\n\nYour Monthly Statement Summary\n\nAccount details below."
         result = extractor.extract(content)
@@ -209,7 +217,9 @@ class TestNLIDocumentClassifier:
         assert normalized.category == "banking"
         assert normalized.doctype == "statement"
 
-    def test_normalize_classification_fallback_mode(self, taxonomy: HouseholdTaxonomy) -> None:
+    def test_normalize_classification_fallback_mode(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
         """Unknown values map to 'other' in fallback mode."""
         classifier = NLIDocumentClassifier(
             taxonomy=taxonomy,
@@ -292,26 +302,41 @@ class TestNLIClassifierIntegration:
                 return 0.8
             return 0.1
 
-        # Patch the scoring method
-        with patch.object(
-            classifier, "_compute_entailment_score", side_effect=mock_score
+        with (
+            patch.object(
+                classifier, "_compute_entailment_score", side_effect=mock_score
+            ),
+            patch.object(
+                classifier, "_get_chunks", return_value=["Bank statement content"]
+            ),
         ):
-            # Patch truncation to return content as-is
-            with patch.object(
-                classifier, "_truncate_content", return_value="Bank statement content"
-            ):
-                result, debug = classifier._classify_sync(
-                    "Bank of America statement showing balance",
-                    capture_debug=True,
-                )
+            result, debug = classifier._classify_sync(
+                "Bank of America statement showing balance",
+                capture_debug=True,
+            )
 
-                assert isinstance(result, RawClassification)
-                assert result.domain == "financial"
-                assert result.category == "banking"
-                assert result.doctype == "statement"
-                assert debug is not None
-                assert "domain_scores" in debug
-                assert call_count["n"] > 0  # Verify scoring was called
+            assert isinstance(result, RawClassification)
+            assert result.domain == "financial"
+            assert result.category == "banking"
+            assert result.doctype == "statement"
+            assert debug is not None
+            assert "domain_scores" in debug
+            assert debug["chunk_count"] == 1
+            assert debug["chunk_strategy"] == "truncate"
+            assert debug["aggregation"] == "max"
+            assert debug["chunk_counts"] == {
+                "domain": 1,
+                "category": 1,
+                "doctype": 1,
+            }
+            assert set(debug["chunk_scores"].keys()) == {
+                "domain",
+                "category",
+                "doctype",
+            }
+            assert len(debug["chunk_scores"]["domain"]) == 1
+            assert "financial" in debug["chunk_scores"]["domain"][0]
+            assert call_count["n"] > 0  # Verify scoring was called
 
 
 class TestExtractionResult:

@@ -145,6 +145,10 @@ Config locations: `drover.yaml`, `~/.config/drover/config.yaml`
 | `DROVER_NLI_MAX_TOKENS` | Max tokens for NLI premise | `450` |
 | `DROVER_NLI_EXTRACTOR` | Metadata extractor (regex, hybrid) | `hybrid` |
 | `DROVER_NLI_FALLBACK_MODEL` | Ollama model for hybrid extractor fallback | — |
+| `DROVER_NLI_CHUNK_STRATEGY` | Long-doc chunking (truncate, sliding, importance) | `truncate` |
+| `DROVER_NLI_CHUNK_SIZE` | Tokens per chunk (max 510) | `400` |
+| `DROVER_NLI_CHUNK_OVERLAP` | Token overlap between sliding-window chunks | `100` |
+| `DROVER_NLI_AGGREGATION` | Per-label score aggregation (max, mean, weighted) | `max` |
 | `DROVER_TAXONOMY` | Taxonomy to use | `household` |
 | `DROVER_TAXONOMY_MODE` | Validation mode (strict, fallback) | `fallback` |
 | `DROVER_NAMING_STYLE` | Naming policy | `nara` |

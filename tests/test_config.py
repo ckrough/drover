@@ -5,11 +5,15 @@ from pathlib import Path
 from unittest.mock import patch
 
 from drover.config import (
+    Aggregation,
     AIConfig,
     AIProvider,
+    ChunkStrategy,
     DroverConfig,
     ErrorMode,
+    ExtractorType,
     LogLevel,
+    NLIConfig,
     SampleStrategy,
     TaxonomyMode,
 )
@@ -275,3 +279,73 @@ class TestAIConfig:
 
         with pytest.raises(ValueError):
             AIConfig(max_retries=11)
+
+
+class TestNLIConfig:
+    """Tests for NLIConfig (Phase 2 chunking + aggregation)."""
+
+    def test_default_values(self) -> None:
+        """Defaults preserve Phase 1 behavior (truncation, max-pool)."""
+        config = NLIConfig()
+
+        assert config.model_name == "cross-encoder/nli-deberta-v3-base"
+        assert config.max_tokens == 450
+        assert config.extractor == ExtractorType.HYBRID
+        assert config.fallback_model is None
+        assert config.chunk_strategy == ChunkStrategy.TRUNCATE
+        assert config.chunk_size == 400
+        assert config.chunk_overlap == 100
+        assert config.aggregation == Aggregation.MAX
+
+    def test_chunk_overlap_must_be_less_than_size(self) -> None:
+        """Overlap >= size is rejected (would loop forever / produce no progress)."""
+        import pytest
+
+        with pytest.raises(ValueError, match="chunk_overlap"):
+            NLIConfig(chunk_size=400, chunk_overlap=400)
+
+        with pytest.raises(ValueError, match="chunk_overlap"):
+            NLIConfig(chunk_size=400, chunk_overlap=500)
+
+    def test_chunk_size_capped_at_510(self) -> None:
+        """chunk_size > 510 leaves no room for special tokens in cross-encoder."""
+        import pytest
+
+        with pytest.raises(ValueError):
+            NLIConfig(chunk_size=511)
+
+    def test_chunk_size_lower_bound(self) -> None:
+        """chunk_size below a sensible floor is rejected."""
+        import pytest
+
+        with pytest.raises(ValueError):
+            NLIConfig(chunk_size=0)
+
+    def test_env_var_chunk_strategy_roundtrip(self) -> None:
+        """DROVER_NLI_CHUNK_STRATEGY threads through to NLIConfig."""
+        with patch.dict(os.environ, {"DROVER_NLI_CHUNK_STRATEGY": "sliding"}):
+            config = DroverConfig.model_validate(DroverConfig.from_env())
+
+        assert config.nli.chunk_strategy == ChunkStrategy.SLIDING
+
+    def test_env_var_chunk_size_int_conversion(self) -> None:
+        """DROVER_NLI_CHUNK_SIZE is parsed as int, not string."""
+        with patch.dict(os.environ, {"DROVER_NLI_CHUNK_SIZE": "256"}):
+            config = DroverConfig.model_validate(DroverConfig.from_env())
+
+        assert config.nli.chunk_size == 256
+        assert isinstance(config.nli.chunk_size, int)
+
+    def test_env_var_chunk_overlap_int_conversion(self) -> None:
+        """DROVER_NLI_CHUNK_OVERLAP is parsed as int."""
+        with patch.dict(os.environ, {"DROVER_NLI_CHUNK_OVERLAP": "50"}):
+            config = DroverConfig.model_validate(DroverConfig.from_env())
+
+        assert config.nli.chunk_overlap == 50
+
+    def test_env_var_aggregation_roundtrip(self) -> None:
+        """DROVER_NLI_AGGREGATION threads through to NLIConfig."""
+        with patch.dict(os.environ, {"DROVER_NLI_AGGREGATION": "weighted"}):
+            config = DroverConfig.model_validate(DroverConfig.from_env())
+
+        assert config.nli.aggregation == Aggregation.WEIGHTED

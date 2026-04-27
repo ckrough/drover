@@ -287,6 +287,35 @@ drover classify document.pdf --ai-provider nli_local \
 | Batch throughput | 10 docs/sec | 50 docs/sec |
 | Model load time | 5s | 3s |
 
+### Phase 2 Baselines (2026-04-27)
+
+Run on `eval/ground_truth.jsonl` against `cross-encoder/nli-deberta-v3-base` on CPU.
+Eval set is 3 documents: `medical_bill.pdf` (619 tokens), `receipt.pdf`, `user_manual.pdf`.
+
+| Strategy | Domain | Category | Doctype | Vendor | Date |
+|---|---|---|---|---|---|
+| `truncate` × `max` (Phase 1 baseline) | 0.0% | 0.0% | 33.3% | 0.0% | 33.3% |
+| `sliding` × `max` | 0.0% | 0.0% | 33.3% | 0.0% | 33.3% |
+| `sliding` × `mean` | 0.0% | 0.0% | 33.3% | 0.0% | 33.3% |
+| `sliding` × `weighted` | 0.0% | 0.0% | 33.3% | 0.0% | 33.3% |
+| `importance` × `max` | 0.0% | 0.0% | 33.3% | 0.0% | 33.3% |
+| `importance` × `weighted` | 0.0% | 0.0% | 33.3% | 0.0% | 33.3% |
+
+**Read these numbers with extreme skepticism.** All six combinations produce *identical* per-document predictions. Two reasons:
+
+1. **The eval set is too small to differentiate strategies.** `medical_bill.pdf` is the only document that exceeds the 512-token cross-encoder limit (619 tokens). The two sliding windows on a 619-token document are 0-400 and 300-619, which share most of their content; max-pooling across them returns essentially the same score truncate would have produced. `receipt.pdf` and `user_manual.pdf` fit in a single chunk, so chunker selection is a no-op for them.
+2. **The corpus does not exercise the failure modes Phase 2 was built to address.** Sliding/importance pay off when the document-type signal lives in middle or trailing pages (statements with itemized line items, contracts with body text after a boilerplate header). On a 3-doc corpus of mostly-short documents, those cases are absent.
+
+The 619-token tokenizer warning fires once per run for every strategy because the chunkers themselves call `tokenizer.encode(content)` to measure document length before splitting. This is benign — only the resulting chunks are fed to the entailment model — but it does mean the user-visible warning isn't a reliable signal that "Phase 2 is doing work." Use the `chunk_count` field in the debug payload instead.
+
+**What changed despite the matched accuracy numbers:**
+
+- The classifier's debug payload now distinguishes `chunk_strategy`, `aggregation`, `chunk_count`, `chunk_counts` (per level), and `chunk_scores` (per level, per chunk, per label). This makes failure analysis tractable.
+- All four `chunk_strategy` values are reachable through config / env / CLI, with TF-IDF-driven importance sampling backed by `scikit-learn`.
+- `_classify_level` no longer assumes a single-chunk premise; it scores per chunk and aggregates per label.
+
+**Next step:** prof-5cg (grow eval set) is the prerequisite for any meaningful Phase 2 conclusion. Until then, the table above functions as a smoke test, not a benchmark.
+
 ## Dependencies
 
 ### Required for Fine-Tuning

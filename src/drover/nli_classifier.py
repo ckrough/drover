@@ -16,17 +16,20 @@ from __future__ import annotations
 
 import asyncio
 import functools
-from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-from drover.config import TaxonomyMode
-from drover.extractors.base import BaseExtractor
+from drover.aggregation import AGGREGATORS
+from drover.chunking import CHUNKERS
+from drover.config import Aggregation, AIProvider, ChunkStrategy, TaxonomyMode
 from drover.extractors.regex import RegexExtractor
 from drover.logging import get_logger
 from drover.models import RawClassification
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from drover.extractors.base import BaseExtractor
     from drover.taxonomy.base import BaseTaxonomy
 
 
@@ -37,7 +40,9 @@ class NLIImportError(ImportError):
     """Raised when NLI dependencies are not installed."""
 
     def __init__(self) -> None:
-        super().__init__("NLI dependencies not installed. Install with: pip install drover[nli]")
+        super().__init__(
+            "NLI dependencies not installed. Install with: pip install drover[nli]"
+        )
 
 
 class NLIClassificationError(Exception):
@@ -89,11 +94,15 @@ def generate_domain_hypotheses(taxonomy: BaseTaxonomy) -> dict[str, list[str]]:
     hypotheses = {}
     for domain in taxonomy.all_domains():
         readable = _label_to_readable(domain)
-        hypotheses[domain] = [template.format(label=readable) for template in DOMAIN_TEMPLATES]
+        hypotheses[domain] = [
+            template.format(label=readable) for template in DOMAIN_TEMPLATES
+        ]
     return hypotheses
 
 
-def generate_category_hypotheses(taxonomy: BaseTaxonomy, domain: str) -> dict[str, list[str]]:
+def generate_category_hypotheses(
+    taxonomy: BaseTaxonomy, domain: str
+) -> dict[str, list[str]]:
     """Generate hypothesis sentences for categories within a domain.
 
     Args:
@@ -126,7 +135,9 @@ def generate_doctype_hypotheses(taxonomy: BaseTaxonomy) -> dict[str, list[str]]:
     hypotheses = {}
     for doctype in taxonomy.all_doctypes():
         readable = _label_to_readable(doctype)
-        hypotheses[doctype] = [template.format(label=readable) for template in DOCTYPE_TEMPLATES]
+        hypotheses[doctype] = [
+            template.format(label=readable) for template in DOCTYPE_TEMPLATES
+        ]
     return hypotheses
 
 
@@ -154,15 +165,32 @@ class NLIDocumentClassifier:
     device: str | None = None
     max_tokens: int = 450  # Reserve ~62 tokens for hypothesis + special tokens
 
+    # Phase 2 chunking + aggregation. Defaults preserve Phase 1 behavior
+    # (single truncated chunk, max-pool across hypothesis templates).
+    chunk_strategy: ChunkStrategy = ChunkStrategy.TRUNCATE
+    chunk_size: int = 400
+    chunk_overlap: int = 100
+    aggregation: Aggregation = Aggregation.MAX
+
+    # Interface parity with DocumentClassifier (used by evaluation framework).
+    provider: AIProvider = AIProvider.NLI_LOCAL
+
     # Internal state (lazy-loaded)
     _tokenizer: Any = field(default=None, repr=False)
     _model: Any = field(default=None, repr=False)
     _torch: Any = field(default=None, repr=False)
 
+    @property
+    def model(self) -> str:
+        """Alias for `model_name`, for parity with DocumentClassifier."""
+        return self.model_name
+
     def __post_init__(self) -> None:
         """Validate configuration."""
         if self.max_tokens > 450:
-            logger.warning("max_tokens > 450 may cause truncation issues with hypotheses")
+            logger.warning(
+                "max_tokens > 450 may cause truncation issues with hypotheses"
+            )
 
     def _ensure_dependencies(self) -> None:
         """Lazily import and verify NLI dependencies."""
@@ -234,7 +262,8 @@ class NLIDocumentClassifier:
             return content
 
         truncated_tokens = tokens[: self.max_tokens]
-        return tokenizer.decode(truncated_tokens, skip_special_tokens=True)
+        decoded: str = tokenizer.decode(truncated_tokens, skip_special_tokens=True)
+        return decoded
 
     def _compute_entailment_score(self, premise: str, hypothesis: str) -> float:
         """Compute entailment probability for premise-hypothesis pair.
@@ -265,31 +294,59 @@ class NLIDocumentClassifier:
             # NLI models: 0=contradiction, 1=neutral, 2=entailment
             entailment_prob = probs[0, 2].item()
 
-        return entailment_prob
+        return float(entailment_prob)
 
     def _classify_level(
         self,
-        content: str,
+        chunks: list[str],
         hypotheses: dict[str, list[str]],
-    ) -> tuple[str, dict[str, float]]:
-        """Classify content against a set of label hypotheses.
+    ) -> tuple[str, dict[str, float], list[dict[str, float]]]:
+        """Classify chunks against a set of label hypotheses.
+
+        For each label, computes one score per chunk by max-pooling across
+        the hypothesis templates, then aggregates the per-chunk scores into
+        one final label score using `self.aggregation`.
 
         Args:
-            content: Truncated document content.
+            chunks: Document content split into chunks.
             hypotheses: Dict mapping labels to hypothesis strings.
 
         Returns:
-            Tuple of (best_label, all_scores).
+            Tuple of (best_label, aggregated_scores, per_chunk_scores).
+            `per_chunk_scores` is a list with one entry per chunk; each entry
+            maps label -> max-template entailment score for that chunk.
         """
-        scores: dict[str, float] = {}
+        aggregator = AGGREGATORS[self.aggregation]
+        labels = list(hypotheses.keys())
+        per_chunk: list[dict[str, float]] = [{} for _ in chunks]
 
-        for label, hypothesis_list in hypotheses.items():
-            # Score each hypothesis template and take max
-            label_scores = [self._compute_entailment_score(content, h) for h in hypothesis_list]
-            scores[label] = max(label_scores)
+        for label in labels:
+            hypothesis_list = hypotheses[label]
+            for chunk_idx, chunk in enumerate(chunks):
+                template_scores = [
+                    self._compute_entailment_score(chunk, h) for h in hypothesis_list
+                ]
+                per_chunk[chunk_idx][label] = max(template_scores)
+
+        scores: dict[str, float] = {
+            label: aggregator([per_chunk[i][label] for i in range(len(chunks))])
+            for label in labels
+        }
 
         best_label = max(scores, key=lambda k: scores[k])
-        return best_label, scores
+        return best_label, scores, per_chunk
+
+    def _get_chunks(self, content: str) -> list[str]:
+        """Split content according to the configured chunking strategy."""
+        tokenizer, _ = self._get_model()
+        chunker = CHUNKERS[self.chunk_strategy]
+
+        if self.chunk_strategy == ChunkStrategy.TRUNCATE:
+            return chunker(content, tokenizer, self.max_tokens)
+        if self.chunk_strategy == ChunkStrategy.SLIDING:
+            return chunker(content, tokenizer, self.chunk_size, self.chunk_overlap)
+        # IMPORTANCE
+        return chunker(content, tokenizer, self.chunk_size)
 
     def _classify_sync(
         self,
@@ -300,22 +357,31 @@ class NLIDocumentClassifier:
 
         This is the core classification logic, run in a thread for async.
         """
-        # Truncate content for NLI model
-        truncated = self._truncate_content(content)
+        # Chunk content according to the configured strategy.
+        chunks = self._get_chunks(content)
+        if not chunks:
+            chunks = [""]
 
         # Hierarchical classification
         domain_hypotheses = generate_domain_hypotheses(self.taxonomy)
-        domain, domain_scores = self._classify_level(truncated, domain_hypotheses)
+        domain, domain_scores, domain_chunk_scores = self._classify_level(
+            chunks, domain_hypotheses
+        )
 
         category_hypotheses = generate_category_hypotheses(self.taxonomy, domain)
         if category_hypotheses:
-            category, category_scores = self._classify_level(truncated, category_hypotheses)
+            category, category_scores, category_chunk_scores = self._classify_level(
+                chunks, category_hypotheses
+            )
         else:
             category = "other"
             category_scores = {}
+            category_chunk_scores = []
 
         doctype_hypotheses = generate_doctype_hypotheses(self.taxonomy)
-        doctype, doctype_scores = self._classify_level(truncated, doctype_hypotheses)
+        doctype, doctype_scores, doctype_chunk_scores = self._classify_level(
+            chunks, doctype_hypotheses
+        )
 
         # Extract metadata fields
         extraction = self.extractor.extract(content)
@@ -336,7 +402,19 @@ class NLIDocumentClassifier:
         debug_info = None
         if capture_debug:
             debug_info = {
-                "truncated_length": len(truncated),
+                "chunk_strategy": self.chunk_strategy.value,
+                "aggregation": self.aggregation.value,
+                "chunk_count": len(chunks),
+                "chunk_counts": {
+                    "domain": len(chunks),
+                    "category": len(chunks) if category_hypotheses else 0,
+                    "doctype": len(chunks),
+                },
+                "chunk_scores": {
+                    "domain": domain_chunk_scores,
+                    "category": category_chunk_scores,
+                    "doctype": doctype_chunk_scores,
+                },
                 "original_length": len(content),
                 "domain_scores": domain_scores,
                 "category_scores": category_scores,
@@ -373,10 +451,14 @@ class NLIDocumentClassifier:
         normalized_domain = self.taxonomy.canonical_domain(raw.domain)
         if normalized_domain is None:
             if self.taxonomy_mode == TaxonomyMode.STRICT:
-                raise TaxonomyValidationError(f"Unknown domain '{raw.domain}' not in taxonomy")
+                raise TaxonomyValidationError(
+                    f"Unknown domain '{raw.domain}' not in taxonomy"
+                )
             normalized_domain = "other"
 
-        normalized_category = self.taxonomy.canonical_category(normalized_domain, raw.category)
+        normalized_category = self.taxonomy.canonical_category(
+            normalized_domain, raw.category
+        )
         if normalized_category is None:
             if self.taxonomy_mode == TaxonomyMode.STRICT:
                 raise TaxonomyValidationError(
@@ -387,7 +469,9 @@ class NLIDocumentClassifier:
         normalized_doctype = self.taxonomy.canonical_doctype(raw.doctype)
         if normalized_doctype is None:
             if self.taxonomy_mode == TaxonomyMode.STRICT:
-                raise TaxonomyValidationError(f"Unknown doctype '{raw.doctype}' not in taxonomy")
+                raise TaxonomyValidationError(
+                    f"Unknown doctype '{raw.doctype}' not in taxonomy"
+                )
             normalized_doctype = "other"
 
         return RawClassification(
@@ -403,7 +487,7 @@ class NLIDocumentClassifier:
         self,
         content: str,
         capture_debug: bool = False,
-        collect_metrics: bool = False,
+        collect_metrics: bool = False,  # noqa: ARG002 — kept for interface parity with DocumentClassifier
     ) -> tuple[RawClassification, dict[str, Any] | None]:
         """Classify document using NLI entailment scoring.
 
@@ -453,9 +537,7 @@ class NLIDocumentClassifier:
         result, _ = await self.classify(content)
 
         if on_token:
-            summary = (
-                f"Domain: {result.domain}, Category: {result.category}, Type: {result.doctype}"
-            )
+            summary = f"Domain: {result.domain}, Category: {result.category}, Type: {result.doctype}"
             on_token(summary)
 
         return result
