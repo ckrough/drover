@@ -1,7 +1,24 @@
 # ADR-003: NLI Classifier Roadmap
 
 ## Status
-Accepted — Phase 1 (MVP) implemented; Phases 2-8 planned.
+Accepted. Phase 1 (MVP) and Phase 2 (long document handling) implemented on branch `nostalgic-engelbart` (not yet merged to `main`); Phases 3-8 planned.
+
+### Phase Progress
+
+| Phase | Title | State | Branch / Commit |
+|-------|-------|-------|-----------------|
+| 1 | MVP | **Implemented** | `nostalgic-engelbart` @ `d7e1614` |
+| 2 | Long Document Handling | **Implemented** | `nostalgic-engelbart` @ `9bf9e89` |
+| 3 | Performance Optimization | Planned | — |
+| 4 | Hypothesis Optimization | Planned | — |
+| 5 | Advanced Extraction | Planned | — |
+| 6 | Confidence and Fallback | Planned | — |
+| 7 | Fine-Tuning Pipeline | Planned | — |
+| 8 | Integration Improvements | Planned | — |
+
+The branch above adds `chunk_strategy`, `chunk_size`, `chunk_overlap`, `aggregation` to `NLIConfig`; new modules `src/drover/aggregation.py` and `src/drover/chunking.py`; `scikit-learn>=1.3` to the `[nli]` extra; and the Phase 2 Baselines section below. Beads tracker holds the epic `prof-ape` with five child tasks `prof-2oe`, `prof-mnb`, `prof-4xe`, `prof-avq`, `prof-qde`. Per project convention `closed = merged`, those issues stay open until the branch lands on `main`.
+
+Phases 3-8 are documented below as design intent, not commitments; nothing is implemented for them.
 
 ## Context
 The cloud LLM classifier path (`classifier.py`) requires API access for non-Ollama providers and incurs per-request cost and latency. ADR-002 commits to a privacy-first, local-first architecture. Even Ollama, while local, requires running a separate model server and pulls in generative-LLM tooling for what is fundamentally a classification problem.
@@ -16,7 +33,7 @@ A purely local, batteries-included classification path was needed that:
 ## Decision
 Add a second classifier path based on **Natural Language Inference (NLI)** using a cross-encoder model. The classifier scores entailment between document text (premise) and label hypotheses, returning the highest-scoring label per level. Hierarchical decoding (domain → category → doctype) keeps the per-level label set small, which keeps inference fast.
 
-### Phase 1: MVP (delivered)
+### Phase 1: MVP (delivered, `d7e1614`)
 
 - Zero-shot classification using `cross-encoder/nli-deberta-v3-base`.
 - Hierarchical classification: domain → category (conditioned on domain) → doctype (conditioned on category).
@@ -26,6 +43,18 @@ Add a second classifier path based on **Natural Language Inference (NLI)** using
 - Async interface matching the existing `DocumentClassifier`.
 - Lazy model loading (downloads on first use).
 - Optional dependencies via the `[nli]` extra (`uv sync --extra nli` or `--all-extras`).
+
+### Phase 2: Long Document Handling (delivered, `9bf9e89`)
+
+- `ChunkStrategy` enum (`truncate`, `sliding`, `importance`) and `Aggregation` enum (`max`, `mean`, `weighted`) on `NLIConfig`, plus `chunk_size` (default 400) and `chunk_overlap` (default 100). Validators reject `chunk_overlap >= chunk_size` and `chunk_size > 510`.
+- Env-var passthrough: `DROVER_NLI_CHUNK_STRATEGY` / `CHUNK_SIZE` / `CHUNK_OVERLAP` / `AGGREGATION`.
+- `src/drover/aggregation.py` with `aggregate_max`, `aggregate_mean`, `aggregate_weighted` (endpoints 2x, middle 1x), and an `AGGREGATORS` registry.
+- `src/drover/chunking.py` with `chunk_truncate`, `chunk_sliding` (overlapping windows covering the full document), and `chunk_importance` (TF-IDF-scored sentences via `scikit-learn`, lazy-imported), and a `CHUNKERS` registry.
+- `NLIDocumentClassifier._classify_level` chunks the content, scores each `(chunk, hypothesis)` pair, max-pools across hypothesis templates per chunk, and aggregates per label using `AGGREGATORS[self.aggregation]`. Debug payload exposes `chunk_strategy`, `aggregation`, `chunk_count`, per-level `chunk_counts`, and per-level per-chunk per-label `chunk_scores`.
+- `scikit-learn>=1.3,<2.0` added to the `[nli]` extra plus a mypy override.
+- 37 new tests across `tests/test_aggregation.py` (15), `tests/test_chunking.py` (14), `tests/test_config.py` (8); the existing NLI integration test now patches `_get_chunks` instead of `_truncate_content`.
+
+Defaults preserve Phase 1 behavior: `chunk_strategy=truncate` and `aggregation=max` give the original single-chunk-per-document score path.
 
 ## Phase 2: Long Document Handling
 
