@@ -119,3 +119,20 @@ Each NLI row is one `drover evaluate` run with `DROVER_NLI_CHUNK_STRATEGY` and `
 - Total cost: $0.43 (session-1, 30 docs, seed 42) + $0.75 (session-2, 47 docs, seed 43, `--top-up`) = $1.18 for 77 synthetic docs.
 - Cache reads were 0; ephemeral cache requires >=1024-token system blocks, our system block is ~280 tokens.
 - Per-doctype structural templates instruct Claude to use markdown headings, pipe tables, bullet lists, and signature blocks. The renderer (`_render_pdf`) parses these into reportlab Table/ListFlowable/Paragraph/HRFlowable elements.
+
+## Format Coverage Matrix (Docling Spike, prof-dt6)
+
+The full per-extension matrix lives at `eval/format_matrix.md`. Rebuild with:
+
+```bash
+uv run python scripts/format_matrix.py --write
+```
+
+Summary across the 24 buildable extensions (the three legacy `.doc/.xls/.ppt` are SKIPped — neither loader handles them without a Microsoft Office toolchain):
+
+- 9 PASS (both loaders extract): `.csv`, `.docx`, `.htm`, `.html`, `.md`, `.pdf`, `.pptx`, `.tsv`, `.txt`, `.xlsx`.
+- 7 GAIN (docling extracts where unstructured does not in this environment, primarily image OCR): `.bmp`, `.gif`, `.jpeg`, `.jpg`, `.png`, `.tif`, `.tiff`.
+- 3 REGRESS (unstructured extracts, docling does not): `.eml`, `.epub`, `.rtf`. Captured in `tests/test_format_matrix.py::KNOWN_REGRESSIONS` for ADR-005.
+- 1 FAIL (neither loader): `.odt`.
+
+Per spike P0-6, REGRESS rows are blocking input for the go/no-go call (prof-nzl).
