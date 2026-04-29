@@ -1,15 +1,20 @@
 ---
-title: Drover NLI Phase 2 Baselines
+title: Drover Phase 2 Baselines
 prepared_by: Claude (Opus 4.7)
-updated: 2026-04-29T11:02:05-04:00
-purpose: Phase 2 NLI accuracy baselines for the zero-shot DeBERTa classifier on the balanced 80-document eval corpus.
+updated: 2026-04-29T13:32:27-04:00
+purpose: Phase 2 LLM and NLI accuracy baselines on the balanced 80-document eval corpus.
 tags: []
 aliases: []
 ---
 
-# Drover NLI Phase 2 Baselines
+# Drover Phase 2 Baselines
 
-Phase 2 zero-shot NLI baselines (`cross-encoder/nli-deberta-v3-base`) across all six `(chunk_strategy, aggregation)` combinations. Captured on a balanced 80-doc corpus (5+ per domain, 2+ categories per domain, 2+ doctypes per domain). These numbers replace the 3-doc and 33-doc snapshots in `docs/adr/003-nli-classifier-roadmap.md`. They will be folded into the ADR at PR-merge.
+Phase 2 baselines on a balanced 80-doc corpus (5+ per domain, 2+ categories per domain, 2+ doctypes per domain) for two providers:
+
+- **LLM**: `gemma4:latest` via local Ollama (single column).
+- **NLI**: `cross-encoder/nli-deberta-v3-base` zero-shot, all six `(chunk_strategy, aggregation)` combinations.
+
+These numbers replace the 3-doc and 33-doc snapshots in `docs/adr/003-nli-classifier-roadmap.md`. They will be folded into the ADR at PR-merge.
 
 ## Corpus
 
@@ -19,7 +24,15 @@ Phase 2 zero-shot NLI baselines (`cross-encoder/nli-deberta-v3-base`) across all
 - All synthetic documents generated via Claude Sonnet 4.6 through `scripts/generate_eval_samples.py` with structured markdown templates per doctype (real tables, headings, signature blocks, line items).
 - Ground truth: `eval/ground_truth.jsonl` (93 lines: 13 header + 80 entries).
 
-## Phase 2 Baselines (2026-04-29, corpus = 80)
+## LLM baseline (2026-04-29, corpus = 80)
+
+| Provider | Model | Domain | Category | Doctype | Vendor | Date |
+|---|---|---|---|---|---|---|
+| ollama | gemma4:latest | **87.5%** | **40.0%** | **86.2%** | **78.8%** | **88.8%** |
+
+Single run, sequential (concurrency=1), ~30 minutes wallclock on M-series Mac. Zero classification errors out of 80 documents.
+
+## NLI baselines (2026-04-29, corpus = 80)
 
 | Strategy | Domain | Category | Doctype | Vendor | Date |
 |---|---|---|---|---|---|
@@ -30,7 +43,19 @@ Phase 2 zero-shot NLI baselines (`cross-encoder/nli-deberta-v3-base`) across all
 | importance / max | 1.2% | 2.5% | 3.8% | 1.2% | 77.5% |
 | importance / weighted | 2.5% | 2.5% | 5.0% | 1.2% | 77.5% |
 
-## Comparison to 33-doc snapshot
+## LLM vs NLI gap
+
+| Metric | NLI best | Gemma4 | Gap |
+|---|---|---|---|
+| Domain | 3.8% | 87.5% | +83.7pp |
+| Category | 2.5% | 40.0% | +37.5pp |
+| Doctype | 6.2% | 86.2% | +80.0pp |
+| Vendor | 1.2% | 78.8% | +77.6pp |
+| Date | 77.5% | 88.8% | +11.3pp |
+
+The LLM is roughly an order of magnitude more accurate on every classification axis. Date is closer because the NLI side relies on the same regex extractor; the gap there is whatever the LLM's date interpretation adds. Category remains the hardest axis even for the LLM (40%) — per-category cues in the taxonomy menu are subtler than domain or doctype distinctions.
+
+## NLI: comparison to 33-doc snapshot
 
 | Metric | 33-doc best | 80-doc best | Delta |
 |---|---|---|---|
@@ -40,7 +65,7 @@ Phase 2 zero-shot NLI baselines (`cross-encoder/nli-deberta-v3-base`) across all
 | Date | 81.8% | 77.5% | -4.3pp |
 | Vendor | 0.0% | 1.2% | +1.2pp |
 
-## Observations
+## NLI observations
 
 - **Doctype regressed on the larger corpus.** The 33-doc snapshot was over-indexed on a few easy doctypes (`manual`, `agreement`). Spreading to 16 doctypes across 16 domains drops accuracy 6pp. The new number is the honest baseline.
 - **Truncate is now competitive on domain.** With more documents per domain, the leading 450-token window of most files is enough to identify the domain. The earlier "importance + weighted is the only domain-non-zero combo" result was corpus-specific, not architectural.
@@ -50,8 +75,28 @@ Phase 2 zero-shot NLI baselines (`cross-encoder/nli-deberta-v3-base`) across all
 - **Vendor (1.2%)** is set by the metadata extractor, not the NLI head. Still effectively zero, as expected; exact vendor matches are a regression test, not a primary metric.
 - Absolute accuracies remain low. The corpus is sized to differentiate strategies and surface real signal, not to validate zero-shot NLI for production. Phase 3+ work targets the gap.
 
+## LLM observations
+
+- **Gemma4 dominates every axis.** Even category, the worst-performing axis, is 16x the best NLI score.
+- **Vendor and date pop up because the LLM extracts them directly.** Drover's LLM path uses `with_structured_output()` to fill `RawClassification`, so the model sees the document text and writes vendor/date into the JSON. The NLI path runs a separate regex extractor that doesn't read the surrounding context.
+- **Cost: 0.** Local Ollama, no API spend. Wallclock ~30 min on M-series for 80 docs sequential. Per-doc cost in time is the binding constraint.
+- **Implication for Phase 3.** Closing the LLM-NLI gap with prompt/hypothesis tuning is unlikely to recover 80pp on doctype or 78pp on vendor — those gaps are about the model class, not the chunking strategy. Fine-tuning (Phase 5+ in ADR-003) is the credible path to NLI parity.
+
 ## Reproducibility
 
+LLM baseline:
+```bash
+env -u ALL_PROXY -u all_proxy -u FTP_PROXY -u GRPC_PROXY \
+  uv run drover evaluate \
+    --ground-truth eval/ground_truth.jsonl \
+    --documents-dir eval/samples \
+    --ai-provider ollama \
+    --ai-model gemma4:latest \
+    --output json \
+    --log quiet
+```
+
+NLI baselines:
 ```bash
 env -u ALL_PROXY -u all_proxy -u FTP_PROXY -u GRPC_PROXY \
   uv run drover evaluate \
@@ -64,7 +109,7 @@ env -u ALL_PROXY -u all_proxy -u FTP_PROXY -u GRPC_PROXY \
 bash /tmp/claude/drover-phase2-bench.sh
 ```
 
-Each row is one `drover evaluate` run with `DROVER_NLI_CHUNK_STRATEGY` and `DROVER_NLI_AGGREGATION` set to the column values. The bench script writes per-combo JSON to `${TMPDIR}/drover-phase2-bench/`. Note: stdout includes loader warnings before the JSON object, so parsers must scan to the first `{`.
+Each NLI row is one `drover evaluate` run with `DROVER_NLI_CHUNK_STRATEGY` and `DROVER_NLI_AGGREGATION` set to the column values. The bench script writes per-combo JSON to `${TMPDIR}/drover-phase2-bench/`. Note: stdout includes loader warnings before the JSON object, so parsers must scan to the first `{`.
 
 ## Generation Provenance
 
