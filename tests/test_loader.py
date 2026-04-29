@@ -29,6 +29,9 @@ async def test_document_loader_loads_text_file(tmp_path: Path) -> None:
     assert loaded.page_count == 1
     assert loaded.pages_sampled == 1
     assert loaded.docling_doc is None
+    assert loaded.loader_backend == "unstructured"
+    assert loaded.loader_latency_ms is not None
+    assert loaded.loader_latency_ms >= 0.0
 
 
 @pytest.mark.asyncio
@@ -191,6 +194,9 @@ async def test_docling_loader_populates_docling_doc(tmp_path: Path) -> None:
     assert loaded.content == "# Heading\n\nBody."
     assert loaded.docling_doc is fake_result.document
     assert loaded.page_count == 2
+    assert loaded.loader_backend == "docling"
+    assert loaded.loader_latency_ms is not None
+    assert loaded.loader_latency_ms >= 0.0
 
 
 @pytest.mark.asyncio

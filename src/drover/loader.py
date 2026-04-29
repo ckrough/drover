@@ -7,6 +7,7 @@ sampling strategies for handling large documents efficiently.
 import asyncio
 import mimetypes
 import os
+import time
 from pathlib import Path
 from typing import Any
 
@@ -35,6 +36,14 @@ class LoadedDocument(BaseModel):
     docling_doc: Any | None = Field(
         default=None,
         description="Parsed DoclingDocument when loader=docling, else None",
+    )
+    loader_latency_ms: float | None = Field(
+        default=None,
+        description="Wallclock duration of the loader's parse call, in ms",
+    )
+    loader_backend: str | None = Field(
+        default=None,
+        description="Loader backend identifier (unstructured | docling)",
     )
 
     model_config = {"arbitrary_types_allowed": True}
@@ -125,10 +134,12 @@ class DocumentLoader:
         if suffix not in _SUPPORTED_EXTENSIONS:
             raise DocumentLoadError(f"Unsupported file type: {suffix}")
 
+        start = time.perf_counter()
         try:
             elements = await asyncio.to_thread(partition, filename=str(path))
         except Exception as e:
             raise DocumentLoadError(f"Failed to load {path.name}: {e}") from e
+        loader_latency_ms = (time.perf_counter() - start) * 1000.0
 
         if not elements:
             raise DocumentLoadError(f"No content extracted from {path.name}")
@@ -152,6 +163,8 @@ class DocumentLoader:
             page_count=total_pages,
             pages_sampled=len(sampled_pages),
             mime_type=mime_type,
+            loader_latency_ms=loader_latency_ms,
+            loader_backend="unstructured",
         )
 
     def _group_by_page(self, elements: list[Any]) -> list[list[Any]]:
@@ -319,10 +332,12 @@ class DoclingLoader:
                 "docling is not installed. Install with `uv sync --extra docling`."
             ) from e
 
+        start = time.perf_counter()
         try:
             result = await asyncio.to_thread(converter.convert, str(path))
         except Exception as e:
             raise DocumentLoadError(f"Failed to load {path.name}: {e}") from e
+        loader_latency_ms = (time.perf_counter() - start) * 1000.0
 
         document = getattr(result, "document", None)
         if document is None:
@@ -342,4 +357,6 @@ class DoclingLoader:
             pages_sampled=page_count,
             mime_type=mime_type,
             docling_doc=document,
+            loader_latency_ms=loader_latency_ms,
+            loader_backend="docling",
         )

@@ -204,7 +204,10 @@ class ClassificationService:
             result = self._path_builder.build(classification, file_path)
 
             if cfg.metrics and debug_info and "metrics" in debug_info:
-                result.metrics = debug_info["metrics"]
+                metrics = debug_info["metrics"]
+                metrics["loader_latency_ms"] = loaded.loader_latency_ms
+                metrics["loader_backend"] = loaded.loader_backend
+                result.metrics = metrics
 
             logger.debug(
                 "file_processing_complete",

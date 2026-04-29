@@ -58,6 +58,8 @@ class ClassificationComparison:
     doctype_correct: bool
     vendor_correct: bool | None  # None if vendor not in ground truth
     date_correct: bool | None  # None if date not in ground truth
+    loader_latency_ms: float | None = None
+    loader_backend: str | None = None
 
 
 @dataclass
@@ -104,6 +106,8 @@ class EvaluationResult:
                     "doctype_correct": c.doctype_correct,
                     "vendor_correct": c.vendor_correct,
                     "date_correct": c.date_correct,
+                    "loader_latency_ms": c.loader_latency_ms,
+                    "loader_backend": c.loader_backend,
                 }
                 for c in self.comparisons
             ],
@@ -310,6 +314,8 @@ class ClassificationEvaluator:
                 doctype_correct=t_correct,
                 vendor_correct=v_correct,
                 date_correct=dt_correct,
+                loader_latency_ms=loaded_doc.loader_latency_ms,
+                loader_backend=loaded_doc.loader_backend,
             )
             comparisons.append(comparison)
 
