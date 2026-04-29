@@ -1,7 +1,11 @@
 # ADR-003: NLI Classifier Roadmap
 
 ## Status
-Accepted. Phase 1 (MVP) and Phase 2 (long document handling) implemented on branch `nostalgic-engelbart` (not yet merged to `main`); Phases 3-8 planned.
+**Superseded by ADR-004 (2026-04-29)** for Phases 3-8.
+
+Phase 1 (MVP) and Phase 2 (long document handling) implemented on branch `nostalgic-engelbart`; Phases 3-8 abandoned after empirical baselines on the 80-doc corpus showed zero-shot NLI lags a small local LLM (`gemma4:latest`) by 11-84 percentage points on every classification axis. See `docs/adr/004-local-llm-as-primary-local-path.md` and `docs/research/nli-vs-llm-notes.md`.
+
+The Phase 1 and Phase 2 code is retained in-tree as a regression baseline pending removal per the ADR-004 deprecation plan. The text below preserves the original roadmap as historical record.
 
 ### Phase Progress
 
