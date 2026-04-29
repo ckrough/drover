@@ -65,16 +65,18 @@ def test_get_chunks_falls_back_to_strategy_when_docling_doc_is_none(
     """`_get_chunks` keeps the legacy registry path for flat text."""
     classifier = _make_classifier(taxonomy)
 
-    with patch.object(
-        classifier, "_chunk_with_hybrid", return_value=["should-not-be-used"]
-    ) as hybrid:
-        with patch.object(classifier, "_get_model") as get_model:
-            get_model.return_value = (object(), object())
-            with patch(
-                "drover.nli_classifier.CHUNKERS",
-                {ChunkStrategy.TRUNCATE: lambda content, tok, n: [content]},
-            ):
-                result = classifier._get_chunks("flat text", docling_doc=None)
+    with (
+        patch.object(
+            classifier, "_chunk_with_hybrid", return_value=["should-not-be-used"]
+        ) as hybrid,
+        patch.object(classifier, "_get_model") as get_model,
+        patch(
+            "drover.nli_classifier.CHUNKERS",
+            {ChunkStrategy.TRUNCATE: lambda content, _tok, _n: [content]},
+        ),
+    ):
+        get_model.return_value = (object(), object())
+        result = classifier._get_chunks("flat text", docling_doc=None)
 
     hybrid.assert_not_called()
     assert result == ["flat text"]

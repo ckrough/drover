@@ -12,7 +12,7 @@ import re
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
-from drover.extractors.base import ExtractionResult
+from drover.extractors.base import ExtractionResult, StructuredRegion
 from drover.extractors.regex import RegexExtractor
 from drover.logging import get_logger
 
@@ -56,17 +56,27 @@ class HybridExtractor:
     max_content_length: int = 2000
     timeout: int = 30
 
-    def extract(self, content: str) -> ExtractionResult:
+    def extract(
+        self,
+        content: str,
+        structured_regions: list[StructuredRegion] | None = None,
+    ) -> ExtractionResult:
         """Extract metadata using regex first, then LLM fallback.
 
         Args:
             content: Document text content.
+            structured_regions: Optional typed regions (e.g., table rows)
+                from a structure-aware loader. Forwarded to the inner
+                regex extractor; the LLM fallback still operates on the
+                truncated flat text.
 
         Returns:
             ExtractionResult with extracted values.
         """
         # First pass: regex extraction
-        regex_result = self.regex_extractor.extract(content)
+        regex_result = self.regex_extractor.extract(
+            content, structured_regions=structured_regions
+        )
 
         # Check what needs LLM fallback
         needs_vendor = regex_result.vendor == "unknown"

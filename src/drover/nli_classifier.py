@@ -428,8 +428,18 @@ class NLIDocumentClassifier:
             chunks, doctype_hypotheses
         )
 
-        # Extract metadata fields
-        extraction = self.extractor.extract(content)
+        # Extract metadata fields. When a parsed Docling document is
+        # available, derive structured regions (e.g., "Bill To" cells)
+        # and let the extractor target named fields directly.
+        if docling_doc is not None:
+            from drover.extractors.structured import extract_structured_regions
+
+            structured_regions = extract_structured_regions(docling_doc)
+        else:
+            structured_regions = None
+        extraction = self.extractor.extract(
+            content, structured_regions=structured_regions
+        )
 
         # Build raw classification
         raw = RawClassification(

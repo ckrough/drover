@@ -9,7 +9,17 @@ import re
 from calendar import month_abbr, month_name
 from dataclasses import dataclass, field
 
-from drover.extractors.base import BaseExtractor, ExtractionResult
+from drover.extractors.base import BaseExtractor, ExtractionResult, StructuredRegion
+
+_VENDOR_LABEL_KEYWORDS = ("bill to", "vendor", "from", "supplier", "company")
+_DATE_LABEL_KEYWORDS = (
+    "date",
+    "issue date",
+    "statement date",
+    "invoice date",
+    "billing date",
+    "due date",
+)
 
 
 @dataclass
@@ -97,11 +107,19 @@ class RegexExtractor:
         ]
     )
 
-    def extract(self, content: str) -> ExtractionResult:
+    def extract(
+        self,
+        content: str,
+        structured_regions: list[StructuredRegion] | None = None,
+    ) -> ExtractionResult:
         """Extract vendor, date, and subject from content.
 
         Args:
             content: Document text content.
+            structured_regions: Optional typed regions (e.g., table rows)
+                from a structure-aware loader. Vendor and date lookups
+                prefer them over flat-text regex when a region's label
+                matches a known keyword.
 
         Returns:
             ExtractionResult with extracted or default values.
@@ -109,8 +127,21 @@ class RegexExtractor:
         # Use search window for vendor/date (usually in header)
         header = content[: self.search_window]
 
-        vendor = self._extract_vendor(header)
-        date = self._extract_date(content)  # Search full content for dates
+        vendor = self._lookup_region(structured_regions, _VENDOR_LABEL_KEYWORDS)
+        if vendor is None:
+            vendor = self._extract_vendor(header)
+        else:
+            vendor = self._truncate_vendor(vendor)
+
+        date_from_region = self._lookup_region(structured_regions, _DATE_LABEL_KEYWORDS)
+        if date_from_region is not None:
+            normalized = self._extract_date(date_from_region)
+            date = (
+                normalized if normalized != "unknown" else self._extract_date(content)
+            )
+        else:
+            date = self._extract_date(content)
+
         subject = self._extract_subject(content)
 
         return ExtractionResult(
@@ -118,6 +149,33 @@ class RegexExtractor:
             date=date,
             subject=subject,
         )
+
+    @staticmethod
+    def _lookup_region(
+        regions: list[StructuredRegion] | None, label_keywords: tuple[str, ...]
+    ) -> str | None:
+        """Return the first region text whose label matches a keyword.
+
+        Match is case-insensitive substring; the *first* match wins because
+        document-order tables put primary fields before secondary ones.
+        """
+        if not regions:
+            return None
+        for region in regions:
+            label = region["label"].strip().lower()
+            for kw in label_keywords:
+                if kw in label:
+                    text = region["text"].strip()
+                    if text:
+                        return text
+        return None
+
+    def _truncate_vendor(self, vendor: str) -> str:
+        """Trim vendor text to the configured max length without splitting words."""
+        vendor = re.sub(r"[.,]+$", "", vendor.strip())
+        if len(vendor) > self.max_vendor_length:
+            vendor = vendor[: self.max_vendor_length].rsplit(" ", 1)[0]
+        return vendor
 
     def _extract_date(self, content: str) -> str:
         """Extract and normalize date to YYYYMMDD format."""
