@@ -1,10 +1,17 @@
 """Tests for DocumentLoader and document sampling."""
 
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 import pytest
 
-from drover.loader import _SUPPORTED_EXTENSIONS, DocumentLoader, DocumentLoadError
+from drover.loader import (
+    _SUPPORTED_EXTENSIONS,
+    DoclingLoader,
+    DocumentLoader,
+    DocumentLoadError,
+)
 from drover.sampling import SampleStrategy
 
 
@@ -21,6 +28,7 @@ async def test_document_loader_loads_text_file(tmp_path: Path) -> None:
     assert "hello world" in loaded.content
     assert loaded.page_count == 1
     assert loaded.pages_sampled == 1
+    assert loaded.docling_doc is None
 
 
 @pytest.mark.asyncio
@@ -147,3 +155,91 @@ def test_adaptive_strategy_selects_bookends_for_large_docs() -> None:
 
     selected = loader._select_strategy(total_pages=50)
     assert selected == SampleStrategy.BOOKENDS
+
+
+# ---------------------------------------------------------------------------
+# DoclingLoader
+# ---------------------------------------------------------------------------
+
+
+def _fake_docling_result(markdown: str, num_pages: int = 1) -> SimpleNamespace:
+    """Build a stand-in for `ConversionResult` with the attributes we use."""
+    document = SimpleNamespace(
+        export_to_markdown=lambda: markdown,
+        pages={i: SimpleNamespace() for i in range(1, num_pages + 1)},
+    )
+    return SimpleNamespace(document=document)
+
+
+@pytest.mark.asyncio
+async def test_docling_loader_populates_docling_doc(tmp_path: Path) -> None:
+    """DoclingLoader returns the parsed structure on `docling_doc`."""
+    file_path = tmp_path / "sample.txt"
+    file_path.write_text("placeholder body for docling fake")
+
+    fake_result = _fake_docling_result("# Heading\n\nBody.", num_pages=2)
+
+    class FakeConverter:
+        def convert(self, source: str) -> SimpleNamespace:
+            return fake_result
+
+    with patch("drover.loader._build_docling_converter", return_value=FakeConverter()):
+        loader = DoclingLoader()
+        loaded = await loader.load(file_path)
+
+    assert loaded.path == file_path
+    assert loaded.content == "# Heading\n\nBody."
+    assert loaded.docling_doc is fake_result.document
+    assert loaded.page_count == 2
+
+
+@pytest.mark.asyncio
+async def test_docling_loader_raises_when_package_missing(tmp_path: Path) -> None:
+    """A clear error fires when the `docling` extra is not installed."""
+    file_path = tmp_path / "sample.txt"
+    file_path.write_text("body")
+
+    def boom() -> None:
+        raise ImportError("docling not installed")
+
+    with patch("drover.loader._build_docling_converter", side_effect=boom):
+        loader = DoclingLoader()
+        with pytest.raises(DocumentLoadError, match="docling"):
+            await loader.load(file_path)
+
+
+@pytest.mark.asyncio
+async def test_docling_loader_rejects_unsupported_extension(tmp_path: Path) -> None:
+    """DoclingLoader honors the same extension allowlist as DocumentLoader."""
+    file_path = tmp_path / "data.xyz"
+    file_path.write_text("noop")
+
+    loader = DoclingLoader()
+    with pytest.raises(DocumentLoadError, match="Unsupported file type"):
+        await loader.load(file_path)
+
+
+@pytest.mark.asyncio
+async def test_docling_loader_raises_for_missing_file(tmp_path: Path) -> None:
+    """Missing files produce DocumentLoadError before any docling call."""
+    loader = DoclingLoader()
+    with pytest.raises(DocumentLoadError, match="File not found"):
+        await loader.load(tmp_path / "ghost.pdf")
+
+
+@pytest.mark.asyncio
+async def test_docling_loader_raises_when_markdown_empty(tmp_path: Path) -> None:
+    """An empty markdown export is treated as a failed load."""
+    file_path = tmp_path / "empty.txt"
+    file_path.write_text("placeholder")
+
+    fake_result = _fake_docling_result("   \n", num_pages=1)
+
+    class FakeConverter:
+        def convert(self, source: str) -> SimpleNamespace:
+            return fake_result
+
+    with patch("drover.loader._build_docling_converter", return_value=FakeConverter()):
+        loader = DoclingLoader()
+        with pytest.raises(DocumentLoadError, match="No text content"):
+            await loader.load(file_path)

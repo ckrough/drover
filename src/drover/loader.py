@@ -32,6 +32,10 @@ class LoadedDocument(BaseModel):
     page_count: int = Field(default=1, description="Total pages in document")
     pages_sampled: int = Field(default=1, description="Pages actually processed")
     mime_type: str | None = Field(default=None, description="Detected MIME type")
+    docling_doc: Any | None = Field(
+        default=None,
+        description="Parsed DoclingDocument when loader=docling, else None",
+    )
 
     model_config = {"arbitrary_types_allowed": True}
 
@@ -259,3 +263,83 @@ async def load_document(
     """
     loader = DocumentLoader(strategy=strategy, max_pages=max_pages)
     return await loader.load(path)
+
+
+def _build_docling_converter() -> Any:
+    """Build a Docling `DocumentConverter`. Isolated to ease testing/mocking."""
+    from docling.document_converter import DocumentConverter
+
+    return DocumentConverter()
+
+
+class DoclingLoader:
+    """Structure-aware document loader backed by Docling.
+
+    Returns a `LoadedDocument` whose `content` is the markdown export (so
+    every existing consumer keeps working) and whose `docling_doc` field
+    carries the parsed `DoclingDocument` for downstream structure-aware
+    pipelines (LLM prompts with headings, NLI HybridChunker, region-targeted
+    metadata extraction).
+    """
+
+    def __init__(
+        self,
+        strategy: SampleStrategy = SampleStrategy.ADAPTIVE,
+        max_pages: int = 10,
+    ) -> None:
+        self.strategy = strategy
+        self.max_pages = max_pages
+
+    async def load(self, path: Path) -> LoadedDocument:
+        """Load a document via Docling and return a `LoadedDocument`.
+
+        Args:
+            path: Path to document file.
+
+        Returns:
+            LoadedDocument with markdown content and parsed structure.
+
+        Raises:
+            DocumentLoadError: If loading fails or the docling extra is
+                not installed.
+        """
+        if not path.exists():
+            raise DocumentLoadError(f"File not found: {path}")
+
+        suffix = path.suffix.lower()
+        mime_type, _ = mimetypes.guess_type(str(path))
+
+        if suffix not in _SUPPORTED_EXTENSIONS:
+            raise DocumentLoadError(f"Unsupported file type: {suffix}")
+
+        try:
+            converter = _build_docling_converter()
+        except ImportError as e:
+            raise DocumentLoadError(
+                "docling is not installed. Install with `uv sync --extra docling`."
+            ) from e
+
+        try:
+            result = await asyncio.to_thread(converter.convert, str(path))
+        except Exception as e:
+            raise DocumentLoadError(f"Failed to load {path.name}: {e}") from e
+
+        document = getattr(result, "document", None)
+        if document is None:
+            raise DocumentLoadError(f"No content extracted from {path.name}")
+
+        markdown = document.export_to_markdown()
+        if not markdown.strip():
+            raise DocumentLoadError(f"No text content found in {path.name}")
+
+        pages = getattr(document, "pages", None)
+        page_count = len(pages) if pages else 1
+
+        return LoadedDocument(
+            path=path,
+            content=markdown,
+            page_count=page_count,
+            pages_sampled=page_count,
+            mime_type=mime_type,
+            docling_doc=document,
+        )

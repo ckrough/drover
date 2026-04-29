@@ -159,6 +159,7 @@ Config locations: `drover.yaml`, `~/.config/drover/config.yaml`
 | `DROVER_ON_ERROR` | Error handling (fail, continue, skip) | `fail` |
 | `DROVER_CONCURRENCY` | Parallel processing | `1` |
 | `DROVER_DEBUG_DIR` | Directory for debug outputs | `./debug` |
+| `DROVER_LOADER` | Document loader backend (unstructured, docling) | `unstructured` |
 
 ## Testing
 

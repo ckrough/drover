@@ -19,8 +19,14 @@ from drover.classifier import (
     TaxonomyValidationError,
     TemplateError,
 )
-from drover.config import AIProvider, DroverConfig, ErrorMode, ExtractorType
-from drover.loader import DocumentLoader, DocumentLoadError
+from drover.config import (
+    AIProvider,
+    DroverConfig,
+    ErrorMode,
+    ExtractorType,
+    LoaderType,
+)
+from drover.loader import DoclingLoader, DocumentLoader, DocumentLoadError
 from drover.logging import get_logger
 from drover.models import ClassificationErrorResult, ClassificationResult, ErrorCode
 from drover.naming import get_naming_policy
@@ -57,10 +63,17 @@ class ClassificationService:
         self._taxonomy = get_taxonomy(config.taxonomy)
         self._naming_policy = get_naming_policy(config.naming_style)
 
-        self._loader = DocumentLoader(
-            strategy=config.sample_strategy,
-            max_pages=config.max_pages,
-        )
+        self._loader: DocumentLoader | DoclingLoader
+        if config.loader == LoaderType.DOCLING:
+            self._loader = DoclingLoader(
+                strategy=config.sample_strategy,
+                max_pages=config.max_pages,
+            )
+        else:
+            self._loader = DocumentLoader(
+                strategy=config.sample_strategy,
+                max_pages=config.max_pages,
+            )
         self._classifier = self._create_classifier()
         self._path_builder = PathBuilder(naming_policy=self._naming_policy)
 

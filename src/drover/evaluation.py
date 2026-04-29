@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING, Any
 from pydantic import BaseModel, Field
 
 from drover.classifier import DocumentClassifier
-from drover.loader import DocumentLoader
+from drover.loader import DoclingLoader, DocumentLoader
 from drover.logging import get_logger
 from drover.models import RawClassification
 
@@ -207,7 +207,7 @@ class ClassificationEvaluator:
         self,
         classifier: EvaluableClassifier,
         test_files: Sequence[str | Path] | None = None,
-        loader: DocumentLoader | None = None,
+        loader: DocumentLoader | DoclingLoader | None = None,
     ) -> EvaluationResult:
         """Run classification on test files and compare to ground truth.
 
@@ -215,7 +215,8 @@ class ClassificationEvaluator:
             classifier: Configured DocumentClassifier instance.
             test_files: Specific files to test. If None, uses all files
                        that have ground truth entries.
-            loader: DocumentLoader for text extraction. If None, creates default.
+            loader: Document loader for text extraction. If None, creates
+                a default `DocumentLoader` (unstructured backend).
 
         Returns:
             EvaluationResult with accuracy metrics and detailed comparisons.

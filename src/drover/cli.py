@@ -18,6 +18,7 @@ from drover.config import (
     DroverConfig,
     ErrorMode,
     ExtractorType,
+    LoaderType,
     LogLevel,
     TaxonomyMode,
 )
@@ -82,6 +83,11 @@ def classification_options(func: Callable[..., Any]) -> Callable[..., Any]:
             "--max-pages",
             type=int,
             help="Maximum pages to process per document.",
+        ),
+        click.option(
+            "--loader",
+            type=click.Choice([loader.value for loader in LoaderType]),
+            help="Document loader backend (default: unstructured).",
         ),
         click.option(
             "--on-error",
@@ -158,6 +164,11 @@ def main() -> None:
     help="Maximum pages to process per document.",
 )
 @click.option(
+    "--loader",
+    type=click.Choice([loader.value for loader in LoaderType]),
+    help="Document loader backend (default: unstructured).",
+)
+@click.option(
     "--on-error",
     type=click.Choice([e.value for e in ErrorMode]),
     help="Error handling mode.",
@@ -210,6 +221,7 @@ def classify(
     naming_style: str | None,
     sample_strategy: str | None,
     max_pages: int | None,
+    loader: str | None,
     on_error: str | None,
     concurrency: int | None,
     metrics: bool,
@@ -236,6 +248,7 @@ def classify(
         naming_style=naming_style,
         sample_strategy=sample_strategy,
         max_pages=max_pages,
+        loader=loader,
         on_error=on_error,
         concurrency=concurrency,
         metrics=metrics,
@@ -355,6 +368,7 @@ def tag(
     naming_style: str | None,
     sample_strategy: str | None,
     max_pages: int | None,
+    loader: str | None,
     on_error: str | None,
     concurrency: int | None,
     log_level: str | None,
@@ -409,6 +423,7 @@ def tag(
         naming_style=naming_style,
         sample_strategy=sample_strategy,
         max_pages=max_pages,
+        loader=loader,
         on_error=on_error,
         concurrency=concurrency,
         log_level=log_level,
@@ -530,6 +545,11 @@ def _output_tag_result(result: ActionPlan | ActionResult, log_level: LogLevel) -
     help="Taxonomy to use for classification.",
 )
 @click.option(
+    "--loader",
+    type=click.Choice([loader.value for loader in LoaderType]),
+    help="Document loader backend (default: unstructured).",
+)
+@click.option(
     "--output",
     "output_format",
     type=click.Choice(["summary", "json"]),
@@ -549,6 +569,7 @@ def evaluate(
     ai_provider: str | None,
     ai_model: str | None,
     taxonomy_name: str | None,
+    loader: str | None,
     output_format: str,
     log: str,
 ) -> None:
@@ -570,6 +591,7 @@ def evaluate(
             ai_provider=ai_provider,
             ai_model=ai_model,
             taxonomy_name=taxonomy_name,
+            loader=loader,
             output_format=output_format,
             log=LogLevel(log),
         )
@@ -584,13 +606,14 @@ async def _evaluate_async(
     ai_provider: str | None,
     ai_model: str | None,
     taxonomy_name: str | None,
+    loader: str | None,
     output_format: str,
     log: LogLevel,
 ) -> int:
     """Async implementation of evaluate command."""
     from drover.classifier import DocumentClassifier
     from drover.evaluation import ClassificationEvaluator
-    from drover.loader import DocumentLoader
+    from drover.loader import DoclingLoader, DocumentLoader
     from drover.taxonomy.loader import get_taxonomy
 
     configure_logging(log)
@@ -606,6 +629,7 @@ async def _evaluate_async(
     provider = AIProvider(ai_provider) if ai_provider else config.ai.provider
     model = ai_model or config.ai.model
     taxonomy_key = taxonomy_name or config.taxonomy
+    loader_type = LoaderType(loader) if loader else config.loader
 
     if log != LogLevel.QUIET:
         console.print(f"[blue]Evaluating with {provider.value}/{model}...[/blue]")
@@ -659,10 +683,17 @@ async def _evaluate_async(
             retry_max_wait=config.ai.retry_max_wait,
         )
 
-    loader = DocumentLoader(
-        strategy=config.sample_strategy,
-        max_pages=config.max_pages,
-    )
+    document_loader: DocumentLoader | DoclingLoader
+    if loader_type == LoaderType.DOCLING:
+        document_loader = DoclingLoader(
+            strategy=config.sample_strategy,
+            max_pages=config.max_pages,
+        )
+    else:
+        document_loader = DocumentLoader(
+            strategy=config.sample_strategy,
+            max_pages=config.max_pages,
+        )
 
     try:
         evaluator = ClassificationEvaluator(
@@ -674,7 +705,7 @@ async def _evaluate_async(
             console.print(f"[red]{e}[/red]")
         return 1
 
-    results = await evaluator.evaluate(classifier, loader=loader)
+    results = await evaluator.evaluate(classifier, loader=document_loader)
 
     if output_format == "json":
         click.echo(json.dumps(results.to_dict(), indent=2))
