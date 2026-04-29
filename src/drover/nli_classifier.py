@@ -488,6 +488,7 @@ class NLIDocumentClassifier:
         content: str,
         capture_debug: bool = False,
         collect_metrics: bool = False,  # noqa: ARG002 — kept for interface parity with DocumentClassifier
+        docling_doc: Any | None = None,  # noqa: ARG002 — wired in prof-epk
     ) -> tuple[RawClassification, dict[str, Any] | None]:
         """Classify document using NLI entailment scoring.
 

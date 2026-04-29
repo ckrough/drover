@@ -88,7 +88,10 @@ async def test_debug_dir_writes_files(
     service = ClassificationService(cfg)
 
     async def fake_classify(  # type: ignore[override]
-        content: str, capture_debug: bool = False, collect_metrics: bool = False
+        content: str,
+        capture_debug: bool = False,
+        collect_metrics: bool = False,
+        docling_doc: object | None = None,
     ) -> tuple[ClassificationResult, dict[str, str] | None]:
         debug_info = (
             {"prompt": "PROMPT", "response": "RESPONSE"} if capture_debug else None
@@ -141,7 +144,10 @@ async def test_debug_capture_on_llm_parse_failure(
     service = ClassificationService(cfg)
 
     async def fake_classify_that_fails(
-        content: str, capture_debug: bool = False, collect_metrics: bool = False
+        content: str,
+        capture_debug: bool = False,
+        collect_metrics: bool = False,
+        docling_doc: object | None = None,
     ) -> None:
         # Simulate LLM returning unparseable response with debug_info attached
         debug_info = {"prompt": "TEST PROMPT", "response": "INVALID JSON RESPONSE"}
@@ -448,6 +454,7 @@ class TestUnexpectedErrors:
             content: str,
             capture_debug: bool = False,
             collect_metrics: bool = False,
+            docling_doc: object | None = None,
         ) -> tuple[RawClassification, dict[str, str] | None]:
             return (
                 RawClassification(

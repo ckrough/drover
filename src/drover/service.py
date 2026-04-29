@@ -195,6 +195,7 @@ class ClassificationService:
                 content=loaded.content,
                 capture_debug=cfg.capture_debug,
                 collect_metrics=cfg.metrics,
+                docling_doc=loaded.docling_doc,
             )
 
             if cfg.capture_debug and debug_info:

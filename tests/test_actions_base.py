@@ -47,7 +47,10 @@ def _make_fake_classify(tmp_path: Path):
     """Create a fake classify method for testing."""
 
     async def fake_classify(
-        content: str, capture_debug: bool = False, collect_metrics: bool = False
+        content: str,
+        capture_debug: bool = False,
+        collect_metrics: bool = False,
+        docling_doc: object | None = None,
     ):
         return (
             ClassificationResult(

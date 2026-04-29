@@ -269,7 +269,9 @@ class ClassificationEvaluator:
             # Load and classify document
             try:
                 loaded_doc = await loader.load(resolved_path)
-                predicted, _ = await classifier.classify(loaded_doc.content)
+                predicted, _ = await classifier.classify(
+                    loaded_doc.content, docling_doc=loaded_doc.docling_doc
+                )
             except Exception as e:
                 logger.error(
                     "classification_error",
