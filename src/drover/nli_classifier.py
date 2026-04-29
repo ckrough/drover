@@ -336,8 +336,23 @@ class NLIDocumentClassifier:
         best_label = max(scores, key=lambda k: scores[k])
         return best_label, scores, per_chunk
 
-    def _get_chunks(self, content: str) -> list[str]:
-        """Split content according to the configured chunking strategy."""
+    def _get_chunks(self, content: str, docling_doc: Any | None = None) -> list[str]:
+        """Split content into NLI-friendly chunks.
+
+        When `docling_doc` is provided, a Docling `HybridChunker` walks the
+        parsed document tree and emits chunks that respect both token
+        budgets and structural boundaries (sections, tables). Each chunk is
+        contextualized with its heading breadcrumb so the entailment
+        cross-encoder sees section text as evidence. Otherwise, fall back
+        to the configured `ChunkStrategy` token-window heuristic.
+        """
+        if docling_doc is not None:
+            chunks = self._chunk_with_hybrid(docling_doc)
+            if chunks:
+                return chunks
+            # An empty result from HybridChunker (degenerate doc) drops to
+            # the flat-text path below rather than returning [].
+
         tokenizer, _ = self._get_model()
         chunker = CHUNKERS[self.chunk_strategy]
 
@@ -348,17 +363,47 @@ class NLIDocumentClassifier:
         # IMPORTANCE
         return chunker(content, tokenizer, self.chunk_size)
 
+    def _build_hybrid_chunker(self) -> Any:
+        """Construct a Docling `HybridChunker` aligned to the NLI tokenizer.
+
+        Token budget matches `self.max_tokens` so chunks fit the same
+        window the entailment cross-encoder will score, avoiding silent
+        truncation between chunking and inference. Isolated for tests.
+        """
+        from docling.chunking import HybridChunker  # type: ignore[attr-defined]
+        from docling_core.transforms.chunker.tokenizer.huggingface import (
+            HuggingFaceTokenizer,
+        )
+
+        tokenizer = HuggingFaceTokenizer.from_pretrained(
+            model_name=self.model_name,
+            max_tokens=self.max_tokens,
+        )
+        return HybridChunker(tokenizer=tokenizer, merge_peers=True)
+
+    def _chunk_with_hybrid(self, docling_doc: Any) -> list[str]:
+        """Chunk a parsed `DoclingDocument` with `HybridChunker`.
+
+        Returns `chunker.contextualize(chunk)` so each chunk carries its
+        heading breadcrumb in the text the NLI model sees.
+        """
+        chunker = self._build_hybrid_chunker()
+        return [
+            chunker.contextualize(chunk) for chunk in chunker.chunk(dl_doc=docling_doc)
+        ]
+
     def _classify_sync(
         self,
         content: str,
         capture_debug: bool = False,
+        docling_doc: Any | None = None,
     ) -> tuple[RawClassification, dict[str, Any] | None]:
         """Synchronous classification implementation.
 
         This is the core classification logic, run in a thread for async.
         """
         # Chunk content according to the configured strategy.
-        chunks = self._get_chunks(content)
+        chunks = self._get_chunks(content, docling_doc=docling_doc)
         if not chunks:
             chunks = [""]
 
@@ -402,7 +447,9 @@ class NLIDocumentClassifier:
         debug_info = None
         if capture_debug:
             debug_info = {
-                "chunk_strategy": self.chunk_strategy.value,
+                "chunk_strategy": (
+                    "hybrid" if docling_doc is not None else self.chunk_strategy.value
+                ),
                 "aggregation": self.aggregation.value,
                 "chunk_count": len(chunks),
                 "chunk_counts": {
@@ -488,7 +535,7 @@ class NLIDocumentClassifier:
         content: str,
         capture_debug: bool = False,
         collect_metrics: bool = False,  # noqa: ARG002 — kept for interface parity with DocumentClassifier
-        docling_doc: Any | None = None,  # noqa: ARG002 — wired in prof-epk
+        docling_doc: Any | None = None,
     ) -> tuple[RawClassification, dict[str, Any] | None]:
         """Classify document using NLI entailment scoring.
 
@@ -500,6 +547,9 @@ class NLIDocumentClassifier:
             content: Extracted document text content.
             capture_debug: If True, include debug info in response.
             collect_metrics: Ignored (no API metrics for local model).
+            docling_doc: Optional parsed `DoclingDocument`. When provided,
+                chunking uses Docling's `HybridChunker` instead of the
+                configured token-window strategy.
 
         Returns:
             Tuple of (RawClassification, optional debug info dict).
@@ -514,6 +564,7 @@ class NLIDocumentClassifier:
             self._classify_sync,
             content,
             capture_debug=capture_debug,
+            docling_doc=docling_doc,
         )
         return await loop.run_in_executor(None, classify_fn)
 
