@@ -120,6 +120,81 @@ Each NLI row is one `drover evaluate` run with `DROVER_NLI_CHUNK_STRATEGY` and `
 - Cache reads were 0; ephemeral cache requires >=1024-token system blocks, our system block is ~280 tokens.
 - Per-doctype structural templates instruct Claude to use markdown headings, pipe tables, bullet lists, and signature blocks. The renderer (`_render_pdf`) parses these into reportlab Table/ListFlowable/Paragraph/HRFlowable elements.
 
+## Docling-vs-unstructured benchmark (prof-nft, 2026-04-29, corpus = 80)
+
+Same 80-doc corpus; same evaluator; only the loader changes. Reproduce
+each row with:
+
+```bash
+uv run python scripts/benchmark_docling_loaders.py \
+  --loader {unstructured|docling} \
+  --ai-provider {ollama|anthropic|nli_local} \
+  --ai-model <model>
+```
+
+Raw per-run JSONs are archived under `eval/runs/`.
+
+### LLM (Ollama gemma4:latest)
+
+| Loader | Domain | Category | Doctype | Vendor | Date | Wallclock | Avg loader |
+|---|---|---|---|---|---|---|---|
+| unstructured | 87.5% | **40.0%** | 86.3% | 78.7% | 88.7% | 91 min | 57 ms |
+| docling | 87.5% | **36.2%** | 83.8% | 77.5% | 91.2% | 91 min | 2418 ms |
+| **delta** | 0.0pp | **-3.8pp** | -2.5pp | -1.2pp | +2.5pp | flat | **+42x** |
+
+**Headline result: the structure-aware hypothesis fails on this corpus.** Category accuracy regresses 3.8pp instead of lifting toward the +10pp go-target. Doctype also crosses the -2pp no-regression threshold. Loader latency grows ~42x. The only LLM win is date (+2.5pp).
+
+### LLM (Anthropic claude-haiku-4-5, prompt caching enabled)
+
+| Loader | Domain | Category | Doctype | Vendor | Date | Wallclock | Avg loader |
+|---|---|---|---|---|---|---|---|
+| unstructured | 92.5% | **55.0%** | 90.0% | 96.3% | 93.8% | 1 min 54 s | 67 ms |
+| docling | 93.8% | **53.7%** | 90.0% | 93.8% | 93.8% | 4 min 48 s | 2168 ms |
+| **delta** | +1.3pp | **-1.3pp** | 0.0pp | -2.5pp | 0.0pp | +152% | **+32x** |
+
+Haiku already extracts category at 55% on flat text — Docling's markdown does not lift it further. Vendor regressed slightly (-2.5pp). The structural-input hypothesis does not flip with a stronger model.
+
+### NLI (cross-encoder/nli-deberta-v3-base)
+
+| Loader / chunker | Domain | Category | Doctype | Vendor | Date |
+|---|---|---|---|---|---|
+| unstructured / sliding+mean (Phase 2 best) | 2.5% | 2.5% | **6.2%** | 1.3% | 77.5% |
+| docling / HybridChunker | **5.0%** | **3.7%** | 5.0% | **3.7%** | **80.0%** |
+| delta | +2.5pp | +1.2pp | -1.2pp | +2.4pp | +2.5pp |
+
+Section-aware chunks lift NLI on most axes (informational only — the gap to the LLM remains 80+pp on every classification axis). Doctype regressed slightly. Vendor lift is from structured table-cell extraction (`StructuredRegion` plumbing in prof-dpo).
+
+### Wallclock and cost
+
+| Run | Wallclock | API cost |
+|---|---|---|
+| ollama/gemma4 + unstructured | 91 min | $0 |
+| ollama/gemma4 + docling | 91 min | $0 |
+| anthropic/haiku + unstructured | 114 s | ~$0.10 |
+| anthropic/haiku + docling | 288 s | ~$0.10 |
+| nli_local + unstructured (sliding/mean) | 25 min | $0 |
+| nli_local + docling (hybrid) | 45 min | $0 |
+
+Both gemma4 runs queued at the same Ollama instance and ran serially, hence equal wallclocks.
+
+### Per-axis go/no-go evaluation (gemma4)
+
+Against the spec's thresholds (`docs/research/docling-evaluation-spike.md` §Success Metrics):
+
+| Axis | Threshold | Observed | Verdict |
+|---|---|---|---|
+| LLM category | +10pp or better | **-3.8pp** | **FAIL** |
+| LLM doctype | no regression (>= -2pp tolerance) | **-2.5pp** | **FAIL** |
+| LLM domain | no regression (>= -2pp tolerance) | 0.0pp | pass |
+| LLM vendor | +5pp or better | -1.2pp | fail |
+| LLM date | no regression | +2.5pp | pass |
+| Loader latency | <2x current | ~42x | **FAIL** |
+| Format parity | 26/26 PASS, 0 REGRESS | 9 PASS / 7 GAIN / 3 REGRESS / 1 FAIL / 3 SKIP | partial fail (3 REGRESS, see prof-dt6) |
+
+### Recommendation snapshot for ADR-005 (prof-nzl)
+
+The gating metrics (LLM category lift, LLM doctype non-regression, latency budget) all **fail** under Docling on this corpus. Even Anthropic Haiku — a stronger model — does not extract additional category signal from Docling's markdown. The cleanest reading: synthetic markdown-templated documents already serialize their structure into flat text well enough for these models, so the structural input does not add information; meanwhile the loader pays a 32-42x latency tax and three format regressions. Real-world (non-synthetic) corpora may shift this, but on the corpus we have, the spike is a **NO-GO** for swap-in adoption. ADR-005 will assess whether to defer (revisit on a real corpus), reject, or adopt selectively (e.g., image-only paths via Docling's OCR gain, born-digital paths via unstructured).
+
 ## Format Coverage Matrix (Docling Spike, prof-dt6)
 
 The full per-extension matrix lives at `eval/format_matrix.md`. Rebuild with:

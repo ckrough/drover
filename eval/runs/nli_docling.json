@@ -1,0 +1,2575 @@
+{
+  "total": 80,
+  "domain_accuracy": 0.05,
+  "category_accuracy": 0.0375,
+  "doctype_accuracy": 0.05,
+  "vendor_accuracy": 0.0375,
+  "date_accuracy": 0.8,
+  "model": "cross-encoder/nli-deberta-v3-base",
+  "provider": "nli_local",
+  "comparisons": [
+    {
+      "filename": "medical_bill.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "policy",
+        "vendor": "This is not a bill from your insurance company",
+        "date": "20241022",
+        "subject": "## Medical Services Statement"
+      },
+      "actual": {
+        "filename": "medical_bill.pdf",
+        "domain": "medical",
+        "category": "expense",
+        "doctype": "invoice",
+        "vendor": "Northern Virginia Medical Center",
+        "date": "20241101",
+        "subject": "medical services",
+        "notes": "Itemized medical services bill"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": false,
+      "loader_latency_ms": 7077.8858340017905,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "receipt.pdf",
+      "predicted": {
+        "domain": "reference",
+        "category": "topic",
+        "doctype": "manual",
+        "vendor": "unknown",
+        "date": "20241208",
+        "subject": "## PetSmart"
+      },
+      "actual": {
+        "filename": "receipt.pdf",
+        "domain": "pets",
+        "category": "expense",
+        "doctype": "receipt",
+        "vendor": "PetSmart",
+        "date": "20241208",
+        "subject": "pet supplies",
+        "notes": "Retail receipt for pet supplies"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1687.9213749998598,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "user_manual.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "warranty",
+        "vendor": "unknown",
+        "date": "unknown",
+        "subject": "## SmartHub 3000"
+      },
+      "actual": {
+        "filename": "user_manual.pdf",
+        "domain": "household",
+        "category": "documentation",
+        "doctype": "manual",
+        "vendor": "smarthub",
+        "date": "20240901",
+        "subject": "smarthub 3000",
+        "notes": "Device manual for SmartHub 3000"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": false,
+      "loader_latency_ms": 3524.920583000494,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "summit-academy_agreement_2025-07-23.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "paystub",
+        "vendor": "Summit Academy agrees to provide individualized",
+        "date": "20250723",
+        "subject": "## Tutoring Services Agreement"
+      },
+      "actual": {
+        "filename": "summit-academy_agreement_2025-07-23.pdf",
+        "domain": "education",
+        "category": "reference",
+        "doctype": "agreement",
+        "vendor": "Summit Academy",
+        "date": "20250723",
+        "subject": "reference agreement",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1674.143209002068,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "summit-academy_report_2025-12-09.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "state",
+        "doctype": "letter",
+        "vendor": "The student demonstrated consistent performance",
+        "date": "20251209",
+        "subject": "## Academic Progress Report - Fall Semester 2025"
+      },
+      "actual": {
+        "filename": "summit-academy_report_2025-12-09.pdf",
+        "domain": "education",
+        "category": "transcript",
+        "doctype": "report",
+        "vendor": "Summit Academy",
+        "date": "20251209",
+        "subject": "transcript report",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1983.678749998944,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "riverbend-medical-center_invoice_2026-02-16.pdf",
+      "predicted": {
+        "domain": "household",
+        "category": "network",
+        "doctype": "deed",
+        "vendor": "unknown",
+        "date": "20260216",
+        "subject": "Riverbend Medical Center 4820 Riverbend Parkway Springfield, IL 62704 Phone: (555) 014-7832 Tax ID:..."
+      },
+      "actual": {
+        "filename": "riverbend-medical-center_invoice_2026-02-16.pdf",
+        "domain": "medical",
+        "category": "specialist",
+        "doctype": "invoice",
+        "vendor": "Riverbend Medical Center",
+        "date": "20260216",
+        "subject": "specialist invoice",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 2087.0330840007227,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "highland-hoa_receipt_2025-08-13.pdf",
+      "predicted": {
+        "domain": "personal",
+        "category": "identity",
+        "doctype": "letter",
+        "vendor": "unknown",
+        "date": "20250813",
+        "subject": "## Highland HOA"
+      },
+      "actual": {
+        "filename": "highland-hoa_receipt_2025-08-13.pdf",
+        "domain": "property",
+        "category": "agreement",
+        "doctype": "receipt",
+        "vendor": "Highland HOA",
+        "date": "20250813",
+        "subject": "agreement receipt",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1921.2819159984065,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "coastline-adventures_itinerary_2026-01-17.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "passport",
+        "vendor": "unknown",
+        "date": "20260117",
+        "subject": "## Coastline Adventures Travel Itinerary"
+      },
+      "actual": {
+        "filename": "coastline-adventures_itinerary_2026-01-17.pdf",
+        "domain": "lifestyle",
+        "category": "travel",
+        "doctype": "itinerary",
+        "vendor": "Coastline Adventures",
+        "date": "20260117",
+        "subject": "travel itinerary",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1861.3996670028428,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "cascade-power_invoice_2026-03-12.pdf",
+      "predicted": {
+        "domain": "utilities",
+        "category": "electric",
+        "doctype": "policy",
+        "vendor": "Please inc",
+        "date": "20260312",
+        "subject": "Cascade Power 4801 Ridgeline Boulevard Portland, OR 97201"
+      },
+      "actual": {
+        "filename": "cascade-power_invoice_2026-03-12.pdf",
+        "domain": "utilities",
+        "category": "electric",
+        "doctype": "invoice",
+        "vendor": "Cascade Power",
+        "date": "20260312",
+        "subject": "electric invoice",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": true,
+      "category_correct": true,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 2211.965834001603,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "maple-lane-grocers_recipe_2025-05-04.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "resume",
+        "doctype": "itinerary",
+        "vendor": "unknown",
+        "date": "20250504",
+        "subject": "## Maple Lane Grocers Honey-Glazed Roasted Chicken Thighs"
+      },
+      "actual": {
+        "filename": "maple-lane-grocers_recipe_2025-05-04.pdf",
+        "domain": "food",
+        "category": "recipe",
+        "doctype": "recipe",
+        "vendor": "Maple Lane Grocers",
+        "date": "20250504",
+        "subject": "recipe recipe",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1593.1400839981507,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "cedar-pine-home_guide_2026-01-06.pdf",
+      "predicted": {
+        "domain": "education",
+        "category": "financial_aid",
+        "doctype": "return",
+        "vendor": "unknown",
+        "date": "20260106",
+        "subject": "## Cedar &amp; Pine Home Upholstery Care Guide"
+      },
+      "actual": {
+        "filename": "cedar-pine-home_guide_2026-01-06.pdf",
+        "domain": "household",
+        "category": "documentation",
+        "doctype": "guide",
+        "vendor": "Cedar & Pine Home",
+        "date": "20260106",
+        "subject": "documentation guide",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1474.2103749995294,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "keystone-coverage_policy_2026-03-02.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "letter",
+        "vendor": "Keystone Coverage\n\nPersonal Automobile Insurance",
+        "date": "20260302",
+        "subject": "## Keystone Coverage"
+      },
+      "actual": {
+        "filename": "keystone-coverage_policy_2026-03-02.pdf",
+        "domain": "insurance",
+        "category": "auto",
+        "doctype": "policy",
+        "vendor": "Keystone Coverage",
+        "date": "20260302",
+        "subject": "auto policy",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1949.4145829994523,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "brightford-notary_will_2025-09-24.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "training",
+        "doctype": "will",
+        "vendor": "unknown",
+        "date": "19510303",
+        "subject": "I, MARGARET ELAINE VOSS, a resident of 447 Cloverfield Lane, Dunmore Township, State of Harwick,..."
+      },
+      "actual": {
+        "filename": "brightford-notary_will_2025-09-24.pdf",
+        "domain": "legal",
+        "category": "estate",
+        "doctype": "will",
+        "vendor": "Brightford Notary",
+        "date": "20250924",
+        "subject": "estate will",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": true,
+      "vendor_correct": false,
+      "date_correct": false,
+      "loader_latency_ms": 3132.987790999323,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "westhaven-rentals_lease_2025-12-07.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "correspondence",
+        "doctype": "letter",
+        "vendor": "unknown",
+        "date": "20251207",
+        "subject": "Issuing Organization: Westhaven Rentals Document Date: December 7, 2025 Reference No.: WHR-2025-0449"
+      },
+      "actual": {
+        "filename": "westhaven-rentals_lease_2025-12-07.pdf",
+        "domain": "housing",
+        "category": "property",
+        "doctype": "lease",
+        "vendor": "Westhaven Rentals",
+        "date": "20251207",
+        "subject": "property lease",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1362.5702909994288,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "riverbend-medical-center_invoice_2025-10-16.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "training",
+        "doctype": "letter",
+        "vendor": "unknown",
+        "date": "20251016",
+        "subject": "Riverbend Medical Center 4801 Riverbend Parkway Springfield, IL 62704 Phone: (555) 014-8823 Tax ID:..."
+      },
+      "actual": {
+        "filename": "riverbend-medical-center_invoice_2025-10-16.pdf",
+        "domain": "medical",
+        "category": "expense",
+        "doctype": "invoice",
+        "vendor": "Riverbend Medical Center",
+        "date": "20251016",
+        "subject": "expense invoice",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1914.9027089988522,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "hillcrest-college_agreement_2025-12-07.pdf",
+      "predicted": {
+        "domain": "legal",
+        "category": "contract",
+        "doctype": "letter",
+        "vendor": "Hillc",
+        "date": "20251207",
+        "subject": "## Financial Aid Award Agreement"
+      },
+      "actual": {
+        "filename": "hillcrest-college_agreement_2025-12-07.pdf",
+        "domain": "education",
+        "category": "financial_aid",
+        "doctype": "agreement",
+        "vendor": "Hillcrest College",
+        "date": "20251207",
+        "subject": "financial aid agreement",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1441.6386250013602,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "state-tax-authority_letter_2025-11-03.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "review",
+        "doctype": "policy",
+        "vendor": "This letter is to inform you that the State Tax",
+        "date": "20251103",
+        "subject": "State Tax Authority Revenue Correspondence Division 4400 Capitol Boulevard, Suite 210 Harleton, ST..."
+      },
+      "actual": {
+        "filename": "state-tax-authority_letter_2025-11-03.pdf",
+        "domain": "government",
+        "category": "correspondence",
+        "doctype": "letter",
+        "vendor": "State Tax Authority",
+        "date": "20251103",
+        "subject": "correspondence letter",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1314.4040830011363,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "meridian-software_report_2025-11-07.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "letter",
+        "vendor": "unknown",
+        "date": "20251107",
+        "subject": "## Q3 Workforce Productivity Assessment Report"
+      },
+      "actual": {
+        "filename": "meridian-software_report_2025-11-07.pdf",
+        "domain": "career",
+        "category": "employer",
+        "doctype": "report",
+        "vendor": "Meridian Software",
+        "date": "20251107",
+        "subject": "employer report",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1553.4935830000904,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "hillcrest-college_report_2026-04-06.pdf",
+      "predicted": {
+        "domain": "reference",
+        "category": "topic",
+        "doctype": "record",
+        "vendor": "Hillc",
+        "date": "20260406",
+        "subject": "## Vendor Agreement Compliance Report: Educational Services Contract"
+      },
+      "actual": {
+        "filename": "hillcrest-college_report_2026-04-06.pdf",
+        "domain": "education",
+        "category": "agreement",
+        "doctype": "report",
+        "vendor": "Hillcrest College",
+        "date": "20260406",
+        "subject": "agreement report",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1588.3776250011579,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "greenwood-family-practice_invoice_2026-03-19.pdf",
+      "predicted": {
+        "domain": "household",
+        "category": "vehicle",
+        "doctype": "letter",
+        "vendor": "unknown",
+        "date": "20260319",
+        "subject": "Invoice Number:"
+      },
+      "actual": {
+        "filename": "greenwood-family-practice_invoice_2026-03-19.pdf",
+        "domain": "medical",
+        "category": "record",
+        "doctype": "invoice",
+        "vendor": "Greenwood Family Practice",
+        "date": "20260319",
+        "subject": "record invoice",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1976.253832999646,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "greenwood-family-practice_referral_2025-06-11.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "training",
+        "doctype": "contract",
+        "vendor": "Primary Insurance",
+        "date": "19680314",
+        "subject": "Greenwood Family Practice 482 Elmwood Drive, Suite 101 | Hartville, OH 44632 Phone: (330) 555-0187..."
+      },
+      "actual": {
+        "filename": "greenwood-family-practice_referral_2025-06-11.pdf",
+        "domain": "medical",
+        "category": "prescription",
+        "doctype": "referral",
+        "vendor": "Greenwood Family Practice",
+        "date": "20250611",
+        "subject": "prescription referral",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": false,
+      "loader_latency_ms": 2417.8712499997346,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "civic-library-associati_certificate_2025-05-25.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "policy",
+        "vendor": "This membership entitles the holder to all",
+        "date": "20250525",
+        "subject": "## Civic Library Association"
+      },
+      "actual": {
+        "filename": "civic-library-associati_certificate_2025-05-25.pdf",
+        "domain": "personal",
+        "category": "membership",
+        "doctype": "certificate",
+        "vendor": "Civic Library Association",
+        "date": "20250525",
+        "subject": "membership certificate",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1367.302832997666,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "brightway-hardware_manual_2025-05-06.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "warranty",
+        "vendor": "unknown",
+        "date": "20250506",
+        "subject": "## Brightway ProClean 3500 Pressure Washer"
+      },
+      "actual": {
+        "filename": "brightway-hardware_manual_2025-05-06.pdf",
+        "domain": "household",
+        "category": "documentation",
+        "doctype": "manual",
+        "vendor": "Brightway Hardware",
+        "date": "20250506",
+        "subject": "documentation manual",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 3138.496250001481,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "northwind-studios_paystub_2025-06-07.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "correspondence",
+        "doctype": "contract",
+        "vendor": "Health Insurance",
+        "date": "20250607",
+        "subject": "## Northwind Studios"
+      },
+      "actual": {
+        "filename": "northwind-studios_paystub_2025-06-07.pdf",
+        "domain": "career",
+        "category": "employer",
+        "doctype": "paystub",
+        "vendor": "Northwind Studios",
+        "date": "20250607",
+        "subject": "employer paystub",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 2180.3122500023164,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "willowbrook-market_manual_2025-10-16.pdf",
+      "predicted": {
+        "domain": "reference",
+        "category": "topic",
+        "doctype": "license",
+        "vendor": "unknown",
+        "date": "20251016",
+        "subject": "## Willowbrook Market Harvest Grain Bowl Kit"
+      },
+      "actual": {
+        "filename": "willowbrook-market_manual_2025-10-16.pdf",
+        "domain": "food",
+        "category": "recipe",
+        "doctype": "manual",
+        "vendor": "Willowbrook Market",
+        "date": "20251016",
+        "subject": "recipe manual",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1812.2676250022778,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "sterling-property-group_agreement_2026-01-20.pdf",
+      "predicted": {
+        "domain": "financial",
+        "category": "retirement",
+        "doctype": "paystub",
+        "vendor": "Sterling Property Group",
+        "date": "20260120",
+        "subject": "Agreement Reference No.:"
+      },
+      "actual": {
+        "filename": "sterling-property-group_agreement_2026-01-20.pdf",
+        "domain": "property",
+        "category": "agreement",
+        "doctype": "agreement",
+        "vendor": "Sterling Property Group",
+        "date": "20260120",
+        "subject": "agreement agreement",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": true,
+      "date_correct": true,
+      "loader_latency_ms": 1931.6142079987912,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "bluefield-reference-library_manual_2025-07-28.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "correspondence",
+        "doctype": "report",
+        "vendor": "unknown",
+        "date": "20250728",
+        "subject": "## Bluefield Reference Library - Visitor Self-Service Kiosk"
+      },
+      "actual": {
+        "filename": "bluefield-reference-library_manual_2025-07-28.pdf",
+        "domain": "reference",
+        "category": "manual",
+        "doctype": "manual",
+        "vendor": "Bluefield Reference Library",
+        "date": "20250728",
+        "subject": "manual manual",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 2671.220667001762,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "cedar-pine-home_warranty_2026-02-04.pdf",
+      "predicted": {
+        "domain": "utilities",
+        "category": "electric",
+        "doctype": "certificate",
+        "vendor": "This warranty gives you specific legal rights.",
+        "date": "20260204",
+        "subject": "## Cedar &amp; Pine Home"
+      },
+      "actual": {
+        "filename": "cedar-pine-home_warranty_2026-02-04.pdf",
+        "domain": "household",
+        "category": "documentation",
+        "doctype": "warranty",
+        "vendor": "Cedar & Pine Home",
+        "date": "20260204",
+        "subject": "documentation warranty",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1497.5080420008453,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "oakridge-realty_lease_2026-03-19.pdf",
+      "predicted": {
+        "domain": "lifestyle",
+        "category": "interest",
+        "doctype": "letter",
+        "vendor": "The premises inc",
+        "date": "20260319",
+        "subject": "Prepared by: Oakridge Realty Date: March 19, 2026 Reference No.: OAK-2026-0319-447"
+      },
+      "actual": {
+        "filename": "oakridge-realty_lease_2026-03-19.pdf",
+        "domain": "housing",
+        "category": "rental",
+        "doctype": "lease",
+        "vendor": "Oakridge Realty",
+        "date": "20260319",
+        "subject": "rental lease",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1985.4304999971646,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "greenleaf-tours_itinerary_2026-01-11.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "passport",
+        "vendor": "unknown",
+        "date": "20260111",
+        "subject": "## Greenleaf Tours Travel Itinerary"
+      },
+      "actual": {
+        "filename": "greenleaf-tours_itinerary_2026-01-11.pdf",
+        "domain": "lifestyle",
+        "category": "expense",
+        "doctype": "itinerary",
+        "vendor": "Greenleaf Tours",
+        "date": "20260111",
+        "subject": "expense itinerary",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1587.2622079987195,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "wagging-tails-boarding_receipt_2026-03-23.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "reference",
+        "doctype": "itinerary",
+        "vendor": "unknown",
+        "date": "20260323",
+        "subject": "## Wagging Tails Boarding"
+      },
+      "actual": {
+        "filename": "wagging-tails-boarding_receipt_2026-03-23.pdf",
+        "domain": "pets",
+        "category": "expense",
+        "doctype": "receipt",
+        "vendor": "Wagging Tails Boarding",
+        "date": "20260323",
+        "subject": "expense receipt",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1939.4852079967677,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "crestline-federal-credit-uni_report_2026-01-31.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "state",
+        "doctype": "deed",
+        "vendor": "42 $17,552.00 Yes",
+        "date": "20260131",
+        "subject": "## Payment Processing Review Report"
+      },
+      "actual": {
+        "filename": "crestline-federal-credit-uni_report_2026-01-31.pdf",
+        "domain": "financial",
+        "category": "payment",
+        "doctype": "report",
+        "vendor": "Crestline Federal Credit Union",
+        "date": "20260131",
+        "subject": "payment report",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1693.4125830011908,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "heritage-trust_statement_2025-05-04.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "portfolio",
+        "vendor": "+$96.45 +$312.80",
+        "date": "20250401",
+        "subject": "## Heritage Trust"
+      },
+      "actual": {
+        "filename": "heritage-trust_statement_2025-05-04.pdf",
+        "domain": "financial",
+        "category": "investment",
+        "doctype": "statement",
+        "vendor": "Heritage Trust",
+        "date": "20250504",
+        "subject": "investment statement",
+        "notes": "synthetic, generated 2026-04-28"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": false,
+      "loader_latency_ms": 3464.975457998662,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "meridian-software_letter_2025-09-05.pdf",
+      "predicted": {
+        "domain": "household",
+        "category": "vehicle",
+        "doctype": "trust",
+        "vendor": "unknown",
+        "date": "20250905",
+        "subject": "September 5, 2025"
+      },
+      "actual": {
+        "filename": "meridian-software_letter_2025-09-05.pdf",
+        "domain": "career",
+        "category": "application",
+        "doctype": "letter",
+        "vendor": "Meridian Software",
+        "date": "20250905",
+        "subject": "application letter",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1357.8381660008745,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "pawsworth-supply_receipt_2025-06-27.pdf",
+      "predicted": {
+        "domain": "personal",
+        "category": "membership",
+        "doctype": "agreement",
+        "vendor": "Pet Registration Services",
+        "date": "20250627",
+        "subject": "## Pawsworth Supply"
+      },
+      "actual": {
+        "filename": "pawsworth-supply_receipt_2025-06-27.pdf",
+        "domain": "pets",
+        "category": "registration",
+        "doctype": "receipt",
+        "vendor": "Pawsworth Supply",
+        "date": "20250627",
+        "subject": "registration receipt",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1782.5664159972803,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "willowbrook-market_recipe_2025-12-04.pdf",
+      "predicted": {
+        "domain": "education",
+        "category": "transcript",
+        "doctype": "title",
+        "vendor": "unknown",
+        "date": "unknown",
+        "subject": "## Willowbrook Market Signature Beef Bourguignon"
+      },
+      "actual": {
+        "filename": "willowbrook-market_recipe_2025-12-04.pdf",
+        "domain": "food",
+        "category": "reference",
+        "doctype": "recipe",
+        "vendor": "Willowbrook Market",
+        "date": "20251204",
+        "subject": "reference recipe",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": false,
+      "loader_latency_ms": 1364.887625000847,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "harbor-athletic-club_identification_2026-04-20.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "consulting",
+        "doctype": "itinerary",
+        "vendor": "XXX Member Services",
+        "date": "19880914",
+        "subject": "## Member Identification Card - Official Document"
+      },
+      "actual": {
+        "filename": "harbor-athletic-club_identification_2026-04-20.pdf",
+        "domain": "personal",
+        "category": "identity",
+        "doctype": "identification",
+        "vendor": "Harbor Athletic Club",
+        "date": "20260420",
+        "subject": "identity identification",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": false,
+      "loader_latency_ms": 2148.8808329995663,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "bridgeport-telecom_invoice_2025-07-23.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "consulting",
+        "doctype": "resume",
+        "vendor": "unknown",
+        "date": "20250723",
+        "subject": "Invoice Number: BTC-2025-08841 Invoice Date: July 23, 2025 Due Date:"
+      },
+      "actual": {
+        "filename": "bridgeport-telecom_invoice_2025-07-23.pdf",
+        "domain": "utilities",
+        "category": "internet",
+        "doctype": "invoice",
+        "vendor": "Bridgeport Telecom",
+        "date": "20250723",
+        "subject": "internet invoice",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 2393.4887089999393,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "riverstone-maintenance_receipt_2025-07-08.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "reference",
+        "doctype": "letter",
+        "vendor": "Delmont Property Holdings",
+        "date": "20250708",
+        "subject": "## Riverstone Maintenance"
+      },
+      "actual": {
+        "filename": "riverstone-maintenance_receipt_2025-07-08.pdf",
+        "domain": "property",
+        "category": "agreement",
+        "doctype": "receipt",
+        "vendor": "Riverstone Maintenance",
+        "date": "20250708",
+        "subject": "agreement receipt",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 2123.1169590028003,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "wayfarer-travel_confirmation_2026-02-25.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "reference",
+        "doctype": "paystub",
+        "vendor": "unknown",
+        "date": "20260225",
+        "subject": "## Wayfarer Travel"
+      },
+      "actual": {
+        "filename": "wayfarer-travel_confirmation_2026-02-25.pdf",
+        "domain": "lifestyle",
+        "category": "travel",
+        "doctype": "confirmation",
+        "vendor": "Wayfarer Travel",
+        "date": "20260225",
+        "subject": "travel confirmation",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 2116.4165419977508,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "harbor-athletic-club_certificate_2025-08-19.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "leadership",
+        "doctype": "certificate",
+        "vendor": "is a duly registered and recognized member in",
+        "date": "20250819",
+        "subject": "## Harbor Athletic Club"
+      },
+      "actual": {
+        "filename": "harbor-athletic-club_certificate_2025-08-19.pdf",
+        "domain": "personal",
+        "category": "identity",
+        "doctype": "certificate",
+        "vendor": "Harbor Athletic Club",
+        "date": "20250819",
+        "subject": "identity certificate",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": true,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1890.0961250001274,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "furry-friends-veterinary_agreement_2026-03-11.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "local",
+        "doctype": "letter",
+        "vendor": "Pet Registration and Wellness Services",
+        "date": "20260311",
+        "subject": "## Pet Registration and Wellness Services Agreement"
+      },
+      "actual": {
+        "filename": "furry-friends-veterinary_agreement_2026-03-11.pdf",
+        "domain": "pets",
+        "category": "registration",
+        "doctype": "agreement",
+        "vendor": "Furry Friends Veterinary",
+        "date": "20260311",
+        "subject": "registration agreement",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1413.0075000030047,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "summit-water-district_statement_2026-01-29.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "benefit",
+        "doctype": "invoice",
+        "vendor": "Summit Water District\n\nUtility Services",
+        "date": "20260101",
+        "subject": "## Summit Water District"
+      },
+      "actual": {
+        "filename": "summit-water-district_statement_2026-01-29.pdf",
+        "domain": "utilities",
+        "category": "electric",
+        "doctype": "statement",
+        "vendor": "Summit Water District",
+        "date": "20260129",
+        "subject": "electric statement",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": false,
+      "loader_latency_ms": 2028.1180000019958,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "oakridge-realty_agreement_2025-06-28.pdf",
+      "predicted": {
+        "domain": "lifestyle",
+        "category": "interest",
+        "doctype": "will",
+        "vendor": "unknown",
+        "date": "20250628",
+        "subject": "Oakridge Realty 123 Maple Grove Lane, Suite 4, Hartwell, OH 44201 License No. BRK-00-7741"
+      },
+      "actual": {
+        "filename": "oakridge-realty_agreement_2025-06-28.pdf",
+        "domain": "housing",
+        "category": "property",
+        "doctype": "agreement",
+        "vendor": "Oakridge Realty",
+        "date": "20250628",
+        "subject": "property agreement",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1386.9043750019046,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "brightford-notary_will_2025-05-07.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "certificate",
+        "vendor": "unknown",
+        "date": "20250507",
+        "subject": "I, MARGARET ELOISE DUNFORD, a resident of 44 Cresthollow Lane, Weybridge, County of Aldenmoor,..."
+      },
+      "actual": {
+        "filename": "brightford-notary_will_2025-05-07.pdf",
+        "domain": "legal",
+        "category": "estate",
+        "doctype": "will",
+        "vendor": "Brightford Notary",
+        "date": "20250507",
+        "subject": "estate will",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1807.8003750015341,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "summit-water-district_statement_2026-03-28.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "policy",
+        "vendor": "unknown",
+        "date": "20260301",
+        "subject": "## Summit Water District"
+      },
+      "actual": {
+        "filename": "summit-water-district_statement_2026-03-28.pdf",
+        "domain": "utilities",
+        "category": "internet",
+        "doctype": "statement",
+        "vendor": "Summit Water District",
+        "date": "20260328",
+        "subject": "internet statement",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": false,
+      "loader_latency_ms": 2244.176583000808,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "open-knowledge-press_reference_2026-01-24.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "letter",
+        "vendor": "unknown",
+        "date": "20260124",
+        "subject": "## Quick Reference Guide: Understanding Open Access Publishing Tiers"
+      },
+      "actual": {
+        "filename": "open-knowledge-press_reference_2026-01-24.pdf",
+        "domain": "reference",
+        "category": "topic",
+        "doctype": "reference",
+        "vendor": "Open Knowledge Press",
+        "date": "20260124",
+        "subject": "topic reference",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1594.483291002689,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "northern-capital-bank_report_2025-11-29.pdf",
+      "predicted": {
+        "domain": "personal",
+        "category": "identity",
+        "doctype": "deed",
+        "vendor": "Northern Capital Bank",
+        "date": "20251129",
+        "subject": "## Quarterly Investment Portfolio Review Report"
+      },
+      "actual": {
+        "filename": "northern-capital-bank_report_2025-11-29.pdf",
+        "domain": "financial",
+        "category": "investment",
+        "doctype": "report",
+        "vendor": "Northern Capital Bank",
+        "date": "20251129",
+        "subject": "investment report",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": true,
+      "date_correct": true,
+      "loader_latency_ms": 1685.2982920026989,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "highland-hoa_estimate_2025-07-04.pdf",
+      "predicted": {
+        "domain": "utilities",
+        "category": "electric",
+        "doctype": "policy",
+        "vendor": "Highland HOA\n\nEstimate Reference Document",
+        "date": "20250704",
+        "subject": "## Highland HOA"
+      },
+      "actual": {
+        "filename": "highland-hoa_estimate_2025-07-04.pdf",
+        "domain": "property",
+        "category": "reference",
+        "doctype": "estimate",
+        "vendor": "Highland HOA",
+        "date": "20250704",
+        "subject": "reference estimate",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1764.7406249998312,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "brightford-notary_trust_2025-11-11.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "leadership",
+        "doctype": "certificate",
+        "vendor": "unknown",
+        "date": "20251111",
+        "subject": "Brightford Notary - Instrument No. BN-2025-0447 Date of Execution: November 11, 2025"
+      },
+      "actual": {
+        "filename": "brightford-notary_trust_2025-11-11.pdf",
+        "domain": "legal",
+        "category": "reference",
+        "doctype": "trust",
+        "vendor": "Brightford Notary",
+        "date": "20251111",
+        "subject": "reference trust",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1405.7527919976565,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "wagging-tails-boarding_receipt_2025-05-24.pdf",
+      "predicted": {
+        "domain": "education",
+        "category": "certification",
+        "doctype": "certificate",
+        "vendor": "Enrichment & Socialization Play Group",
+        "date": "20250524",
+        "subject": "## Wagging Tails Boarding"
+      },
+      "actual": {
+        "filename": "wagging-tails-boarding_receipt_2025-05-24.pdf",
+        "domain": "pets",
+        "category": "expense",
+        "doctype": "receipt",
+        "vendor": "Wagging Tails Boarding",
+        "date": "20250524",
+        "subject": "expense receipt",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1517.4193329985428,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "oakridge-realty_lease_2025-07-09.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "reference",
+        "doctype": "letter",
+        "vendor": "unknown",
+        "date": "20250709",
+        "subject": "Oakridge Realty Licensed Property Management &amp; Leasing Office: 4400 Pinecrest Boulevard, Suite..."
+      },
+      "actual": {
+        "filename": "oakridge-realty_lease_2025-07-09.pdf",
+        "domain": "housing",
+        "category": "rental",
+        "doctype": "lease",
+        "vendor": "Oakridge Realty",
+        "date": "20250709",
+        "subject": "rental lease",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 2421.490958000504,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "hillcrest-college_agreement_2026-02-03.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "letter",
+        "vendor": "Hillc",
+        "date": "20260203",
+        "subject": "## Financial Aid Award Agreement"
+      },
+      "actual": {
+        "filename": "hillcrest-college_agreement_2026-02-03.pdf",
+        "domain": "education",
+        "category": "financial_aid",
+        "doctype": "agreement",
+        "vendor": "Hillcrest College",
+        "date": "20260203",
+        "subject": "financial aid agreement",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1224.91758400065,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "marlowe-stone-llp_will_2025-08-05.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "leadership",
+        "doctype": "policy",
+        "vendor": "unknown",
+        "date": "19510314",
+        "subject": "I, DOROTHEA ELAINE VOSS, a resident of 4412 Crestwood Lane, Millhaven, Ohio 44103, being of sound..."
+      },
+      "actual": {
+        "filename": "marlowe-stone-llp_will_2025-08-05.pdf",
+        "domain": "legal",
+        "category": "estate",
+        "doctype": "will",
+        "vendor": "Marlowe & Stone LLP",
+        "date": "20250805",
+        "subject": "estate will",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": false,
+      "loader_latency_ms": 1915.2273330037133,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "open-knowledge-press_reference_2025-11-17.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "reference",
+        "doctype": "bill",
+        "vendor": "unknown",
+        "date": "20251117",
+        "subject": "## Quick Reference Guide: Understanding Microeconomic Concepts"
+      },
+      "actual": {
+        "filename": "open-knowledge-press_reference_2025-11-17.pdf",
+        "domain": "reference",
+        "category": "topic",
+        "doctype": "reference",
+        "vendor": "Open Knowledge Press",
+        "date": "20251117",
+        "subject": "topic reference",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1345.4205419984646,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "highland-hoa_agreement_2025-06-15.pdf",
+      "predicted": {
+        "domain": "financial",
+        "category": "retirement",
+        "doctype": "letter",
+        "vendor": "Highland Homeowners Association , a nonprofit",
+        "date": "20250615",
+        "subject": "## Highland HOA Landscaping and Common Area Maintenance Agreement"
+      },
+      "actual": {
+        "filename": "highland-hoa_agreement_2025-06-15.pdf",
+        "domain": "property",
+        "category": "agreement",
+        "doctype": "agreement",
+        "vendor": "Highland HOA",
+        "date": "20250615",
+        "subject": "agreement agreement",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1473.4956659958698,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "wayfarer-travel_confirmation_2025-07-21.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "passport",
+        "vendor": "Travel Insurance",
+        "date": "20250721",
+        "subject": "## Wayfarer Travel"
+      },
+      "actual": {
+        "filename": "wayfarer-travel_confirmation_2025-07-21.pdf",
+        "domain": "lifestyle",
+        "category": "expense",
+        "doctype": "confirmation",
+        "vendor": "Wayfarer Travel",
+        "date": "20250721",
+        "subject": "expense confirmation",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1408.5791250035982,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "county-permits-office_form_2025-12-13.pdf",
+      "predicted": {
+        "domain": "utilities",
+        "category": "electric",
+        "doctype": "portfolio",
+        "vendor": "unknown",
+        "date": "20251213",
+        "subject": "## County Permits Office - Federal Compliance Division"
+      },
+      "actual": {
+        "filename": "county-permits-office_form_2025-12-13.pdf",
+        "domain": "government",
+        "category": "federal",
+        "doctype": "form",
+        "vendor": "County Permits Office",
+        "date": "20251213",
+        "subject": "federal form",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 3283.3547499976703,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "state-tax-authority_form_2026-04-08.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "letter",
+        "vendor": "Sole Proprietor n Partnership n LLC n Corporation",
+        "date": "20260408",
+        "subject": "## Local Business Tax Registration Update Form"
+      },
+      "actual": {
+        "filename": "state-tax-authority_form_2026-04-08.pdf",
+        "domain": "government",
+        "category": "local",
+        "doctype": "form",
+        "vendor": "State Tax Authority",
+        "date": "20260408",
+        "subject": "local form",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": true,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1537.2719579972909,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "crestline-federal-credit_statement_2025-10-26.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "agreement",
+        "vendor": "Crestline Federal Credit Union\n\nInvestment",
+        "date": "20251026",
+        "subject": "## Crestline Federal Credit Union"
+      },
+      "actual": {
+        "filename": "crestline-federal-credit_statement_2025-10-26.pdf",
+        "domain": "financial",
+        "category": "investment",
+        "doctype": "statement",
+        "vendor": "Crestline Federal Credit Union",
+        "date": "20251026",
+        "subject": "investment statement",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 2899.780915999145,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "open-knowledge-press_manual_2025-05-20.pdf",
+      "predicted": {
+        "domain": "utilities",
+        "category": "electric",
+        "doctype": "return",
+        "vendor": "unknown",
+        "date": "20250520",
+        "subject": "## BrewMaster Compact Pour-Over Station"
+      },
+      "actual": {
+        "filename": "open-knowledge-press_manual_2025-05-20.pdf",
+        "domain": "reference",
+        "category": "manual",
+        "doctype": "manual",
+        "vendor": "Open Knowledge Press",
+        "date": "20250520",
+        "subject": "manual manual",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 2236.3817500008736,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "sentinel-mutual_letter_2025-06-25.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "leadership",
+        "doctype": "certificate",
+        "vendor": "Sentinel Mutual Insurance Company",
+        "date": "20250625",
+        "subject": "Sentinel Mutual Insurance Company 4200 Westbrook Corporate Drive, Suite 110 Columbus, OH 43215..."
+      },
+      "actual": {
+        "filename": "sentinel-mutual_letter_2025-06-25.pdf",
+        "domain": "insurance",
+        "category": "home",
+        "doctype": "letter",
+        "vendor": "Sentinel Mutual",
+        "date": "20250625",
+        "subject": "home letter",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1125.8946250018198,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "allport-insurance-group_policy_2025-11-28.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "review",
+        "doctype": "certificate",
+        "vendor": "Allport Insurance Group\n\nHomeowners Insurance",
+        "date": "20251201",
+        "subject": "## Allport Insurance Group"
+      },
+      "actual": {
+        "filename": "allport-insurance-group_policy_2025-11-28.pdf",
+        "domain": "insurance",
+        "category": "home",
+        "doctype": "policy",
+        "vendor": "Allport Insurance Group",
+        "date": "20251128",
+        "subject": "home policy",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": false,
+      "loader_latency_ms": 1495.9116669997456,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "bridgeport-telecom_invoice_2025-07-29.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "reference",
+        "doctype": "contract",
+        "vendor": "Please inc",
+        "date": "20250729",
+        "subject": "Invoice Number:"
+      },
+      "actual": {
+        "filename": "bridgeport-telecom_invoice_2025-07-29.pdf",
+        "domain": "utilities",
+        "category": "electric",
+        "doctype": "invoice",
+        "vendor": "Bridgeport Telecom",
+        "date": "20250729",
+        "subject": "electric invoice",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1986.6112909949152,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "ironwood-supply_manual_2026-03-16.pdf",
+      "predicted": {
+        "domain": "utilities",
+        "category": "electric",
+        "doctype": "identification",
+        "vendor": "unknown",
+        "date": "20260316",
+        "subject": "## Ironwood Supply Model IW-7 Compact Air Purifier"
+      },
+      "actual": {
+        "filename": "ironwood-supply_manual_2026-03-16.pdf",
+        "domain": "household",
+        "category": "reference",
+        "doctype": "manual",
+        "vendor": "Ironwood Supply",
+        "date": "20260316",
+        "subject": "reference manual",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1543.5224169996218,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "northwind-studios_report_2025-07-03.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "local",
+        "doctype": "bill",
+        "vendor": "unknown",
+        "date": "20250703",
+        "subject": "## Quarterly Workforce Performance Report"
+      },
+      "actual": {
+        "filename": "northwind-studios_report_2025-07-03.pdf",
+        "domain": "career",
+        "category": "employer",
+        "doctype": "report",
+        "vendor": "Northwind Studios",
+        "date": "20250703",
+        "subject": "employer report",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1406.6319999983534,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "allport-insurance-group_policy_2025-10-28.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "certificate",
+        "vendor": "Allport Insurance Group\n\nHomeowners Insurance",
+        "date": "20251101",
+        "subject": "## Allport Insurance Group"
+      },
+      "actual": {
+        "filename": "allport-insurance-group_policy_2025-10-28.pdf",
+        "domain": "insurance",
+        "category": "home",
+        "doctype": "policy",
+        "vendor": "Allport Insurance Group",
+        "date": "20251028",
+        "subject": "home policy",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": false,
+      "loader_latency_ms": 1495.6335829992895,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "lighthouse-volunteers_certificate_2026-02-28.pdf",
+      "predicted": {
+        "domain": "lifestyle",
+        "category": "planning",
+        "doctype": "itinerary",
+        "vendor": "Thornton Director of Volunteer Services",
+        "date": "20260228",
+        "subject": "## Lighthouse Volunteers"
+      },
+      "actual": {
+        "filename": "lighthouse-volunteers_certificate_2026-02-28.pdf",
+        "domain": "personal",
+        "category": "identity",
+        "doctype": "certificate",
+        "vendor": "Lighthouse Volunteers",
+        "date": "20260228",
+        "subject": "identity certificate",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1357.8282500020578,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "northwind-studios_letter_2025-12-18.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "resume",
+        "vendor": "Thank you sincerely for considering my",
+        "date": "20251218",
+        "subject": "December 18, 2025"
+      },
+      "actual": {
+        "filename": "northwind-studios_letter_2025-12-18.pdf",
+        "domain": "career",
+        "category": "application",
+        "doctype": "letter",
+        "vendor": "Northwind Studios",
+        "date": "20251218",
+        "subject": "application letter",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1139.571874999092,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "keystone-coverage_policy_2025-11-23.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "correspondence",
+        "doctype": "policy",
+        "vendor": "Automobile Insurance",
+        "date": "20251201",
+        "subject": "## Keystone Coverage"
+      },
+      "actual": {
+        "filename": "keystone-coverage_policy_2025-11-23.pdf",
+        "domain": "insurance",
+        "category": "auto",
+        "doctype": "policy",
+        "vendor": "Keystone Coverage",
+        "date": "20251123",
+        "subject": "auto policy",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": true,
+      "vendor_correct": false,
+      "date_correct": false,
+      "loader_latency_ms": 1753.5274999972899,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "northern-capital-bank_statement_2026-04-28.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "correspondence",
+        "doctype": "letter",
+        "vendor": "Northern Capital Bank",
+        "date": "20260328",
+        "subject": "## Northern Capital Bank"
+      },
+      "actual": {
+        "filename": "northern-capital-bank_statement_2026-04-28.pdf",
+        "domain": "financial",
+        "category": "investment",
+        "doctype": "statement",
+        "vendor": "Northern Capital Bank",
+        "date": "20260428",
+        "subject": "investment statement",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": true,
+      "date_correct": false,
+      "loader_latency_ms": 2630.2072499966016,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "marlowe-stone-llp_will_2026-02-24.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "leadership",
+        "doctype": "will",
+        "vendor": "First Millbrook Community Bank",
+        "date": "20260224",
+        "subject": "- I, Dorothy Elaine Carmichael, a resident of 4412 Westhaven Drive, Millbrook, State of Carleton,..."
+      },
+      "actual": {
+        "filename": "marlowe-stone-llp_will_2026-02-24.pdf",
+        "domain": "legal",
+        "category": "estate",
+        "doctype": "will",
+        "vendor": "Marlowe & Stone LLP",
+        "date": "20260224",
+        "subject": "estate will",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": true,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1770.7559580012457,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "wayfarer-travel_confirmation_2025-04-30.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "paystub",
+        "vendor": "unknown",
+        "date": "20250430",
+        "subject": "## Wayfarer Travel"
+      },
+      "actual": {
+        "filename": "wayfarer-travel_confirmation_2025-04-30.pdf",
+        "domain": "lifestyle",
+        "category": "expense",
+        "doctype": "confirmation",
+        "vendor": "Wayfarer Travel",
+        "date": "20250430",
+        "subject": "expense confirmation",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1419.354083998769,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "maple-lane-grocers_manual_2025-10-04.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "policy",
+        "vendor": "unknown",
+        "date": "20251004",
+        "subject": "## Maple Lane Grocers Countertop Food Warmer - Model MLG-7"
+      },
+      "actual": {
+        "filename": "maple-lane-grocers_manual_2025-10-04.pdf",
+        "domain": "food",
+        "category": "reference",
+        "doctype": "manual",
+        "vendor": "Maple Lane Grocers",
+        "date": "20251004",
+        "subject": "reference manual",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 1539.994624996325,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "harvest-table-co-op_recipe_2025-11-13.pdf",
+      "predicted": {
+        "domain": "personal",
+        "category": "membership",
+        "doctype": "warranty",
+        "vendor": "This recipe was developed by the Harvest Table Co",
+        "date": "unknown",
+        "subject": "## Roasted Butternut Squash &amp; Wild Mushroom Risotto"
+      },
+      "actual": {
+        "filename": "harvest-table-co-op_recipe_2025-11-13.pdf",
+        "domain": "food",
+        "category": "recipe",
+        "doctype": "recipe",
+        "vendor": "Harvest Table Co-op",
+        "date": "20251113",
+        "subject": "recipe recipe",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": false,
+      "loader_latency_ms": 1179.5473329984816,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "bluefield-reference-library_manual_2025-11-06.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "reference",
+        "doctype": "letter",
+        "vendor": "unknown",
+        "date": "20251106",
+        "subject": "## Bluefield Self-Service Lending Terminal - Model BRL-7 User Manual"
+      },
+      "actual": {
+        "filename": "bluefield-reference-library_manual_2025-11-06.pdf",
+        "domain": "reference",
+        "category": "manual",
+        "doctype": "manual",
+        "vendor": "Bluefield Reference Library",
+        "date": "20251106",
+        "subject": "manual manual",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 2375.3664579999167,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "department-of-public-records_form_2026-01-14.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "certificate",
+        "vendor": "unknown",
+        "date": "20260114",
+        "subject": "## Application for Public Records Access and Fee Assessment"
+      },
+      "actual": {
+        "filename": "department-of-public-records_form_2026-01-14.pdf",
+        "domain": "government",
+        "category": "federal",
+        "doctype": "form",
+        "vendor": "Department of Public Records",
+        "date": "20260114",
+        "subject": "federal form",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": true,
+      "category_correct": true,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 3120.483582999441,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "lighthouse-volunteer_identification_2026-04-03.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "correspondence",
+        "doctype": "letter",
+        "vendor": "Report lost or stolen cards to Member Services",
+        "date": "19880914",
+        "subject": "## Official Volunteer Identification Card"
+      },
+      "actual": {
+        "filename": "lighthouse-volunteer_identification_2026-04-03.pdf",
+        "domain": "personal",
+        "category": "identity",
+        "doctype": "identification",
+        "vendor": "Lighthouse Volunteers",
+        "date": "20260403",
+        "subject": "identity identification",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": false,
+      "loader_latency_ms": 1521.2892920026206,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "county-permits-office_form_2025-07-09.pdf",
+      "predicted": {
+        "domain": "government",
+        "category": "federal",
+        "doctype": "policy",
+        "vendor": "unknown",
+        "date": "20250709",
+        "subject": "## APPLICATION FOR MINOR CONSTRUCTION AND LAND DISTURBANCE PERMIT"
+      },
+      "actual": {
+        "filename": "county-permits-office_form_2025-07-09.pdf",
+        "domain": "government",
+        "category": "federal",
+        "doctype": "form",
+        "vendor": "County Permits Office",
+        "date": "20250709",
+        "subject": "federal form",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": true,
+      "category_correct": true,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 2135.1815840025665,
+      "loader_backend": "docling"
+    },
+    {
+      "filename": "oakridge-realty_lease_2025-06-29.pdf",
+      "predicted": {
+        "domain": "career",
+        "category": "leadership",
+        "doctype": "policy",
+        "vendor": "unknown",
+        "date": "20250629",
+        "subject": "Issued by: Oakridge Realty Document Reference: OAK-2025-RL-4471 Date of Agreement: June 29, 2025"
+      },
+      "actual": {
+        "filename": "oakridge-realty_lease_2025-06-29.pdf",
+        "domain": "housing",
+        "category": "rental",
+        "doctype": "lease",
+        "vendor": "Oakridge Realty",
+        "date": "20250629",
+        "subject": "rental lease",
+        "notes": "synthetic, generated 2026-04-29"
+      },
+      "domain_correct": false,
+      "category_correct": false,
+      "doctype_correct": false,
+      "vendor_correct": false,
+      "date_correct": true,
+      "loader_latency_ms": 2160.7573329965817,
+      "loader_backend": "docling"
+    }
+  ],
+  "domain_confusion": {
+    "medical": {
+      "government": 1,
+      "household": 2,
+      "career": 2
+    },
+    "pets": {
+      "reference": 1,
+      "government": 2,
+      "personal": 1,
+      "education": 1
+    },
+    "household": {
+      "government": 2,
+      "education": 1,
+      "utilities": 2
+    },
+    "education": {
+      "government": 3,
+      "legal": 1,
+      "reference": 1
+    },
+    "property": {
+      "personal": 1,
+      "financial": 2,
+      "career": 1,
+      "utilities": 1
+    },
+    "lifestyle": {
+      "government": 5
+    },
+    "utilities": {
+      "utilities": 1,
+      "career": 3,
+      "government": 1
+    },
+    "food": {
+      "career": 1,
+      "reference": 1,
+      "education": 1,
+      "government": 1,
+      "personal": 1
+    },
+    "insurance": {
+      "government": 3,
+      "career": 2
+    },
+    "legal": {
+      "career": 4,
+      "government": 1
+    },
+    "housing": {
+      "career": 2,
+      "lifestyle": 2,
+      "government": 1
+    },
+    "government": {
+      "career": 1,
+      "utilities": 1,
+      "government": 3
+    },
+    "career": {
+      "government": 4,
+      "household": 1
+    },
+    "personal": {
+      "government": 2,
+      "career": 2,
+      "lifestyle": 1
+    },
+    "reference": {
+      "government": 4,
+      "utilities": 1
+    },
+    "financial": {
+      "government": 4,
+      "personal": 1
+    }
+  },
+  "category_confusion": {
+    "expense": {
+      "federal": 4,
+      "topic": 1,
+      "training": 1,
+      "reference": 1,
+      "certification": 1
+    },
+    "documentation": {
+      "federal": 2,
+      "financial_aid": 1,
+      "electric": 1
+    },
+    "reference": {
+      "federal": 2,
+      "transcript": 1,
+      "electric": 2,
+      "leadership": 1
+    },
+    "transcript": {
+      "state": 1
+    },
+    "specialist": {
+      "network": 1
+    },
+    "agreement": {
+      "identity": 1,
+      "topic": 1,
+      "retirement": 2,
+      "reference": 1
+    },
+    "travel": {
+      "federal": 1,
+      "reference": 1
+    },
+    "electric": {
+      "electric": 1,
+      "benefit": 1,
+      "reference": 1
+    },
+    "recipe": {
+      "resume": 1,
+      "topic": 1,
+      "membership": 1
+    },
+    "auto": {
+      "federal": 1,
+      "correspondence": 1
+    },
+    "estate": {
+      "training": 1,
+      "federal": 1,
+      "leadership": 2
+    },
+    "property": {
+      "correspondence": 1,
+      "interest": 1
+    },
+    "financial_aid": {
+      "contract": 1,
+      "federal": 1
+    },
+    "correspondence": {
+      "review": 1
+    },
+    "employer": {
+      "federal": 1,
+      "correspondence": 1,
+      "local": 1
+    },
+    "record": {
+      "vehicle": 1
+    },
+    "prescription": {
+      "training": 1
+    },
+    "membership": {
+      "federal": 1
+    },
+    "manual": {
+      "correspondence": 1,
+      "electric": 1,
+      "reference": 1
+    },
+    "rental": {
+      "interest": 1,
+      "reference": 1,
+      "leadership": 1
+    },
+    "payment": {
+      "state": 1
+    },
+    "investment": {
+      "federal": 2,
+      "identity": 1,
+      "correspondence": 1
+    },
+    "application": {
+      "vehicle": 1,
+      "federal": 1
+    },
+    "registration": {
+      "membership": 1,
+      "local": 1
+    },
+    "identity": {
+      "consulting": 1,
+      "leadership": 1,
+      "planning": 1,
+      "correspondence": 1
+    },
+    "internet": {
+      "consulting": 1,
+      "federal": 1
+    },
+    "topic": {
+      "federal": 1,
+      "reference": 1
+    },
+    "federal": {
+      "electric": 1,
+      "federal": 2
+    },
+    "local": {
+      "federal": 1
+    },
+    "home": {
+      "leadership": 1,
+      "review": 1,
+      "federal": 1
+    }
+  },
+  "doctype_confusion": {
+    "invoice": {
+      "policy": 2,
+      "deed": 1,
+      "letter": 2,
+      "resume": 1,
+      "contract": 1
+    },
+    "receipt": {
+      "manual": 1,
+      "letter": 2,
+      "itinerary": 1,
+      "agreement": 1,
+      "certificate": 1
+    },
+    "manual": {
+      "warranty": 2,
+      "license": 1,
+      "report": 1,
+      "return": 1,
+      "identification": 1,
+      "policy": 1,
+      "letter": 1
+    },
+    "agreement": {
+      "paystub": 2,
+      "letter": 4,
+      "will": 1
+    },
+    "report": {
+      "letter": 2,
+      "record": 1,
+      "deed": 2,
+      "bill": 1
+    },
+    "itinerary": {
+      "passport": 2
+    },
+    "recipe": {
+      "itinerary": 1,
+      "title": 1,
+      "warranty": 1
+    },
+    "guide": {
+      "return": 1
+    },
+    "policy": {
+      "letter": 1,
+      "certificate": 2,
+      "policy": 1
+    },
+    "will": {
+      "will": 2,
+      "certificate": 1,
+      "policy": 1
+    },
+    "lease": {
+      "letter": 3,
+      "policy": 1
+    },
+    "letter": {
+      "policy": 1,
+      "trust": 1,
+      "certificate": 1,
+      "resume": 1
+    },
+    "referral": {
+      "contract": 1
+    },
+    "certificate": {
+      "policy": 1,
+      "certificate": 1,
+      "itinerary": 1
+    },
+    "paystub": {
+      "contract": 1
+    },
+    "warranty": {
+      "certificate": 1
+    },
+    "statement": {
+      "portfolio": 1,
+      "invoice": 1,
+      "policy": 1,
+      "agreement": 1,
+      "letter": 1
+    },
+    "identification": {
+      "itinerary": 1,
+      "letter": 1
+    },
+    "confirmation": {
+      "paystub": 2,
+      "passport": 1
+    },
+    "reference": {
+      "letter": 1,
+      "bill": 1
+    },
+    "estimate": {
+      "policy": 1
+    },
+    "trust": {
+      "certificate": 1
+    },
+    "form": {
+      "portfolio": 1,
+      "letter": 1,
+      "certificate": 1,
+      "policy": 1
+    }
+  }
+}
