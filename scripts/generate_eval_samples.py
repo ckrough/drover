@@ -965,6 +965,131 @@ def _existing_filenames(output_dir: Path, jsonl_path: Path) -> set[str]:
     return seen
 
 
+def _read_existing_rows(jsonl_path: Path) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    if not jsonl_path.exists():
+        return rows
+    for line in jsonl_path.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        try:
+            rows.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    return rows
+
+
+def _topup_plan(
+    rows: list[dict[str, Any]],
+    taxonomy: BaseTaxonomy,
+    target_per_domain: int,
+    target_cats: int,
+    target_doctypes: int,
+    seed: int,
+) -> list[Triple]:
+    """Build a coverage-filling plan from current ground-truth state.
+
+    Stages:
+    1. Add (domain, new_category, plausible_doctype) triples until each domain
+       has >= target_cats distinct categories.
+    2. Add (domain, seen_category, new_doctype) triples until each domain has
+       >= target_doctypes distinct doctypes.
+    3. Pad each domain up to target_per_domain total docs, biasing toward
+       LONG_TRIPLES when available so long-doc coverage stays healthy.
+    """
+    rng = random.Random(seed)
+    domains = sorted(taxonomy.CANONICAL_DOMAINS)
+
+    counts: dict[str, int] = dict.fromkeys(domains, 0)
+    cats_seen: dict[str, set[str]] = {d: set() for d in domains}
+    doctypes_seen: dict[str, set[str]] = {d: set() for d in domains}
+    for r in rows:
+        d = r.get("domain")
+        if d not in counts:
+            continue
+        counts[d] += 1
+        c = r.get("category")
+        dt = r.get("doctype")
+        if isinstance(c, str):
+            cats_seen[d].add(c)
+        if isinstance(dt, str):
+            doctypes_seen[d].add(dt)
+
+    long_by_domain: dict[str, list[Triple]] = {}
+    for d, c, dt in LONG_TRIPLES:
+        long_by_domain.setdefault(d, []).append(Triple(d, c, dt))
+
+    picks: list[Triple] = []
+
+    def _record(t: Triple) -> None:
+        picks.append(t)
+        counts[t.domain] += 1
+        cats_seen[t.domain].add(t.category)
+        doctypes_seen[t.domain].add(t.doctype)
+
+    # Stage 1: category shortfall.
+    for d in domains:
+        canonical_cats = sorted(taxonomy.CANONICAL_CATEGORIES.get(d, set()))
+        plausible_dts = sorted(DOMAIN_DOCTYPES.get(d, set()))
+        if not canonical_cats or not plausible_dts:
+            continue
+        missing = [c for c in canonical_cats if c not in cats_seen[d]]
+        rng.shuffle(missing)
+        rng.shuffle(plausible_dts)
+        while len(cats_seen[d]) < target_cats and missing:
+            new_cat = missing.pop()
+            if taxonomy.canonical_category(d, new_cat) is None:
+                continue
+            _record(Triple(d, new_cat, plausible_dts[0]))
+
+    # Stage 2: doctype shortfall.
+    for d in domains:
+        plausible_dts = sorted(DOMAIN_DOCTYPES.get(d, set()))
+        cat_options = sorted(cats_seen[d]) or sorted(
+            taxonomy.CANONICAL_CATEGORIES.get(d, set())
+        )
+        if not plausible_dts or not cat_options:
+            continue
+        missing_dts = [dt for dt in plausible_dts if dt not in doctypes_seen[d]]
+        rng.shuffle(missing_dts)
+        rng.shuffle(cat_options)
+        while len(doctypes_seen[d]) < target_doctypes and missing_dts:
+            new_dt = missing_dts.pop()
+            cat = cat_options[0]
+            if taxonomy.canonical_category(d, cat) is None:
+                continue
+            _record(Triple(d, cat, new_dt))
+
+    # Stage 3: pad each domain up to target_per_domain.
+    for d in domains:
+        cat_options = sorted(cats_seen[d]) or sorted(
+            taxonomy.CANONICAL_CATEGORIES.get(d, set())
+        )
+        dt_options = sorted(doctypes_seen[d]) or sorted(DOMAIN_DOCTYPES.get(d, set()))
+        if not cat_options or not dt_options:
+            continue
+        long_pool = list(long_by_domain.get(d, []))
+        guard = 0
+        while counts[d] < target_per_domain and guard < 100:
+            guard += 1
+            if long_pool and rng.random() < 0.5:
+                t = rng.choice(long_pool)
+                if taxonomy.canonical_category(t.domain, t.category) is None:
+                    long_pool.remove(t)
+                    continue
+                _record(t)
+            else:
+                cat = rng.choice(cat_options)
+                dt = rng.choice(dt_options)
+                if taxonomy.canonical_category(d, cat) is None:
+                    continue
+                _record(Triple(d, cat, dt))
+
+    rng.shuffle(picks)
+    return picks
+
+
 # -- Generation orchestration ------------------------------------------------
 
 
@@ -1070,11 +1195,31 @@ async def _run(
     concurrency: int,
     max_cost_usd: float,
     dry_run: bool,
+    top_up: bool,
+    target_per_domain: int,
+    target_cats: int,
+    target_doctypes: int,
 ) -> None:
     taxonomy = get_taxonomy("household")
     rng = random.Random(seed)
 
-    plan = _coverage_plan(count, min_long, seed, taxonomy)
+    if top_up:
+        existing_rows = _read_existing_rows(ground_truth)
+        plan = _topup_plan(
+            existing_rows,
+            taxonomy,
+            target_per_domain,
+            target_cats,
+            target_doctypes,
+            seed,
+        )
+        click.echo(
+            f"# Top-up plan: existing={len(existing_rows)} new_triples={len(plan)} "
+            f"targets per domain: docs>={target_per_domain} "
+            f"cats>={target_cats} doctypes>={target_doctypes}"
+        )
+    else:
+        plan = _coverage_plan(count, min_long, seed, taxonomy)
     for t in plan:
         _validate_triple(t, taxonomy)
 
@@ -1195,6 +1340,15 @@ async def _run(
 )
 @click.option("--dry-run", is_flag=True, default=False)
 @click.option(
+    "--top-up",
+    is_flag=True,
+    default=False,
+    help="Read existing ground-truth and generate only triples that fill coverage gaps.",
+)
+@click.option("--target-per-domain", type=int, default=5, show_default=True)
+@click.option("--target-cats", type=int, default=2, show_default=True)
+@click.option("--target-doctypes", type=int, default=2, show_default=True)
+@click.option(
     "--log-level",
     type=click.Choice([lvl.value for lvl in LogLevel]),
     default=LogLevel.QUIET.value,
@@ -1210,6 +1364,10 @@ def main(
     output_dir: Path,
     ground_truth: Path,
     dry_run: bool,
+    top_up: bool,
+    target_per_domain: int,
+    target_cats: int,
+    target_doctypes: int,
     log_level: str,
 ) -> None:
     """Generate synthetic eval documents and append ground-truth rows."""
@@ -1226,6 +1384,10 @@ def main(
             concurrency=concurrency,
             max_cost_usd=max_cost_usd,
             dry_run=dry_run,
+            top_up=top_up,
+            target_per_domain=target_per_domain,
+            target_cats=target_cats,
+            target_doctypes=target_doctypes,
         )
     )
 
