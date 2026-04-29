@@ -201,6 +201,9 @@ class ClassificationService:
             if cfg.capture_debug and debug_info:
                 self._save_debug_files(file_path, debug_info)
 
+            if cfg.debug_structure:
+                self._save_docling_structure(file_path, loaded.docling_doc)
+
             result = self._path_builder.build(classification, file_path)
 
             if cfg.metrics and debug_info and "metrics" in debug_info:
@@ -387,3 +390,43 @@ class ClassificationService:
             if not candidate.exists():
                 return candidate
             idx += 1
+
+    def _save_docling_structure(
+        self, file_path: Path, docling_doc: object | None
+    ) -> None:
+        """Write the parsed `DoclingDocument` to `<debug_dir>/<stem>.docling.json`.
+
+        No-op when the active loader did not produce a `docling_doc` (e.g.,
+        the unstructured backend) — a debug log records why so users can
+        spot the misconfiguration.
+        """
+        import json
+
+        if docling_doc is None:
+            logger.info(
+                "debug_structure_skipped",
+                file=str(file_path),
+                reason="no_docling_doc",
+                hint="use --loader docling to produce a structure dump",
+            )
+            return
+
+        cfg = self.config
+        if cfg.debug_dir is not None:
+            debug_root = Path(cfg.debug_dir).expanduser()
+            debug_root.mkdir(parents=True, exist_ok=True)
+            base = debug_root / file_path.stem
+        else:
+            base = file_path.with_suffix("")
+
+        target = self._unique_debug_path(base.with_suffix(".docling.json"))
+        export_to_dict = getattr(docling_doc, "export_to_dict", None)
+        if export_to_dict is None:
+            logger.warning(
+                "debug_structure_unsupported",
+                file=str(file_path),
+                reason="docling_doc has no export_to_dict()",
+            )
+            return
+
+        target.write_text(json.dumps(export_to_dict(), indent=2))

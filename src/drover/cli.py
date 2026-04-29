@@ -189,6 +189,11 @@ def main() -> None:
     help="Save prompts and responses to debug files.",
 )
 @click.option(
+    "--debug-structure",
+    is_flag=True,
+    help="Dump DoclingDocument JSON to debug-dir (only with --loader docling).",
+)
+@click.option(
     "--debug-dir",
     "debug_dir",
     type=click.Path(file_okay=False, dir_okay=True, path_type=Path),
@@ -226,6 +231,7 @@ def classify(
     concurrency: int | None,
     metrics: bool,
     capture_debug: bool,
+    debug_structure: bool,
     debug_dir: Path | None,
     log_level: str | None,
     batch: bool,
@@ -253,6 +259,7 @@ def classify(
         concurrency=concurrency,
         metrics=metrics,
         capture_debug=capture_debug,
+        debug_structure=debug_structure,
         debug_dir=debug_dir,
         log_level=log_level,
         prompt=prompt_path,

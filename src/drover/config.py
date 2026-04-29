@@ -182,6 +182,10 @@ class DroverConfig(BaseModel):
     concurrency: int = Field(default=1)
     metrics: bool = Field(default=False)
     capture_debug: bool = Field(default=False)
+    debug_structure: bool = Field(
+        default=False,
+        description="Dump DoclingDocument JSON to debug_dir for inspection",
+    )
     debug_dir: Path | None = Field(
         default=None, description="Directory for debug prompt/response files"
     )
