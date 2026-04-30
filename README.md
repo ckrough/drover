@@ -118,7 +118,7 @@ drover evaluate eval/ground_truth.jsonl --output-format json
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `DROVER_AI_PROVIDER` | AI provider (ollama, openai, anthropic, openrouter) | `ollama` |
-| `DROVER_AI_MODEL` | Model name | `llama3.2:latest` |
+| `DROVER_AI_MODEL` | Model name | `gemma4:latest` |
 | `DROVER_TAXONOMY` | Classification taxonomy | `household` |
 | `DROVER_NAMING_STYLE` | Filename policy | `nara` |
 | `DROVER_SAMPLE_STRATEGY` | Page sampling (full, first_n, bookends, adaptive) | `adaptive` |
@@ -145,7 +145,7 @@ concurrency: 4
 
 | Provider | API Key Variable | Example Model |
 |----------|------------------|---------------|
-| Ollama | — (local) | `llama3.2:latest` |
+| Ollama | — (local) | `gemma4:latest` |
 | OpenAI | `OPENAI_API_KEY` | `gpt-4o` |
 | Anthropic | `ANTHROPIC_API_KEY` | `claude-sonnet-4-20250514` |
 | OpenRouter | `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4` |
@@ -199,6 +199,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full development workflow.
 - [Contributing Guide](CONTRIBUTING.md) — Development setup, architecture, and extension guides
 - [ADR-001: Chain-of-Thought Prompting](docs/adr/001-chain-of-thought-prompting.md) — 7-step reasoning for accurate classification
 - [ADR-002: Privacy-First Design](docs/adr/002-privacy-first-design.md) — Local-first, zero telemetry approach
+- [ADR-003: NLI Classifier Roadmap](docs/adr/003-nli-classifier-roadmap.md) — Zero-shot NLI exploration (superseded by ADR-004)
+- [ADR-004: Local LLM as Primary Local Path](docs/adr/004-local-llm-as-primary-local-path.md) — Ollama gemma4 as the default local classifier
+- [ADR-005: Docling Evaluation](docs/adr/005-docling-evaluation.md) — Rejected Docling as a structure-aware loader replacement
 
 ## License
 
