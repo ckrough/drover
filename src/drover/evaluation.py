@@ -18,11 +18,9 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from drover.classifier import DocumentClassifier
-from drover.loader import DoclingLoader, DocumentLoader
+from drover.loader import DocumentLoader
 from drover.logging import get_logger
 from drover.models import RawClassification
-
-type EvaluableClassifier = DocumentClassifier
 
 logger = get_logger(__name__)
 
@@ -52,8 +50,6 @@ class ClassificationComparison:
     doctype_correct: bool
     vendor_correct: bool | None  # None if vendor not in ground truth
     date_correct: bool | None  # None if date not in ground truth
-    loader_latency_ms: float | None = None
-    loader_backend: str | None = None
 
 
 @dataclass
@@ -100,8 +96,6 @@ class EvaluationResult:
                     "doctype_correct": c.doctype_correct,
                     "vendor_correct": c.vendor_correct,
                     "date_correct": c.date_correct,
-                    "loader_latency_ms": c.loader_latency_ms,
-                    "loader_backend": c.loader_backend,
                 }
                 for c in self.comparisons
             ],
@@ -203,9 +197,9 @@ class ClassificationEvaluator:
 
     async def evaluate(
         self,
-        classifier: EvaluableClassifier,
+        classifier: DocumentClassifier,
         test_files: Sequence[str | Path] | None = None,
-        loader: DocumentLoader | DoclingLoader | None = None,
+        loader: DocumentLoader | None = None,
     ) -> EvaluationResult:
         """Run classification on test files and compare to ground truth.
 
@@ -214,7 +208,7 @@ class ClassificationEvaluator:
             test_files: Specific files to test. If None, uses all files
                        that have ground truth entries.
             loader: Document loader for text extraction. If None, creates
-                a default `DocumentLoader` (unstructured backend).
+                a default `DocumentLoader`.
 
         Returns:
             EvaluationResult with accuracy metrics and detailed comparisons.
@@ -267,9 +261,7 @@ class ClassificationEvaluator:
             # Load and classify document
             try:
                 loaded_doc = await loader.load(resolved_path)
-                predicted, _ = await classifier.classify(
-                    loaded_doc.content, docling_doc=loaded_doc.docling_doc
-                )
+                predicted, _ = await classifier.classify(loaded_doc.content)
             except Exception as e:
                 logger.error(
                     "classification_error",
@@ -308,8 +300,6 @@ class ClassificationEvaluator:
                 doctype_correct=t_correct,
                 vendor_correct=v_correct,
                 date_correct=dt_correct,
-                loader_latency_ms=loaded_doc.loader_latency_ms,
-                loader_backend=loaded_doc.loader_backend,
             )
             comparisons.append(comparison)
 
@@ -382,8 +372,8 @@ class ClassificationEvaluator:
 
 
 async def compare_models(
-    classifier_a: EvaluableClassifier,
-    classifier_b: EvaluableClassifier,
+    classifier_a: DocumentClassifier,
+    classifier_b: DocumentClassifier,
     ground_truth_path: str | Path,
     documents_dir: str | Path | None = None,
 ) -> tuple[EvaluationResult, EvaluationResult]:

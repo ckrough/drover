@@ -50,7 +50,6 @@ def _make_fake_classify(tmp_path: Path):
         content: str,
         capture_debug: bool = False,
         collect_metrics: bool = False,
-        docling_doc: object | None = None,
     ):
         return (
             ClassificationResult(

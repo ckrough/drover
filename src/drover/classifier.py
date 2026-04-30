@@ -461,7 +461,6 @@ class DocumentClassifier:
         content: str,
         capture_debug: bool = False,
         collect_metrics: bool = False,
-        docling_doc: Any | None = None,
     ) -> tuple[RawClassification, dict[str, Any] | None]:
         """Classify document content using structured output.
 
@@ -472,9 +471,6 @@ class DocumentClassifier:
             content: Extracted document text content.
             capture_debug: Whether to capture debug info (prompt, response).
             collect_metrics: Whether to collect AI metrics for this call.
-            docling_doc: Optional parsed `DoclingDocument`. When provided,
-                the prompt is built from its markdown export (preserving
-                headings and tables) instead of `content`.
 
         Returns:
             Tuple of (classification result, debug info dict or None).
@@ -483,22 +479,17 @@ class DocumentClassifier:
             LLMParseError: If LLM output cannot be parsed.
             TaxonomyValidationError: If strict mode validation fails.
         """
-        prompt_content = (
-            docling_doc.export_to_markdown() if docling_doc is not None else content
-        )
-
         logger.info(
             "classification_started",
             provider=self.provider.value,
             model=self.model,
-            content_length=len(prompt_content),
-            input_format="docling_markdown" if docling_doc is not None else "flat",
+            content_length=len(content),
         )
 
         taxonomy_menu = self.taxonomy.to_prompt_menu()
         prompt = self.template.render(
             taxonomy_menu=taxonomy_menu,
-            document_content=prompt_content,
+            document_content=content,
         )
 
         debug_info: dict[str, Any] | None = None
@@ -583,7 +574,6 @@ class DocumentClassifier:
         self,
         content: str,
         on_token: Callable[[str], None] | None = None,
-        docling_doc: Any | None = None,
     ) -> RawClassification:
         """Classify document content with streaming output.
 
@@ -595,9 +585,6 @@ class DocumentClassifier:
             content: Extracted document text content.
             on_token: Optional callback invoked for each token received.
                      Useful for real-time display in CLI or UI.
-            docling_doc: Optional parsed `DoclingDocument`. When provided,
-                the prompt is built from its markdown export instead of
-                `content`.
 
         Returns:
             Normalized RawClassification result.
@@ -606,22 +593,17 @@ class DocumentClassifier:
             LLMParseError: If LLM output cannot be parsed.
             TaxonomyValidationError: If strict mode validation fails.
         """
-        prompt_content = (
-            docling_doc.export_to_markdown() if docling_doc is not None else content
-        )
-
         logger.info(
             "classification_streaming_started",
             provider=self.provider.value,
             model=self.model,
-            content_length=len(prompt_content),
-            input_format="docling_markdown" if docling_doc is not None else "flat",
+            content_length=len(content),
         )
 
         taxonomy_menu = self.taxonomy.to_prompt_menu()
         prompt = self.template.render(
             taxonomy_menu=taxonomy_menu,
-            document_content=prompt_content,
+            document_content=content,
         )
 
         message = HumanMessage(content=prompt)
