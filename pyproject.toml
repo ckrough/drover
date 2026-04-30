@@ -31,12 +31,6 @@ dev = [
     "mypy>=1.8.0",
     "reportlab>=4.0,<5.0",
 ]
-nli = [
-    "transformers>=4.35,<5.0",
-    "torch>=2.0,<3.0",
-    "sentencepiece>=0.2,<1.0",
-    "scikit-learn>=1.3,<2.0",
-]
 docling = [
     "docling>=2.0,<3.0",
 ]
@@ -121,16 +115,6 @@ module = [
 ]
 ignore_missing_imports = true
 ignore_errors = true
-
-# NLI dependencies (optional)
-[[tool.mypy.overrides]]
-module = [
-    "transformers.*",
-    "torch.*",
-    "sentencepiece.*",
-    "sklearn.*",
-]
-ignore_missing_imports = true
 
 # Docling dependencies (optional)
 [[tool.mypy.overrides]]

@@ -13,7 +13,7 @@ import json
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -22,13 +22,7 @@ from drover.loader import DoclingLoader, DocumentLoader
 from drover.logging import get_logger
 from drover.models import RawClassification
 
-if TYPE_CHECKING:
-    from drover.nli_classifier import NLIDocumentClassifier
-
-# Either classifier path is acceptable to the evaluator. Both expose the same
-# minimal surface used here: `classify(content) -> (RawClassification, ...)`,
-# `.model`, and `.provider`. PEP 695 `type` keeps the NLI import deferred.
-type EvaluableClassifier = DocumentClassifier | NLIDocumentClassifier
+type EvaluableClassifier = DocumentClassifier
 
 logger = get_logger(__name__)
 

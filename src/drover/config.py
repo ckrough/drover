@@ -25,7 +25,6 @@ class AIProvider(StrEnum):
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
     OPENROUTER = "openrouter"
-    NLI_LOCAL = "nli_local"  # Local NLI classifier (no API)
 
 
 class TaxonomyMode(StrEnum):
@@ -81,93 +80,10 @@ class AIConfig(BaseModel):
         return self
 
 
-class ExtractorType(StrEnum):
-    """Metadata extractor types for NLI classifier."""
-
-    REGEX = "regex"  # Fast regex-only extraction
-    HYBRID = "hybrid"  # Regex with LLM fallback
-
-
-class ChunkStrategy(StrEnum):
-    """Long-document chunking strategies for the NLI classifier."""
-
-    TRUNCATE = "truncate"  # Phase 1 default: keep first chunk_size tokens
-    SLIDING = "sliding"  # Sliding window with overlap
-    IMPORTANCE = "importance"  # TF-IDF-selected sentences
-
-
-class Aggregation(StrEnum):
-    """Per-label aggregation across chunks for NLI scoring."""
-
-    MAX = "max"  # Highest entailment score across chunks
-    MEAN = "mean"  # Arithmetic mean
-    WEIGHTED = "weighted"  # Endpoint-weighted mean (favor first/last)
-
-
-class NLIConfig(BaseModel):
-    """NLI classifier configuration.
-
-    Used when ai.provider is set to 'nli_local'. The NLI classifier
-    uses a cross-encoder model for zero-shot document classification.
-    """
-
-    model_name: str = Field(
-        default="cross-encoder/nli-deberta-v3-base",
-        description="HuggingFace model identifier for NLI",
-    )
-    device: str | None = Field(
-        default=None,
-        description="Compute device: cuda, mps, cpu, or None for auto-detect",
-    )
-    max_tokens: int = Field(
-        default=450,
-        ge=100,
-        le=500,
-        description="Max premise tokens (reserves space for hypothesis)",
-    )
-    extractor: ExtractorType = Field(
-        default=ExtractorType.HYBRID,
-        description="Metadata extractor type",
-    )
-    fallback_model: str | None = Field(
-        default=None,
-        description="Ollama model for hybrid extractor fallback (e.g., 'phi3:mini')",
-    )
-    chunk_strategy: ChunkStrategy = Field(
-        default=ChunkStrategy.TRUNCATE,
-        description="Long-document chunking strategy",
-    )
-    chunk_size: int = Field(
-        default=400,
-        ge=64,
-        le=510,
-        description="Tokens per chunk (cross-encoder max is 512; leave room for specials)",
-    )
-    chunk_overlap: int = Field(
-        default=100,
-        ge=0,
-        description="Overlap between adjacent sliding-window chunks (must be < chunk_size)",
-    )
-    aggregation: Aggregation = Field(
-        default=Aggregation.MAX,
-        description="How to combine per-chunk entailment scores into a single label score",
-    )
-
-    @model_validator(mode="after")
-    def _validate_overlap(self) -> Self:
-        if self.chunk_overlap >= self.chunk_size:
-            raise ValueError(
-                f"chunk_overlap ({self.chunk_overlap}) must be less than "
-                f"chunk_size ({self.chunk_size})"
-            )
-        return self
-
-
 class DroverConfig(BaseModel):
     """Complete Drover configuration."""
 
     ai: AIConfig = Field(default_factory=AIConfig)
-    nli: NLIConfig = Field(default_factory=NLIConfig)
     taxonomy: str = Field(default="household")
     taxonomy_mode: TaxonomyMode = Field(default=TaxonomyMode.FALLBACK)
     naming_style: str = Field(default="nara")
@@ -222,17 +138,6 @@ class DroverConfig(BaseModel):
             "DROVER_AI_MAX_RETRIES": ("ai", "max_retries"),
             "DROVER_AI_RETRY_MIN_WAIT": ("ai", "retry_min_wait"),
             "DROVER_AI_RETRY_MAX_WAIT": ("ai", "retry_max_wait"),
-            # NLI config
-            "DROVER_NLI_MODEL": ("nli", "model_name"),
-            "DROVER_NLI_DEVICE": ("nli", "device"),
-            "DROVER_NLI_MAX_TOKENS": ("nli", "max_tokens"),
-            "DROVER_NLI_EXTRACTOR": ("nli", "extractor"),
-            "DROVER_NLI_FALLBACK_MODEL": ("nli", "fallback_model"),
-            "DROVER_NLI_CHUNK_STRATEGY": ("nli", "chunk_strategy"),
-            "DROVER_NLI_CHUNK_SIZE": ("nli", "chunk_size"),
-            "DROVER_NLI_CHUNK_OVERLAP": ("nli", "chunk_overlap"),
-            "DROVER_NLI_AGGREGATION": ("nli", "aggregation"),
-            # Other config
             "DROVER_TAXONOMY": ("taxonomy",),
             "DROVER_TAXONOMY_MODE": ("taxonomy_mode",),
             "DROVER_NAMING_STYLE": ("naming_style",),
@@ -253,8 +158,6 @@ class DroverConfig(BaseModel):
             "max_tokens",
             "timeout",
             "max_retries",
-            "chunk_size",
-            "chunk_overlap",
         }
         float_fields = {"temperature", "retry_min_wait", "retry_max_wait"}
 
