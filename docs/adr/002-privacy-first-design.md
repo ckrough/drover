@@ -50,7 +50,7 @@ Implement a privacy-first architecture with the following principles:
 # drover.yaml - Privacy-focused configuration
 ai:
   provider: ollama          # Local-only processing
-  model: llama3.2:latest    # Runs entirely on your machine
+  model: gemma4:latest      # Runs entirely on your machine
 
 # Optional: cloud provider for better accuracy
 # ai:

@@ -7,6 +7,8 @@ Phase 1 (MVP) and Phase 2 (long document handling) implemented on branch `nostal
 
 The Phase 1 and Phase 2 code is retained in-tree as a regression baseline pending removal per the ADR-004 deprecation plan. The text below preserves the original roadmap as historical record.
 
+**Amended (2026-04-30):** the Phase 1 and Phase 2 code referenced throughout this ADR (`nli_classifier.py`, `chunking.py`, `aggregation.py`, the `extractors/` package, the `[nli]` extra, `AIProvider.NLI_LOCAL`, `NLIConfig`, `ExtractorType`, and the related tests) has been removed on branch `nostalgic-engelbart`. The roadmap, phase tables, and "Related" file list below are preserved as the original historical record; the file paths in those sections no longer resolve. See ADR-004's amendment for the cleanup commit reference (beads `prof-wis`).
+
 ### Phase Progress
 
 | Phase | Title | State | Branch / Commit |

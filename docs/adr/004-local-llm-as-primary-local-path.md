@@ -3,6 +3,8 @@
 ## Status
 Accepted (2026-04-29). Supersedes ADR-003 (NLI Classifier Roadmap) for Phases 3-8; the Phase 1 and Phase 2 NLI implementations on branch `nostalgic-engelbart` are kept in tree as a regression baseline but no further investment is planned.
 
+**Amended (2026-04-30):** the NLI implementation referenced above as "kept in tree as a regression baseline" has been fully removed on branch `nostalgic-engelbart`. The decision in this ADR is unchanged. The deprecation window described in step 2 of "Decision" is collapsed: there is no `--i-know-this-is-deprecated` shim. `src/drover/nli_classifier.py`, `chunking.py`, `aggregation.py`, the `extractors/` package, and the `[nli]` install extra are gone. The "subject to confirmation in the implementation issue" hedge in step 1 of "Decision" is resolved: `AIConfig.model` default is now `gemma4:latest` in `src/drover/config.py`. See the cleanup commits on `nostalgic-engelbart` for the deletion (refs beads `prof-wis`).
+
 ## Context
 
 ADR-002 commits drover to a privacy-first, local-first architecture: documents must not leave the user's machine unless the user explicitly opts into a hosted provider. ADR-003 added a zero-shot NLI classifier (`cross-encoder/nli-deberta-v3-base`) as the first concrete fully-local path: 184M params, no model server, no API cost, hierarchical decoding (domain → category → doctype), with `[nli]` as an optional install extra.

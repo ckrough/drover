@@ -12,7 +12,7 @@
 ai:
   # Option 1: Local Ollama (recommended for testing)
   provider: ollama
-  model: llama3.2:latest
+  model: gemma4:latest
 
   # Option 2: OpenAI (requires OPENAI_API_KEY env var)
   # provider: openai

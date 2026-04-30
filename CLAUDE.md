@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Drover is a document classification CLI that uses LLMs to analyze documents and suggest organized filesystem paths. It supports multiple AI providers (Ollama, OpenAI, Anthropic, OpenRouter) through LangChain, plus a local NLI classifier using DeBERTa-v3 for zero-shot classification without API calls.
+Drover is a document classification CLI that uses LLMs to analyze documents and suggest organized filesystem paths. It supports multiple AI providers (Ollama, OpenAI, Anthropic, OpenRouter) through LangChain. The default local path is Ollama with `gemma4:latest`, which extracts the full classification (domain, category, doctype, vendor, date, subject) in a single structured-output call.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed architecture, code style, and extension guides.
 
@@ -36,7 +36,6 @@ src/drover/
 ├── config.py           # Configuration management (Pydantic models)
 ├── loader.py           # DocumentLoader - text extraction from documents
 ├── classifier.py       # LLM-based DocumentClassifier (uses structured output)
-├── nli_classifier.py   # Zero-shot NLI classifier using DeBERTa-v3
 ├── path_builder.py     # PathBuilder - generates organized paths
 ├── models.py           # Data models (RawClassification, ClassificationResult)
 ├── service.py          # High-level service orchestration
@@ -54,10 +53,6 @@ src/drover/
 │   ├── base.py         # BaseNamingPolicy abstract class
 │   ├── nara.py         # NARA-compliant naming
 │   └── loader.py       # Naming policy registry
-├── extractors/         # Metadata extractors for NLI classifier
-│   ├── base.py         # BaseExtractor protocol
-│   ├── regex.py        # Regex-based extraction
-│   └── llm.py          # Hybrid extractor with LLM fallback
 └── actions/            # File action implementations
     ├── base.py         # ActionPlan and ActionResult dataclasses
     ├── runner.py       # ActionRunner orchestration
@@ -71,10 +66,7 @@ src/drover/
 uv sync --all-extras
 
 # Run CLI - classify command (LLM-based)
-uv run drover classify document.pdf --ai-provider ollama --ai-model llama3.2:latest
-
-# Run CLI - classify command (NLI-based, requires `uv sync --all-extras` or `--extra nli`)
-uv run drover classify document.pdf --ai-provider nli_local
+uv run drover classify document.pdf --ai-provider ollama --ai-model gemma4:latest
 
 # Run CLI - tag command (macOS only)
 uv run drover tag document.pdf --dry-run
@@ -129,8 +121,8 @@ Config locations: `drover.yaml`, `~/.config/drover/config.yaml`
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `DROVER_AI_PROVIDER` | AI provider (ollama, openai, anthropic, openrouter, nli_local) | `ollama` |
-| `DROVER_AI_MODEL` | Model name | `llama3.2:latest` |
+| `DROVER_AI_PROVIDER` | AI provider (ollama, openai, anthropic, openrouter) | `ollama` |
+| `DROVER_AI_MODEL` | Model name | `gemma4:latest` |
 | `DROVER_AI_TEMPERATURE` | LLM temperature (0.0-2.0) | `0.0` |
 | `DROVER_AI_MAX_TOKENS` | Maximum tokens in LLM response | `1000` |
 | `DROVER_AI_TIMEOUT` | Request timeout in seconds | `60` |
@@ -140,15 +132,6 @@ Config locations: `drover.yaml`, `~/.config/drover/config.yaml`
 | `OPENAI_API_KEY` | API key for OpenAI (required when provider=openai) | — |
 | `ANTHROPIC_API_KEY` | API key for Anthropic (required when provider=anthropic) | — |
 | `OPENROUTER_API_KEY` | API key for OpenRouter (required when provider=openrouter) | — |
-| `DROVER_NLI_MODEL` | HuggingFace model for NLI (when provider=nli_local) | `cross-encoder/nli-deberta-v3-base` |
-| `DROVER_NLI_DEVICE` | Compute device for NLI (cuda, mps, cpu) | auto-detect |
-| `DROVER_NLI_MAX_TOKENS` | Max tokens for NLI premise | `450` |
-| `DROVER_NLI_EXTRACTOR` | Metadata extractor (regex, hybrid) | `hybrid` |
-| `DROVER_NLI_FALLBACK_MODEL` | Ollama model for hybrid extractor fallback | — |
-| `DROVER_NLI_CHUNK_STRATEGY` | Long-doc chunking (truncate, sliding, importance) | `truncate` |
-| `DROVER_NLI_CHUNK_SIZE` | Tokens per chunk (max 510) | `400` |
-| `DROVER_NLI_CHUNK_OVERLAP` | Token overlap between sliding-window chunks | `100` |
-| `DROVER_NLI_AGGREGATION` | Per-label score aggregation (max, mean, weighted) | `max` |
 | `DROVER_TAXONOMY` | Taxonomy to use | `household` |
 | `DROVER_TAXONOMY_MODE` | Validation mode (strict, fallback) | `fallback` |
 | `DROVER_NAMING_STYLE` | Naming policy | `nara` |
@@ -159,7 +142,6 @@ Config locations: `drover.yaml`, `~/.config/drover/config.yaml`
 | `DROVER_ON_ERROR` | Error handling (fail, continue, skip) | `fail` |
 | `DROVER_CONCURRENCY` | Parallel processing | `1` |
 | `DROVER_DEBUG_DIR` | Directory for debug outputs | `./debug` |
-| `DROVER_LOADER` | Document loader backend (unstructured, docling) | `unstructured` |
 
 ## Testing
 
@@ -196,6 +178,4 @@ def test_parse_response_direct_json() -> None:
 
 10. **Evaluation:** Use `drover evaluate` to measure accuracy against ground truth. See `evaluation.py` for the framework.
 
-11. **ADRs:** Architectural decisions are documented in `docs/adr/`.
-
-12. **NLI classification:** Use `--ai-provider nli_local` for local zero-shot classification without API calls. Requires the `[nli]` extra (installed by `uv sync --all-extras` or `uv sync --extra nli`). See `docs/adr/003-nli-classifier-roadmap.md` for the full feature roadmap.
+11. **ADRs:** Architectural decisions are documented in `docs/adr/`. ADR-004 standardized on the local LLM (Ollama gemma4) as the primary local path; ADR-005 rejected Docling as a structure-aware loader replacement. The NLI classifier path and the Docling spike infrastructure that those ADRs originally kept in tree have since been removed.
