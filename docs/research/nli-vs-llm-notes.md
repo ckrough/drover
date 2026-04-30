@@ -9,6 +9,8 @@ aliases: []
 
 # Zero-Shot NLI vs Local LLM for Document Classification — Research Notes
 
+> **Status: HISTORICAL.** The zero-shot NLI classifier described here was implemented, evaluated, and then removed from Drover. The decision is recorded in [ADR-004](../adr/004-local-llm-as-primary-local-path.md), which adopts the local LLM (Ollama `gemma4:latest`) as the primary local classification path. This document is preserved as a factual record of the experiment; nothing here describes Drover's current behavior.
+
 These are research notes, not the blog post. The structure below mirrors an arXiv paper so that the eventual blog post can pick and shape sections without rediscovering the data.
 
 ## Abstract (one paragraph)

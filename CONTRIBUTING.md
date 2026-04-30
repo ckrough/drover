@@ -496,3 +496,6 @@ Design decisions are documented in `docs/adr/`:
 
 - [ADR-001](docs/adr/001-chain-of-thought-prompting.md): Chain-of-thought prompting strategy
 - [ADR-002](docs/adr/002-privacy-first-design.md): Privacy-first design principles
+- [ADR-003](docs/adr/003-nli-classifier-roadmap.md): Zero-shot NLI classifier roadmap (superseded by ADR-004)
+- [ADR-004](docs/adr/004-local-llm-as-primary-local-path.md): Local LLM (Ollama gemma4) as the primary local classification path
+- [ADR-005](docs/adr/005-docling-evaluation.md): Docling evaluation — rejected as a structure-aware loader replacement
