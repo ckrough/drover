@@ -33,8 +33,6 @@ class LoadedDocument(BaseModel):
     pages_sampled: int = Field(default=1, description="Pages actually processed")
     mime_type: str | None = Field(default=None, description="Detected MIME type")
 
-    model_config = {"arbitrary_types_allowed": True}
-
 
 class DocumentLoadError(Exception):
     """Raised when document loading fails."""

@@ -23,7 +23,7 @@ class TestDroverConfig:
         config = DroverConfig()
 
         assert config.ai.provider == AIProvider.OLLAMA
-        assert config.ai.model == "llama3.2:latest"
+        assert config.ai.model == "gemma4:latest"
         assert config.taxonomy == "household"
         assert config.taxonomy_mode == TaxonomyMode.FALLBACK
         assert config.naming_style == "nara"
@@ -200,7 +200,7 @@ class TestAIConfig:
         """Test default AI config values."""
         config = AIConfig()
         assert config.provider == AIProvider.OLLAMA
-        assert config.model == "llama3.2:latest"
+        assert config.model == "gemma4:latest"
         assert config.temperature == 0.0
         assert config.max_tokens == 1000
         assert config.timeout == 60

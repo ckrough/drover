@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Drover is a document classification CLI that uses LLMs to analyze documents and suggest organized filesystem paths. It supports multiple AI providers (Ollama, OpenAI, Anthropic, OpenRouter) through LangChain.
+Drover is a document classification CLI that uses LLMs to analyze documents and suggest organized filesystem paths. It supports multiple AI providers (Ollama, OpenAI, Anthropic, OpenRouter) through LangChain. The default local path is Ollama with `gemma4:latest`, which extracts the full classification (domain, category, doctype, vendor, date, subject) in a single structured-output call.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed architecture, code style, and extension guides.
 
@@ -65,8 +65,8 @@ src/drover/
 # Install with dev dependencies
 uv sync --all-extras
 
-# Run CLI - classify command
-uv run drover classify document.pdf --ai-provider ollama --ai-model llama3.2:latest
+# Run CLI - classify command (LLM-based)
+uv run drover classify document.pdf --ai-provider ollama --ai-model gemma4:latest
 
 # Run CLI - tag command (macOS only)
 uv run drover tag document.pdf --dry-run
@@ -122,7 +122,7 @@ Config locations: `drover.yaml`, `~/.config/drover/config.yaml`
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `DROVER_AI_PROVIDER` | AI provider (ollama, openai, anthropic, openrouter) | `ollama` |
-| `DROVER_AI_MODEL` | Model name | `llama3.2:latest` |
+| `DROVER_AI_MODEL` | Model name | `gemma4:latest` |
 | `DROVER_AI_TEMPERATURE` | LLM temperature (0.0-2.0) | `0.0` |
 | `DROVER_AI_MAX_TOKENS` | Maximum tokens in LLM response | `1000` |
 | `DROVER_AI_TIMEOUT` | Request timeout in seconds | `60` |
@@ -178,4 +178,4 @@ def test_parse_response_direct_json() -> None:
 
 10. **Evaluation:** Use `drover evaluate` to measure accuracy against ground truth. See `evaluation.py` for the framework.
 
-11. **ADRs:** Architectural decisions are documented in `docs/adr/`.
+11. **ADRs:** Architectural decisions are documented in `docs/adr/`. ADR-004 standardized on the local LLM (Ollama gemma4) as the primary local path; ADR-005 rejected Docling as a structure-aware loader replacement. The NLI classifier path and the Docling spike infrastructure that those ADRs originally kept in tree have since been removed.

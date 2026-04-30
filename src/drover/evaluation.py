@@ -207,7 +207,8 @@ class ClassificationEvaluator:
             classifier: Configured DocumentClassifier instance.
             test_files: Specific files to test. If None, uses all files
                        that have ground truth entries.
-            loader: DocumentLoader for text extraction. If None, creates default.
+            loader: Document loader for text extraction. If None, creates
+                a default `DocumentLoader`.
 
         Returns:
             EvaluationResult with accuracy metrics and detailed comparisons.

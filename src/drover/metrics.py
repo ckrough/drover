@@ -20,6 +20,7 @@ MODEL_PRICING: dict[str, tuple[float, float]] = {
     "claude-3-5-sonnet-latest": (3.00, 15.00),
     "claude-3-5-haiku-latest": (0.80, 4.00),
     "claude-3-opus-latest": (15.00, 75.00),
+    "gemma4:latest": (0.0, 0.0),
     "llama3.2:latest": (0.0, 0.0),
     "llama3.1:latest": (0.0, 0.0),
     "mistral:latest": (0.0, 0.0),

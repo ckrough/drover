@@ -18,7 +18,10 @@ from drover.classifier import (
     TaxonomyValidationError,
     TemplateError,
 )
-from drover.config import DroverConfig, ErrorMode
+from drover.config import (
+    DroverConfig,
+    ErrorMode,
+)
 from drover.loader import DocumentLoader, DocumentLoadError
 from drover.logging import get_logger
 from drover.models import ClassificationErrorResult, ClassificationResult, ErrorCode
@@ -49,20 +52,26 @@ class ClassificationService:
             strategy=config.sample_strategy,
             max_pages=config.max_pages,
         )
-        self._classifier = DocumentClassifier(
-            provider=config.ai.provider,
-            model=config.ai.model,
-            taxonomy=self._taxonomy,
-            taxonomy_mode=config.taxonomy_mode,
-            template_path=config.prompt,
-            temperature=config.ai.temperature,
-            max_tokens=config.ai.max_tokens,
-            timeout=config.ai.timeout,
-            max_retries=config.ai.max_retries,
-            retry_min_wait=config.ai.retry_min_wait,
-            retry_max_wait=config.ai.retry_max_wait,
-        )
+        self._classifier = self._create_classifier()
         self._path_builder = PathBuilder(naming_policy=self._naming_policy)
+
+    def _create_classifier(self) -> DocumentClassifier:
+        """Create the LLM-based document classifier."""
+        cfg = self.config
+
+        return DocumentClassifier(
+            provider=cfg.ai.provider,
+            model=cfg.ai.model,
+            taxonomy=self._taxonomy,
+            taxonomy_mode=cfg.taxonomy_mode,
+            template_path=cfg.prompt,
+            temperature=cfg.ai.temperature,
+            max_tokens=cfg.ai.max_tokens,
+            timeout=cfg.ai.timeout,
+            max_retries=cfg.ai.max_retries,
+            retry_min_wait=cfg.ai.retry_min_wait,
+            retry_max_wait=cfg.ai.retry_max_wait,
+        )
 
     async def classify_files(
         self,

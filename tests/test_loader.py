@@ -4,7 +4,11 @@ from pathlib import Path
 
 import pytest
 
-from drover.loader import _SUPPORTED_EXTENSIONS, DocumentLoader, DocumentLoadError
+from drover.loader import (
+    _SUPPORTED_EXTENSIONS,
+    DocumentLoader,
+    DocumentLoadError,
+)
 from drover.sampling import SampleStrategy
 
 

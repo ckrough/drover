@@ -54,7 +54,7 @@ class AIConfig(BaseModel):
     """AI provider configuration."""
 
     provider: AIProvider = Field(default=AIProvider.OLLAMA)
-    model: str = Field(default="llama3.2:latest")
+    model: str = Field(default="gemma4:latest")
     temperature: float = Field(default=0.0, ge=0.0, le=2.0)
     max_tokens: int | None = Field(default=1000, ge=1)
     timeout: int = Field(default=60, ge=1, description="Request timeout in seconds")

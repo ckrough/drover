@@ -627,7 +627,7 @@ async def _evaluate_async(
         retry_max_wait=config.ai.retry_max_wait,
     )
 
-    loader = DocumentLoader(
+    document_loader = DocumentLoader(
         strategy=config.sample_strategy,
         max_pages=config.max_pages,
     )
@@ -642,7 +642,7 @@ async def _evaluate_async(
             console.print(f"[red]{e}[/red]")
         return 1
 
-    results = await evaluator.evaluate(classifier, loader=loader)
+    results = await evaluator.evaluate(classifier, loader=document_loader)
 
     if output_format == "json":
         click.echo(json.dumps(results.to_dict(), indent=2))
