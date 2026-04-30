@@ -24,35 +24,9 @@ Drover currently uses a single generative LLM (via LangChain) to classify docume
 
 ---
 
-## Encoder Classifier Implementation
-
-- [ ] Discuss implementing a zero-shot NLI encoder classifier using cross-encoder/nli-deberta-v3-base that classifies documents by scoring natural language hypotheses against document text using entailment, as an alternative to the current generative LLM approach.
-
-- [ ] Explore how to craft effective natural language hypothesis mappings for each of the 19 taxonomy domains that describe what documents in that domain look like, since hypothesis quality directly impacts NLI classification accuracy.
-
-- [ ] Discuss implementing hierarchical category classification where the encoder first predicts domain, then classifies into categories valid only within that predicted domain, returning ranked results with confidence scores.
-
-- [ ] Explore how to build doctype hypotheses for the ~50 canonical document types that distinguish between similar types like "statement" versus "invoice" versus "receipt" effectively.
-
-- [ ] Discuss confidence calibration approaches using softmax normalization over entailment logits to produce probability distributions, and how to set appropriate thresholds for fallback to full LLM classification.
-
----
-
-## Hybrid Pipeline Integration
-
-- [ ] Design a hybrid classifier that uses the encoder for domain/category/doctype classification and delegates only vendor/date/subject extraction to the LLM, exploring how to handle low-confidence encoder predictions.
-
-- [ ] Discuss creating a simplified extraction-only prompt that accepts pre-classified fields and extracts only vendor, date, and subject, estimating the token savings versus the full classification prompt.
-
-- [ ] Explore adding a classifier mode option that lets users choose between full LLM classification, encoder-only, or hybrid approaches depending on their accuracy/speed tradeoffs.
-
-- [ ] Discuss what configuration options the encoder classifier needs and how to integrate them with Drover's existing YAML config and CLI patterns.
-
----
-
 ## Confidence Scoring and Routing
 
-- [ ] Explore adding confidence scores to classification output and discuss how to extract meaningful confidence from both encoder predictions (softmax) and LLM responses (token log-probabilities).
+- [ ] Explore adding confidence scores to classification output and discuss how to extract meaningful confidence from LLM responses (token log-probabilities).
 
 - [ ] Discuss implementing confidence-based routing that surfaces uncertain classifications for human review, since the current taxonomy fallback mode masks uncertainty by silently mapping unknown values to "other".
 
@@ -63,8 +37,6 @@ Drover currently uses a single generative LLM (via LangChain) to classify docume
 ---
 
 ## Model and Evaluation Improvements
-
-- [ ] Discuss switching the default Ollama model from Llama 3.2 to Qwen 2.5, comparing their structured output capabilities and document understanding performance.
 
 - [ ] Explore adding vision model support that renders PDF pages to images and classifies them directly, bypassing text extraction errors for scanned documents.
 
@@ -87,8 +59,6 @@ Drover currently uses a single generative LLM (via LangChain) to classify docume
 ---
 
 ## Performance and Throughput
-
-- [ ] Discuss batch inference approaches for the encoder classifier that process multiple documents in a single forward pass for improved throughput on large document sets.
 
 - [ ] Explore parallel processing strategies that run document loading concurrently with classification to hide I/O latency when processing batches.
 
