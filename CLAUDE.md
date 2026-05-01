@@ -59,6 +59,16 @@ src/drover/
     └── tag.py          # macOS filesystem tagging (TagAction, TagMode)
 ```
 
+## Eval Layout
+
+- `eval/samples/synthetic/` — 80 synthetic PDFs (committed)
+- `eval/samples/real-world/` — 14 real-world PDFs (gitignored; PII)
+- `eval/ground_truth/synthetic.jsonl` — synthetic labels (committed)
+- `eval/ground_truth/real-world.jsonl` — real-world labels (gitignored; PII in filenames/vendors/dates)
+- `eval/runs/<timestamp>/results.md` — committed when free of PII
+- `eval/runs/<timestamp>/*.json` — per-doc dumps (gitignored)
+- `eval/dashboard.html` and `eval/dashboard_data.json` — regenerator-managed via `scripts/build_eval_dashboard.py`; aggregates only, no per-doc PII
+
 ## Commands
 
 ```bash
@@ -73,7 +83,7 @@ uv run drover tag document.pdf --dry-run
 uv run drover tag document.pdf --tag-fields domain,category --tag-mode replace
 
 # Run CLI - evaluate command
-uv run drover evaluate eval/ground_truth.jsonl --ai-model gpt-4o
+uv run drover evaluate --ground-truth eval/ground_truth/synthetic.jsonl --ai-model gpt-4o
 
 # Run all tests
 uv run pytest
@@ -146,7 +156,8 @@ Config locations: `drover.yaml`, `~/.config/drover/config.yaml`
 
 ## Testing
 
-- pytest with pytest-asyncio (`asyncio_mode = "auto"`)
+- pytest with pytest-asyncio (`asyncio_mode = "auto"`); do NOT add `@pytest.mark.asyncio` decorators (redundant noise)
+- For tests requiring the optional Docling extra, use `pytest.importorskip("docling")` at module top
 - **Never call real LLMs in unit tests** — mock at the classifier level
 - Test parsing logic directly without LLM invocation:
 
@@ -180,3 +191,11 @@ def test_parse_response_direct_json() -> None:
 10. **Evaluation:** Use `drover evaluate` to measure accuracy against ground truth. See `evaluation.py` for the framework.
 
 11. **ADRs:** Architectural decisions are documented in `docs/adr/`. ADR-004 standardized on the local LLM (Ollama gemma4) as the primary local path. ADR-005 sets Docling with full-page OCR as the default PDF loader; fall back via `--loader unstructured` or `DROVER_LOADER=unstructured`. First-time Docling setup requires `uv sync --extra docling` and `uv run docling-tools models download`. Beads issue: `prof-m78`.
+
+12. **Docling first-run failure signature:** If every doc errors with `Docling models not found at ~/.cache/docling/models`, run `uv run docling-tools models download` once. The error is actionable but easy to miss in batch eval logs.
+
+13. **Sandbox + Ollama:** The Bash sandbox blocks localhost (`127.0.0.1:11434`). Run any command that calls the Ollama provider with `dangerouslyDisableSandbox: true` (drover classify/evaluate, ollama list, etc.).
+
+14. **Eval dashboard:** `eval/dashboard.html` and `eval/dashboard_data.json` are both regenerator-managed by `scripts/build_eval_dashboard.py`. After adding a run to `eval/runs/`, run the script; never edit either file by hand.
+
+15. **Ollama structured output (gemma):** Use `with_structured_output(method="json_mode", include_raw=True)` for the Ollama provider. The default `json_schema` (constrained decoding) produces tool-call fallback on non-tool-trained models like gemma when prompts are long. `num_predict` is bumped to ≥ 3072 on the Ollama path for the same reason.
