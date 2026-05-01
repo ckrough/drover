@@ -243,8 +243,9 @@ class DocumentLoader:
             case SampleStrategy.FIRST_N:
                 return pages[: self.max_pages]
             case SampleStrategy.BOOKENDS:
-                half = self.max_pages // 2
-                return pages[:half] + pages[-half:]
+                head_count = (self.max_pages + 1) // 2
+                tail_count = self.max_pages // 2
+                return pages[:head_count] + pages[-tail_count:]
             case _:
                 return pages[: self.max_pages]
 
@@ -426,7 +427,14 @@ class DoclingLoader:
             raise DocumentLoadError(f"No text content found in {path.name}")
 
         if self.debug_structure:
-            self.dump_structure(document, path)
+            try:
+                self.dump_structure(document, path)
+            except OSError as exc:
+                import logging
+
+                logging.getLogger(__name__).warning(
+                    "could not write debug structure: %s", exc
+                )
 
         return LoadedDocument(
             path=path,
@@ -460,8 +468,9 @@ class DoclingLoader:
             case SampleStrategy.FIRST_N:
                 return all_pages[: self.max_pages]
             case SampleStrategy.BOOKENDS:
-                half = self.max_pages // 2
-                return all_pages[:half] + all_pages[-half:]
+                head_count = (self.max_pages + 1) // 2
+                tail_count = self.max_pages // 2
+                return all_pages[:head_count] + all_pages[-tail_count:]
             case _:
                 return all_pages[: self.max_pages]
 
@@ -499,10 +508,10 @@ class DoclingLoader:
 
         if self.debug_dir is not None:
             debug_root = self.debug_dir.expanduser()
-            debug_root.mkdir(parents=True, exist_ok=True)
-            base = debug_root / source_path.stem
         else:
-            base = source_path.with_suffix("")
+            debug_root = Path.cwd() / "debug"
+        debug_root.mkdir(parents=True, exist_ok=True)
+        base = debug_root / source_path.stem
 
         target = _unique_path(base.with_suffix(".docling.json"))
         target.write_text(json.dumps(export_to_dict(), indent=2))

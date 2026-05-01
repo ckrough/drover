@@ -224,7 +224,17 @@ class PromptTemplate:
         """
         content = self.content
 
-        if SYSTEM_SECTION_HEADING in content and HUMAN_SECTION_HEADING in content:
+        has_system = SYSTEM_SECTION_HEADING in content
+        has_human = HUMAN_SECTION_HEADING in content
+
+        if has_system ^ has_human:
+            raise TemplateError(
+                "Custom prompt template must contain both"
+                f" '{SYSTEM_SECTION_HEADING}' and '{HUMAN_SECTION_HEADING}'"
+                " headings, or neither."
+            )
+
+        if has_system and has_human:
             # Split on the human heading; everything before is system,
             # everything after (excluding the heading line) is human.
             sys_part, human_part = content.split(HUMAN_SECTION_HEADING, 1)
@@ -297,6 +307,10 @@ class DocumentClassifier:
                 head+tail pattern to preserve both letterhead and signature/total
                 blocks. Applies only to non-streaming classification.
         """
+        if max_prompt_chars <= 0:
+            raise ValueError(
+                f"max_prompt_chars must be a positive integer, got {max_prompt_chars}"
+            )
         self.provider = provider
         self.model = model
         self.taxonomy = taxonomy
@@ -710,11 +724,19 @@ class DocumentClassifier:
         messages.append(HumanMessage(content=human_text))
 
         # Stream tokens for UX. Output is ephemeral — we do not rely on it
-        # for the final classification.
+        # for the final classification. Any streaming failure is logged and
+        # discarded; the structured finalizer below is the source of truth.
         llm = self._get_llm()
-        async for chunk in llm.astream(messages):
-            if on_token is not None:
-                on_token(str(chunk.content))
+        try:
+            async for chunk in llm.astream(messages):
+                if on_token is not None:
+                    on_token(str(chunk.content))
+        except Exception:
+            logger.warning(
+                "streaming_interrupted_fallback_to_finalizer",
+                provider=self.provider.value,
+                model=self.model,
+            )
 
         # Authoritative call: schema-enforced structured output.
         result = await self._invoke_structured_with_retry(messages, None)

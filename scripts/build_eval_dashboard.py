@@ -1,4 +1,4 @@
-"""Build eval/dashboard_data.json from eval/runs/ and eval/baselines.md.
+"""Build eval/dashboard_data.json and update the inline data block in eval/dashboard.html.
 
 Idempotent: existing entries with the same run_id are preserved. New runs
 found in eval/runs/ that are not already recorded are appended. Runs are
@@ -10,6 +10,11 @@ Usage:
 The script strips all per-document records and filenames from the raw JSON
 dumps before writing to dashboard_data.json. Only aggregate metrics are
 committed to the summary file.
+
+After updating dashboard_data.json, the script also rewrites the inline
+<script id="data" type="application/json"> block in dashboard.html so both
+files stay in sync. This keeps the dashboard loadable via file:// without
+a local server.
 """
 
 from __future__ import annotations
@@ -28,6 +33,7 @@ REPO_ROOT = Path(__file__).parent.parent
 EVAL_DIR = REPO_ROOT / "eval"
 RUNS_DIR = EVAL_DIR / "runs"
 DASHBOARD_DATA = EVAL_DIR / "dashboard_data.json"
+DASHBOARD_HTML = EVAL_DIR / "dashboard.html"
 
 SCHEMA_VERSION = 1
 
@@ -234,6 +240,51 @@ def _sort_key(run: dict[str, Any]) -> tuple[str, str]:
 
 
 # ---------------------------------------------------------------------------
+# HTML inline-data sync
+# ---------------------------------------------------------------------------
+
+_HTML_DATA_OPEN = '<script id="data" type="application/json">'
+_HTML_DATA_CLOSE = "</script>"
+
+
+def update_html_data_block(html_path: Path, json_text: str) -> None:
+    """Replace the inline JSON data block in dashboard.html with *json_text*.
+
+    Finds the ``<script id="data" type="application/json">`` marker, replaces
+    everything between it and the next ``</script>`` with *json_text*, and
+    writes the file back. The function is idempotent: running it twice with
+    the same JSON produces no further changes.
+
+    Args:
+        html_path: Path to dashboard.html.
+        json_text: Serialised JSON string to embed (should end with a newline).
+
+    Raises:
+        ValueError: If the expected markers are not found in the HTML.
+        OSError: On file read/write failure.
+    """
+    html = html_path.read_text(encoding="utf-8")
+
+    open_idx = html.find(_HTML_DATA_OPEN)
+    if open_idx == -1:
+        raise ValueError(
+            f"Marker '{_HTML_DATA_OPEN}' not found in {html_path}. "
+            "Cannot update inline data block."
+        )
+
+    # Search for closing tag after the opening marker
+    after_open = open_idx + len(_HTML_DATA_OPEN)
+    close_idx = html.find(_HTML_DATA_CLOSE, after_open)
+    if close_idx == -1:
+        raise ValueError(
+            f"Closing '{_HTML_DATA_CLOSE}' not found after data marker in {html_path}."
+        )
+
+    updated = html[:after_open] + "\n" + json_text + html[close_idx:]
+    html_path.write_text(updated, encoding="utf-8")
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -265,11 +316,18 @@ def main() -> None:
     data["generated_at"] = _rfc3339_now()
     data["schema_version"] = SCHEMA_VERSION
 
+    json_text = json.dumps(data, indent=2) + "\n"
+
     with DASHBOARD_DATA.open("w") as f:
-        json.dump(data, f, indent=2)
-        f.write("\n")
+        f.write(json_text)
 
     print(f"\nWrote {len(data['runs'])} total run(s) to {DASHBOARD_DATA}")
+
+    if DASHBOARD_HTML.exists():
+        update_html_data_block(DASHBOARD_HTML, json_text)
+        print(f"Updated inline data block in {DASHBOARD_HTML}")
+    else:
+        print(f"[warn] {DASHBOARD_HTML} not found; skipping HTML update.")
 
 
 if __name__ == "__main__":

@@ -209,10 +209,11 @@
   </div>
 </div>
 
+<!-- Regenerator-managed: contents replaced by scripts/build_eval_dashboard.py -->
 <script id="data" type="application/json">
 {
   "schema_version": 1,
-  "generated_at": "2026-05-01T10:11:23-04:00",
+  "generated_at": "2026-05-01T11:41:19-04:00",
   "runs": [
     {
       "run_id": "legacy-gemma4_docling",
@@ -365,7 +366,7 @@
       "date_accuracy": 0.36363636363636365,
       "errors": 0,
       "source": "eval/runs/real-world-2026-04-30T184932/gemma4_docling.json",
-      "notes": "First real-world run, full-page OCR. n=11 of 14 (3 LLM_PARSE_ERROR on long docs). Path-joint accuracy: 0.455 vs 0.182 for unstructured."
+      "notes": "First real-world run, full-page OCR. n=11 of 14 (3 LLM_PARSE_ERROR on long docs). Path-joint (domain+category+doctype) accuracy: 0.455 vs 0.182 for unstructured."
     },
     {
       "run_id": "real-world-2026-04-30T184932-gemma4_unstructured",
@@ -392,7 +393,6 @@
       "model": "gemma4:latest",
       "provider": "ollama",
       "loader": "docling",
-      "loader_variant": "picture-region-ocr",
       "domain_accuracy": 0.5454545454545454,
       "category_accuracy": 0.36363636363636365,
       "doctype_accuracy": 0.6363636363636364,
@@ -400,7 +400,8 @@
       "date_accuracy": 0.45454545454545453,
       "errors": 0,
       "source": "eval/runs/real-world-2026-04-30T191002-picture-ocr/gemma4_docling.json",
-      "notes": "Picture-region-only OCR (force_full_page_ocr=False). ~50% faster. Vendor/date improve vs full-page; category/doctype regress. n=11 aligned."
+      "notes": "Picture-region-only OCR (force_full_page_ocr=False). ~50% faster. Vendor/date improve vs full-page; category/doctype regress. n=11 aligned.",
+      "loader_variant": "picture-region-ocr"
     },
     {
       "run_id": "real-world-2026-04-30T191002-picture-ocr-gemma4_unstructured",
@@ -410,7 +411,6 @@
       "model": "gemma4:latest",
       "provider": "ollama",
       "loader": "unstructured",
-      "loader_variant": "picture-region-ocr",
       "domain_accuracy": 0.6923076923076923,
       "category_accuracy": 0.23076923076923078,
       "doctype_accuracy": 0.5384615384615384,
@@ -418,7 +418,8 @@
       "date_accuracy": 0.6153846153846154,
       "errors": 0,
       "source": "eval/runs/real-world-2026-04-30T191002-picture-ocr/gemma4_unstructured.json",
-      "notes": "Companion unstructured run for picture-region-OCR comparison. n=13 of 14."
+      "notes": "Companion unstructured run for picture-region-OCR comparison. n=13 of 14.",
+      "loader_variant": "picture-region-ocr"
     },
     {
       "run_id": "post-audit-2026-05-01T095432-gemma4_docling",
@@ -428,7 +429,6 @@
       "model": "gemma4:latest",
       "provider": "ollama",
       "loader": "docling",
-      "loader_variant": "full-page-ocr",
       "domain_accuracy": 0.7142857142857143,
       "category_accuracy": 0.2857142857142857,
       "doctype_accuracy": 0.6428571428571429,
@@ -436,7 +436,8 @@
       "date_accuracy": 0.42857142857142855,
       "errors": 0,
       "source": "eval/runs/post-audit-2026-05-01T095432/gemma4_docling.json",
-      "notes": "Post-audit run after phase 3 refactor. n=14 full corpus, 0 errors (long-doc fix verified). Full-page OCR. This is the current production baseline."
+      "notes": "Post-audit run after phase 3 refactor. n=14 full corpus, 0 errors (long-doc fix verified). Full-page OCR. This is the current production baseline.",
+      "loader_variant": "full-page-ocr"
     },
     {
       "run_id": "real-world-2026-05-01T070630-structured-gemma4_docling",
@@ -446,7 +447,6 @@
       "model": "gemma4:latest",
       "provider": "ollama",
       "loader": "docling",
-      "loader_variant": "structured-regions",
       "domain_accuracy": 0.6363636363636364,
       "category_accuracy": 0.2727272727272727,
       "doctype_accuracy": 0.6363636363636364,
@@ -454,7 +454,8 @@
       "date_accuracy": 0.36363636363636365,
       "errors": 0,
       "source": "eval/runs/real-world-2026-05-01T070630-structured/gemma4_docling.json",
-      "notes": "Structured-regions ([TAG] prefix) input experiment. Worse than markdown on category/vendor/date. Production reverted to markdown export."
+      "notes": "Structured-regions ([TAG] prefix) input experiment. Worse than markdown on category/vendor/date. Production reverted to markdown export.",
+      "loader_variant": "structured-regions"
     }
   ]
 }

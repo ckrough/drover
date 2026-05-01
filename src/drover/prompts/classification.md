@@ -5,11 +5,10 @@ You are a document classification system that categorizes documents according to
 ## Document Format
 
 <document_format>
-Input documents are GitHub-flavored Markdown produced by Docling with full-page OCR.
+Input documents are GitHub-flavored Markdown produced by an OCR-aware document loader.
 
 - Headings reflect the document's own sections (letterhead, totals, signature blocks).
-- Logo and image content has been OCR'd inline as text.
-- Near-duplicate header/footer fragments and OCR garble are extraction artifacts; treat them as noise rather than signal.
+- Image and logo content may be OCR'd inline as text; treat header/footer near-duplicates and OCR garble as extraction artifacts, not signal.
 - Tables may be rendered as Markdown tables or as loosely aligned text rows.
 </document_format>
 
