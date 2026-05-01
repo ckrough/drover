@@ -21,8 +21,14 @@ from drover.classifier import (
 from drover.config import (
     DroverConfig,
     ErrorMode,
+    LoaderType,
 )
-from drover.loader import DocumentLoader, DocumentLoadError
+from drover.loader import (
+    DoclingLoader,
+    DocumentLoader,
+    DocumentLoaderProtocol,
+    DocumentLoadError,
+)
 from drover.logging import get_logger
 from drover.models import ClassificationErrorResult, ClassificationResult, ErrorCode
 from drover.naming import get_naming_policy
@@ -48,10 +54,22 @@ class ClassificationService:
         self._taxonomy = get_taxonomy(config.taxonomy)
         self._naming_policy = get_naming_policy(config.naming_style)
 
-        self._loader = DocumentLoader(
-            strategy=config.sample_strategy,
-            max_pages=config.max_pages,
-        )
+        self._loader: DocumentLoaderProtocol
+        if config.loader == LoaderType.DOCLING:
+            debug_dir = (
+                Path(config.debug_dir).expanduser() if config.debug_dir else None
+            )
+            self._loader = DoclingLoader(
+                strategy=config.sample_strategy,
+                max_pages=config.max_pages,
+                debug_dir=debug_dir,
+                debug_structure=config.debug_structure,
+            )
+        else:
+            self._loader = DocumentLoader(
+                strategy=config.sample_strategy,
+                max_pages=config.max_pages,
+            )
         self._classifier = self._create_classifier()
         self._path_builder = PathBuilder(naming_policy=self._naming_policy)
 
@@ -142,7 +160,10 @@ class ClassificationService:
             result = self._path_builder.build(classification, file_path)
 
             if cfg.metrics and debug_info and "metrics" in debug_info:
-                result.metrics = debug_info["metrics"]
+                metrics = debug_info["metrics"]
+                metrics["loader_latency_ms"] = loaded.loader_latency_ms
+                metrics["loader_backend"] = loaded.loader_backend
+                result.metrics = metrics
 
             logger.debug(
                 "file_processing_complete",

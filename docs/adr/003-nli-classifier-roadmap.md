@@ -393,10 +393,10 @@ nli-spacy = [
 - Benchmarks are recorded against `eval/ground_truth.jsonl` to track the zero-shot baseline before each phase lands.
 
 ## Related
-- `src/drover/nli_classifier.py` — `NLIDocumentClassifier`
-- `src/drover/extractors/{base,regex,llm}.py` — metadata extractors used by the NLI path
-- `src/drover/config.py` — `AIProvider.NLI_LOCAL`, `NLIConfig`, `ExtractorType`
-- `src/drover/service.py` — factory selecting between LLM and NLI classifier
-- `tests/test_nli_classifier.py` — unit tests for the classifier
+- ~~`src/drover/nli_classifier.py`~~ — `NLIDocumentClassifier` *(removed in 0875371 "chore: remove NLI classifier path")*
+- ~~`src/drover/extractors/{base,regex,llm}.py`~~ — metadata extractors used by the NLI path *(removed in 0875371)*
+- `src/drover/config.py` — ~~`AIProvider.NLI_LOCAL`, `NLIConfig`, `ExtractorType`~~ *(removed in 0875371)* — current LLM path config remains
+- `src/drover/service.py` — factory selecting between LLM and NLI classifier *(NLI branch removed in 0875371; LLM path is now sole factory; see ADR-004 and ADR-005)*
+- ~~`tests/test_nli_classifier.py`~~ — unit tests for the classifier *(removed in 0875371)*
 - ADR-001: Chain-of-Thought Prompting Strategy (LLM classifier reasoning)
 - ADR-002: Privacy-First Design (motivates local-first NLI)

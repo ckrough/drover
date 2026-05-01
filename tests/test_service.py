@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from drover.classifier import LLMParseError
-from drover.config import DroverConfig, ErrorMode
+from drover.config import DroverConfig, ErrorMode, LoaderType
 from drover.models import ClassificationErrorResult, ClassificationResult
 from drover.service import ClassificationService
 
@@ -40,7 +40,15 @@ def _make_error_result(filename: str) -> ClassificationErrorResult:
     )
 
 
-@pytest.mark.asyncio
+def _unstructured_config(**kwargs: object) -> DroverConfig:
+    """Build a DroverConfig that uses the unstructured loader.
+
+    Service tests that exercise the loader path use this to avoid the
+    Docling model pre-flight check.
+    """
+    return DroverConfig(loader=LoaderType.UNSTRUCTURED, **kwargs)  # type: ignore[arg-type]
+
+
 async def test_classification_service_empty_files() -> None:
     """No files should return exit code 0 and not error."""
     cfg = DroverConfig()
@@ -51,14 +59,13 @@ async def test_classification_service_empty_files() -> None:
     assert exit_code == 0
 
 
-@pytest.mark.asyncio
 async def test_classification_service_error_modes_continue(tmp_path: Path) -> None:
     """Service should continue on errors when ErrorMode.CONTINUE is set.
 
     We feed it a non-existent file to force a DocumentLoadError and
     ensure it maps to an error result and exit code 2 when all fail.
     """
-    cfg = DroverConfig(on_error=ErrorMode.CONTINUE)
+    cfg = _unstructured_config(on_error=ErrorMode.CONTINUE)
     service = ClassificationService(cfg)
 
     missing = tmp_path / "does_not_exist.pdf"
@@ -76,7 +83,6 @@ async def test_classification_service_error_modes_continue(tmp_path: Path) -> No
     assert results[0].error is True
 
 
-@pytest.mark.asyncio
 async def test_debug_dir_writes_files(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -84,10 +90,10 @@ async def test_debug_dir_writes_files(
     doc_path = tmp_path / "doc.txt"
     doc_path.write_text("dummy content")
 
-    cfg = DroverConfig(capture_debug=True, debug_dir=tmp_path / "debug")
+    cfg = _unstructured_config(capture_debug=True, debug_dir=tmp_path / "debug")
     service = ClassificationService(cfg)
 
-    async def fake_classify(  # type: ignore[override]
+    async def fake_classify(
         content: str,
         capture_debug: bool = False,
         collect_metrics: bool = False,
@@ -124,7 +130,6 @@ async def test_debug_dir_writes_files(
     assert response_files
 
 
-@pytest.mark.asyncio
 async def test_debug_capture_on_llm_parse_failure(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -137,7 +142,7 @@ async def test_debug_capture_on_llm_parse_failure(
     doc_path.write_text("dummy content")
 
     debug_dir = tmp_path / "debug"
-    cfg = DroverConfig(
+    cfg = _unstructured_config(
         capture_debug=True, debug_dir=debug_dir, on_error=ErrorMode.CONTINUE
     )
     service = ClassificationService(cfg)
@@ -180,7 +185,6 @@ async def test_debug_capture_on_llm_parse_failure(
 class TestConcurrencyLimiting:
     """Tests for semaphore-based concurrency control."""
 
-    @pytest.mark.asyncio
     async def test_concurrency_limit_respected(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -233,7 +237,6 @@ class TestConcurrencyLimiting:
 class TestPartialSuccess:
     """Tests for partial success scenarios (some files succeed, some fail)."""
 
-    @pytest.mark.asyncio
     async def test_partial_failure_returns_exit_code_1(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -276,7 +279,6 @@ class TestPartialSuccess:
 class TestErrorModes:
     """Tests for different error handling modes."""
 
-    @pytest.mark.asyncio
     async def test_error_mode_fail_stops_on_first_error(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -308,7 +310,6 @@ class TestErrorModes:
         assert len(results) == 1
         assert results[0].error is True
 
-    @pytest.mark.asyncio
     async def test_error_mode_skip_omits_errors_from_callback(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -338,7 +339,6 @@ class TestErrorModes:
         assert len(results) == 2
         assert all(not r.error for r in results)
 
-    @pytest.mark.asyncio
     async def test_error_mode_continue_includes_all_results(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -372,7 +372,6 @@ class TestErrorModes:
         assert len(successes) == 2
         assert len(errors) == 1
 
-    @pytest.mark.asyncio
     async def test_all_files_fail_returns_exit_code_2(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -398,7 +397,6 @@ class TestErrorModes:
         assert len(results) == 3
         assert all(r.error for r in results)
 
-    @pytest.mark.asyncio
     async def test_all_files_succeed_returns_exit_code_0(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -428,7 +426,6 @@ class TestErrorModes:
 class TestUnexpectedErrors:
     """Tests for defensive error handling fallback."""
 
-    @pytest.mark.asyncio
     async def test_unexpected_error_triggers_fallback(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -444,7 +441,7 @@ class TestUnexpectedErrors:
         doc = tmp_path / "doc.txt"
         doc.write_text("test content")
 
-        cfg = DroverConfig()
+        cfg = _unstructured_config()
         service = ClassificationService(cfg)
 
         # Mock classifier to succeed

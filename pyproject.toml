@@ -31,6 +31,10 @@ dev = [
     "mypy>=1.8.0",
     "reportlab>=4.0,<5.0",
 ]
+docling = [
+    "docling>=2.0,<3.0",
+]
+
 [project.scripts]
 drover = "drover.cli:main"
 
@@ -111,6 +115,14 @@ module = [
 ]
 ignore_missing_imports = true
 ignore_errors = true
+
+# Docling dependencies (optional)
+[[tool.mypy.overrides]]
+module = [
+    "docling.*",
+    "docling_core.*",
+]
+ignore_missing_imports = true
 
 [tool.bandit]
 exclude_dirs = ["tests", ".venv"]

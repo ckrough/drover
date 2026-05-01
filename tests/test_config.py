@@ -4,11 +4,14 @@ import os
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
+
 from drover.config import (
     AIConfig,
     AIProvider,
     DroverConfig,
     ErrorMode,
+    LoaderType,
     LogLevel,
     SampleStrategy,
     TaxonomyMode,
@@ -192,6 +195,35 @@ class TestDroverConfig:
             env_data = DroverConfig.from_env()
         assert env_data["prompt"] == "/env/prompt.md"
 
+    def test_loader_default_is_docling(self) -> None:
+        """Default loader is `docling` (structure-aware) on this branch."""
+        config = DroverConfig()
+        assert config.loader == LoaderType.DOCLING
+
+    def test_loader_from_env(self) -> None:
+        """DROVER_LOADER environment variable selects the unstructured backend."""
+        with patch.dict(os.environ, {"DROVER_LOADER": "unstructured"}):
+            config = DroverConfig.model_validate(DroverConfig.from_env())
+        assert config.loader == LoaderType.UNSTRUCTURED
+
+    def test_loader_with_overrides(self) -> None:
+        """CLI override for loader takes precedence over default."""
+        config = DroverConfig()
+        new_config = config.with_overrides(loader="docling")
+        assert new_config.loader == LoaderType.DOCLING
+
+    def test_loader_cli_override_beats_env(self) -> None:
+        """with_overrides applied on top of env-loaded config wins."""
+        with patch.dict(os.environ, {"DROVER_LOADER": "unstructured"}):
+            config = DroverConfig.model_validate(DroverConfig.from_env())
+        new_config = config.with_overrides(loader="docling")
+        assert new_config.loader == LoaderType.DOCLING
+
+    def test_loader_rejects_unknown_value(self) -> None:
+        """Validation rejects loaders outside the known set."""
+        with pytest.raises(ValueError):
+            DroverConfig.model_validate({"loader": "magic"})
+
 
 class TestAIConfig:
     """Tests for AIConfig."""
@@ -216,8 +248,6 @@ class TestAIConfig:
 
     def test_temperature_bounds(self) -> None:
         """Test temperature validation bounds."""
-        import pytest
-
         config = AIConfig(temperature=0.5)
         assert config.temperature == 0.5
 
@@ -243,8 +273,6 @@ class TestAIConfig:
 
     def test_retry_wait_validation_invalid(self) -> None:
         """Test invalid retry wait range raises error."""
-        import pytest
-
         with pytest.raises(
             ValueError, match=r"retry_min_wait.*must be <= retry_max_wait"
         ):
@@ -252,8 +280,6 @@ class TestAIConfig:
 
     def test_timeout_validation(self) -> None:
         """Test timeout must be positive."""
-        import pytest
-
         config = AIConfig(timeout=30)
         assert config.timeout == 30
 
@@ -262,8 +288,6 @@ class TestAIConfig:
 
     def test_max_retries_bounds(self) -> None:
         """Test max_retries validation bounds."""
-        import pytest
-
         config = AIConfig(max_retries=1)
         assert config.max_retries == 1
 

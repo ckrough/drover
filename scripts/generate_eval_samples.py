@@ -3,7 +3,7 @@
 
 Picks (domain, category, doctype) triples from HouseholdTaxonomy, asks
 Claude to write realistic prose for each, renders the result as a PDF,
-and appends a row to eval/ground_truth.jsonl.
+and appends a row to eval/ground_truth/synthetic.jsonl.
 
 Usage:
     uv run python scripts/generate_eval_samples.py --dry-run
@@ -206,7 +206,7 @@ class Triple(NamedTuple):
 
 
 class GroundTruthRow(BaseModel):
-    """One JSONL row in eval/ground_truth.jsonl (validated against taxonomy)."""
+    """One JSONL row in eval/ground_truth/synthetic.jsonl (validated against taxonomy)."""
 
     filename: str
     domain: str
@@ -1329,13 +1329,13 @@ async def _run(
 @click.option(
     "--output-dir",
     type=click.Path(file_okay=False, path_type=Path),
-    default=Path("eval/samples"),
+    default=Path("eval/samples/synthetic"),
     show_default=True,
 )
 @click.option(
     "--ground-truth",
     type=click.Path(dir_okay=False, path_type=Path),
-    default=Path("eval/ground_truth.jsonl"),
+    default=Path("eval/ground_truth/synthetic.jsonl"),
     show_default=True,
 )
 @click.option("--dry-run", is_flag=True, default=False)
