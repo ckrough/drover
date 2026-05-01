@@ -1,18 +1,20 @@
 """Tests for DocumentLoader and document sampling."""
 
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 import pytest
 
 from drover.loader import (
     _SUPPORTED_EXTENSIONS,
+    DoclingLoader,
     DocumentLoader,
     DocumentLoadError,
 )
 from drover.sampling import SampleStrategy
 
 
-@pytest.mark.asyncio
 async def test_document_loader_loads_text_file(tmp_path: Path) -> None:
     """DocumentLoader should load a simple text file without errors."""
     file_path = tmp_path / "example.txt"
@@ -25,9 +27,11 @@ async def test_document_loader_loads_text_file(tmp_path: Path) -> None:
     assert "hello world" in loaded.content
     assert loaded.page_count == 1
     assert loaded.pages_sampled == 1
+    assert loaded.loader_backend == "unstructured"
+    assert loaded.loader_latency_ms is not None
+    assert loaded.loader_latency_ms >= 0.0
 
 
-@pytest.mark.asyncio
 async def test_document_loader_loads_markdown_file(tmp_path: Path) -> None:
     """DocumentLoader should load markdown files."""
     file_path = tmp_path / "readme.md"
@@ -41,7 +45,6 @@ async def test_document_loader_loads_markdown_file(tmp_path: Path) -> None:
     assert "Some content" in loaded.content
 
 
-@pytest.mark.asyncio
 async def test_document_loader_raises_for_missing_file(tmp_path: Path) -> None:
     """DocumentLoader should raise DocumentLoadError for missing files."""
     file_path = tmp_path / "nonexistent.txt"
@@ -51,7 +54,6 @@ async def test_document_loader_raises_for_missing_file(tmp_path: Path) -> None:
         await loader.load(file_path)
 
 
-@pytest.mark.asyncio
 async def test_document_loader_raises_for_unsupported_type(tmp_path: Path) -> None:
     """DocumentLoader should raise DocumentLoadError for unsupported file types."""
     file_path = tmp_path / "data.xyz"
@@ -62,7 +64,6 @@ async def test_document_loader_raises_for_unsupported_type(tmp_path: Path) -> No
         await loader.load(file_path)
 
 
-@pytest.mark.asyncio
 async def test_document_loader_raises_for_empty_file(tmp_path: Path) -> None:
     """DocumentLoader should raise DocumentLoadError for empty files."""
     file_path = tmp_path / "empty.txt"
@@ -151,3 +152,157 @@ def test_adaptive_strategy_selects_bookends_for_large_docs() -> None:
 
     selected = loader._select_strategy(total_pages=50)
     assert selected == SampleStrategy.BOOKENDS
+
+
+# ---------------------------------------------------------------------------
+# DoclingLoader
+# ---------------------------------------------------------------------------
+
+
+def _fake_docling_result(markdown: str, num_pages: int = 1) -> SimpleNamespace:
+    """Build a stand-in for `ConversionResult` with the attributes we use."""
+    _md = markdown
+
+    def _export(**_kwargs: object) -> str:
+        return _md
+
+    document = SimpleNamespace(
+        export_to_markdown=_export,
+        pages={i: SimpleNamespace() for i in range(1, num_pages + 1)},
+    )
+    return SimpleNamespace(document=document)
+
+
+async def test_docling_loader_loads_document(tmp_path: Path) -> None:
+    """DoclingLoader returns content from the markdown export."""
+    file_path = tmp_path / "sample.txt"
+    file_path.write_text("placeholder body for docling fake")
+
+    fake_result = _fake_docling_result("# Heading\n\nBody.", num_pages=2)
+
+    class FakeConverter:
+        def convert(self, source: str) -> SimpleNamespace:
+            return fake_result
+
+    with (
+        patch("drover.loader._build_docling_converter", return_value=FakeConverter()),
+        patch("drover.loader._check_docling_models_available"),
+    ):
+        loader = DoclingLoader()
+        loaded = await loader.load(file_path)
+
+    assert loaded.path == file_path
+    assert loaded.content == "# Heading\n\nBody."
+    assert loaded.page_count == 2
+    assert loaded.loader_backend == "docling"
+    assert loaded.loader_latency_ms is not None
+    assert loaded.loader_latency_ms >= 0.0
+
+
+async def test_docling_loader_raises_when_package_missing(tmp_path: Path) -> None:
+    """A clear error fires when the `docling` extra is not installed."""
+    file_path = tmp_path / "sample.txt"
+    file_path.write_text("body")
+
+    def boom() -> None:
+        raise ImportError("docling not installed")
+
+    with patch("drover.loader._build_docling_converter", side_effect=boom):
+        loader = DoclingLoader()
+        with pytest.raises(DocumentLoadError, match="docling"):
+            await loader.load(file_path)
+
+
+async def test_docling_loader_rejects_unsupported_extension(tmp_path: Path) -> None:
+    """DoclingLoader honors the same extension allowlist as DocumentLoader."""
+    file_path = tmp_path / "data.xyz"
+    file_path.write_text("noop")
+
+    loader = DoclingLoader()
+    with pytest.raises(DocumentLoadError, match="Unsupported file type"):
+        await loader.load(file_path)
+
+
+async def test_docling_loader_raises_for_missing_file(tmp_path: Path) -> None:
+    """Missing files produce DocumentLoadError before any docling call."""
+    loader = DoclingLoader()
+    with pytest.raises(DocumentLoadError, match="File not found"):
+        await loader.load(tmp_path / "ghost.pdf")
+
+
+async def test_docling_loader_raises_when_markdown_empty(tmp_path: Path) -> None:
+    """An empty markdown export is treated as a failed load."""
+    file_path = tmp_path / "empty.txt"
+    file_path.write_text("placeholder")
+
+    fake_result = _fake_docling_result("   \n", num_pages=1)
+
+    class FakeConverter:
+        def convert(self, source: str) -> SimpleNamespace:
+            return fake_result
+
+    with (
+        patch("drover.loader._build_docling_converter", return_value=FakeConverter()),
+        patch("drover.loader._check_docling_models_available"),
+    ):
+        loader = DoclingLoader()
+        with pytest.raises(DocumentLoadError, match="No text content"):
+            await loader.load(file_path)
+
+
+async def test_docling_loader_raises_when_models_missing(tmp_path: Path) -> None:
+    """DoclingLoader raises DocumentLoadError when model cache is absent."""
+    file_path = tmp_path / "sample.txt"
+    file_path.write_text("body")
+
+    with patch(
+        "drover.loader._check_docling_models_available",
+        side_effect=DocumentLoadError("Docling models not found"),
+    ):
+        loader = DoclingLoader()
+        with pytest.raises(DocumentLoadError, match="Docling models not found"):
+            await loader.load(file_path)
+
+
+def test_docling_loader_page_sampling_first_n() -> None:
+    """DoclingLoader._select_page_numbers respects FIRST_N strategy."""
+    loader = DoclingLoader(strategy=SampleStrategy.FIRST_N, max_pages=3)
+    page_nos = loader._select_page_numbers(10)
+    assert page_nos == [1, 2, 3]
+
+
+def test_docling_loader_page_sampling_bookends() -> None:
+    """DoclingLoader._select_page_numbers applies BOOKENDS correctly."""
+    loader = DoclingLoader(strategy=SampleStrategy.BOOKENDS, max_pages=4)
+    page_nos = loader._select_page_numbers(10)
+    assert page_nos == [1, 2, 9, 10]
+
+
+def test_docling_loader_page_sampling_returns_all_when_under_max() -> None:
+    """DoclingLoader returns all pages when document is smaller than max_pages."""
+    loader = DoclingLoader(strategy=SampleStrategy.FIRST_N, max_pages=10)
+    page_nos = loader._select_page_numbers(3)
+    assert page_nos == [1, 2, 3]
+
+
+async def test_docling_loader_pages_sampled_matches_selected(tmp_path: Path) -> None:
+    """pages_sampled reflects the actual number of sampled pages, not total."""
+    file_path = tmp_path / "sample.txt"
+    file_path.write_text("placeholder")
+
+    # 15-page doc; FIRST_N with max_pages=5 → 5 pages sampled
+    fake_result = _fake_docling_result("content", num_pages=15)
+
+    class FakeConverter:
+        def convert(self, source: str) -> SimpleNamespace:
+            return fake_result
+
+    with (
+        patch("drover.loader._build_docling_converter", return_value=FakeConverter()),
+        patch("drover.loader._check_docling_models_available"),
+    ):
+        loader = DoclingLoader(strategy=SampleStrategy.FIRST_N, max_pages=5)
+        loaded = await loader.load(file_path)
+
+    assert loaded.page_count == 15
+    assert loaded.pages_sampled == 5

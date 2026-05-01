@@ -4,7 +4,7 @@ Enables systematic measurement of classification accuracy against ground truth
 data, supporting model comparison, prompt optimization, and regression testing.
 
 Example usage:
-    evaluator = ClassificationEvaluator(ground_truth_path="eval/ground_truth.jsonl")
+    evaluator = ClassificationEvaluator(ground_truth_path="eval/ground_truth/synthetic.jsonl")
     results = await evaluator.evaluate(classifier, test_files)
     print(f"Domain accuracy: {results.domain_accuracy:.1%}")
 """
@@ -18,7 +18,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from drover.classifier import DocumentClassifier
-from drover.loader import DocumentLoader
+from drover.loader import DocumentLoaderProtocol
 from drover.logging import get_logger
 from drover.models import RawClassification
 
@@ -50,6 +50,8 @@ class ClassificationComparison:
     doctype_correct: bool
     vendor_correct: bool | None  # None if vendor not in ground truth
     date_correct: bool | None  # None if date not in ground truth
+    loader_latency_ms: float | None = None
+    loader_backend: str | None = None
 
 
 @dataclass
@@ -96,6 +98,8 @@ class EvaluationResult:
                     "doctype_correct": c.doctype_correct,
                     "vendor_correct": c.vendor_correct,
                     "date_correct": c.date_correct,
+                    "loader_latency_ms": c.loader_latency_ms,
+                    "loader_backend": c.loader_backend,
                 }
                 for c in self.comparisons
             ],
@@ -198,23 +202,22 @@ class ClassificationEvaluator:
     async def evaluate(
         self,
         classifier: DocumentClassifier,
+        loader: DocumentLoaderProtocol,
         test_files: Sequence[str | Path] | None = None,
-        loader: DocumentLoader | None = None,
     ) -> EvaluationResult:
         """Run classification on test files and compare to ground truth.
 
         Args:
             classifier: Configured DocumentClassifier instance.
+            loader: Document loader for text extraction. Must be explicitly
+                provided so the caller's loader configuration (docling vs
+                unstructured) is honoured rather than silently defaulted.
             test_files: Specific files to test. If None, uses all files
                        that have ground truth entries.
-            loader: Document loader for text extraction. If None, creates
-                a default `DocumentLoader`.
 
         Returns:
             EvaluationResult with accuracy metrics and detailed comparisons.
         """
-        if loader is None:
-            loader = DocumentLoader()
 
         # Determine files to evaluate
         if test_files is None:
@@ -300,6 +303,8 @@ class ClassificationEvaluator:
                 doctype_correct=t_correct,
                 vendor_correct=v_correct,
                 date_correct=dt_correct,
+                loader_latency_ms=loaded_doc.loader_latency_ms,
+                loader_backend=loaded_doc.loader_backend,
             )
             comparisons.append(comparison)
 
@@ -374,6 +379,7 @@ class ClassificationEvaluator:
 async def compare_models(
     classifier_a: DocumentClassifier,
     classifier_b: DocumentClassifier,
+    loader: DocumentLoaderProtocol,
     ground_truth_path: str | Path,
     documents_dir: str | Path | None = None,
 ) -> tuple[EvaluationResult, EvaluationResult]:
@@ -384,6 +390,7 @@ async def compare_models(
     Args:
         classifier_a: First classifier to evaluate.
         classifier_b: Second classifier to evaluate.
+        loader: Document loader to use for both evaluations.
         ground_truth_path: Path to ground truth JSONL file.
         documents_dir: Directory containing test documents.
 
@@ -392,7 +399,7 @@ async def compare_models(
     """
     evaluator = ClassificationEvaluator(ground_truth_path, documents_dir)
 
-    results_a = await evaluator.evaluate(classifier_a)
-    results_b = await evaluator.evaluate(classifier_b)
+    results_a = await evaluator.evaluate(classifier_a, loader)
+    results_b = await evaluator.evaluate(classifier_b, loader)
 
     return results_a, results_b

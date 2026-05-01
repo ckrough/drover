@@ -46,6 +46,19 @@ debug/
 eval/documents/
 eval/results/
 
+# Real-world sample documents and ground truth (PII risk; local only)
+eval/samples/real-world/*.pdf
+eval/samples/real-world/*.docx
+eval/samples/real-world/*.png
+eval/samples/real-world/*.jpg
+eval/samples/real-world/*.jpeg
+eval/samples/real-world/*.tiff
+eval/ground_truth/real-world.jsonl
+
+# Per-doc benchmark JSON dumps (large; reconstructible by re-running)
+eval/runs/*/*.json
+eval/runs/*.json
+
 # Integration tests (user-specific LLM config)
 tests/integration/config.yaml
 

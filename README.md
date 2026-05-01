@@ -45,13 +45,28 @@ Drover uses LLMs to analyze documents and suggest consistent, policy-compliant f
 # Clone and sync the project (creates .venv and installs dependencies)
 git clone https://github.com/ckrough/drover.git
 cd drover
-uv sync
+uv sync --extra docling
 
-# Download required NLTK data (one-time)
+# Download required NLTK data (one-time, used by the `unstructured` fallback loader)
 uv run python -c "import nltk; nltk.download('averaged_perceptron_tagger_eng'); nltk.download('punkt_tab')"
+
+# Download Docling models (one-time, ~500 MB to ~/.cache/docling/models)
+uv run docling-tools models download
 ```
 
 Run the CLI through `uv run drover ...`, or activate the environment with `source .venv/bin/activate` to call `drover` directly.
+
+#### About the Docling loader
+
+Drover uses [Docling](https://docling-project.github.io/docling/) as the default PDF loader, with full-page OCR enabled so vendor names carried in logos and embedded images reach the classifier. The `[docling]` install extra and the one-time model download above are required. If you skip the download, Docling's first run fetches models from Hugging Face on demand (a few hundred MB, internet required); subsequent runs are fully offline. Rationale and trade-offs are in [ADR-005](docs/adr/005-docling-evaluation.md).
+
+To fall back to the lighter-weight `unstructured` loader:
+
+```bash
+uv sync   # without --extra docling
+drover classify document.pdf --loader unstructured
+# or set DROVER_LOADER=unstructured in your environment
+```
 
 ### Classify Your First Document
 
@@ -92,8 +107,8 @@ drover tag --tag-mode replace document.pdf       # Replace existing tags
 Measure classification accuracy against ground truth:
 
 ```bash
-drover evaluate eval/ground_truth.jsonl
-drover evaluate eval/ground_truth.jsonl --output-format json
+drover evaluate eval/ground_truth/synthetic.jsonl
+drover evaluate eval/ground_truth/synthetic.jsonl --output-format json
 ```
 
 ### Output Format
@@ -122,6 +137,7 @@ drover evaluate eval/ground_truth.jsonl --output-format json
 | `DROVER_TAXONOMY` | Classification taxonomy | `household` |
 | `DROVER_NAMING_STYLE` | Filename policy | `nara` |
 | `DROVER_SAMPLE_STRATEGY` | Page sampling (full, first_n, bookends, adaptive) | `adaptive` |
+| `DROVER_LOADER` | Document loader backend (docling, unstructured) | `docling` |
 | `DROVER_LOG_LEVEL` | Logging verbosity (quiet, verbose, debug) | `quiet` |
 
 ### Config File
@@ -201,7 +217,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full development workflow.
 - [ADR-002: Privacy-First Design](docs/adr/002-privacy-first-design.md) — Local-first, zero telemetry approach
 - [ADR-003: NLI Classifier Roadmap](docs/adr/003-nli-classifier-roadmap.md) — Zero-shot NLI exploration (superseded by ADR-004)
 - [ADR-004: Local LLM as Primary Local Path](docs/adr/004-local-llm-as-primary-local-path.md) — Ollama gemma4 as the default local classifier
-- [ADR-005: Docling Evaluation](docs/adr/005-docling-evaluation.md) — Rejected Docling as a structure-aware loader replacement
+- [ADR-005: Docling with Full-Page OCR as the Default PDF Loader](docs/adr/005-docling-evaluation.md) — Structure-aware loading with OCR over logos and embedded images for accurate folder placement
 
 ## License
 

@@ -17,11 +17,11 @@ These numbers supersede the 3-doc and 33-doc snapshots referenced historically i
 
 ## Corpus
 
-- 80 documents in `eval/samples/` (3 original + 77 synthetic).
+- 80 documents in `eval/samples/synthetic/` (3 original + 77 synthetic).
 - 16/16 canonical household-taxonomy domains, each with at least 5 documents, 2 categories, and 2 doctypes.
 - 41 documents exceed 512 tokens in the synthetic generator's tokenizer. The long-doc bias is intentional: long documents stress the page-sampling strategies in `src/drover/sampling.py` more than short ones.
 - All synthetic documents generated via Claude Sonnet 4.6 through `scripts/generate_eval_samples.py` with structured markdown templates per doctype (real tables, headings, signature blocks, line items).
-- Ground truth: `eval/ground_truth.jsonl` (93 lines: 13 header + 80 entries).
+- Ground truth: `eval/ground_truth/synthetic.jsonl` (93 lines: 13 header + 80 entries).
 
 ## LLM baseline (2026-04-29, corpus = 80)
 
@@ -44,8 +44,8 @@ LLM baseline:
 ```bash
 env -u ALL_PROXY -u all_proxy -u FTP_PROXY -u GRPC_PROXY \
   uv run drover evaluate \
-    --ground-truth eval/ground_truth.jsonl \
-    --documents-dir eval/samples \
+    --ground-truth eval/ground_truth/synthetic.jsonl \
+    --documents-dir eval/samples/synthetic \
     --ai-provider ollama \
     --ai-model gemma4:latest \
     --output json \

@@ -45,6 +45,14 @@ class AIMetrics(BaseModel):
     cache_read_input_tokens: int = Field(
         default=0, description="Tokens read from cache (subsequent requests)"
     )
+    # Loader-level instrumentation (populated by service after loading)
+    loader_latency_ms: float | None = Field(
+        default=None, description="Document parse latency in milliseconds"
+    )
+    loader_backend: str | None = Field(
+        default=None,
+        description="Document loader backend (unstructured | docling)",
+    )
 
 
 class MetricsCallback(BaseCallbackHandler):

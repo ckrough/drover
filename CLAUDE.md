@@ -142,6 +142,7 @@ Config locations: `drover.yaml`, `~/.config/drover/config.yaml`
 | `DROVER_ON_ERROR` | Error handling (fail, continue, skip) | `fail` |
 | `DROVER_CONCURRENCY` | Parallel processing | `1` |
 | `DROVER_DEBUG_DIR` | Directory for debug outputs | `./debug` |
+| `debug_structure` | Dump `DoclingDocument` JSON to `debug_dir` for inspection (config-file / CLI flag only; no env-var hookup yet) | `false` |
 
 ## Testing
 
@@ -178,4 +179,4 @@ def test_parse_response_direct_json() -> None:
 
 10. **Evaluation:** Use `drover evaluate` to measure accuracy against ground truth. See `evaluation.py` for the framework.
 
-11. **ADRs:** Architectural decisions are documented in `docs/adr/`. ADR-004 standardized on the local LLM (Ollama gemma4) as the primary local path; ADR-005 rejected Docling as a structure-aware loader replacement. The NLI classifier path and the Docling spike infrastructure that those ADRs originally kept in tree have since been removed.
+11. **ADRs:** Architectural decisions are documented in `docs/adr/`. ADR-004 standardized on the local LLM (Ollama gemma4) as the primary local path. ADR-005 sets Docling with full-page OCR as the default PDF loader; fall back via `--loader unstructured` or `DROVER_LOADER=unstructured`. First-time Docling setup requires `uv sync --extra docling` and `uv run docling-tools models download`. Beads issue: `prof-m78`.

@@ -21,6 +21,20 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 uv sync --all-extras
 ```
 
+#### First-run setup: Docling models
+
+The Docling loader requires model files (~500 MB) that must be downloaded once
+before first use. Run this after `uv sync --all-extras`:
+
+```bash
+uv run docling-tools models download
+```
+
+Models are stored at `~/.cache/docling/models` and used offline on all
+subsequent runs. If you skip this step, `DoclingLoader` raises a
+`DocumentLoadError` with instructions rather than attempting a silent
+network download at classification time.
+
 `uv run <command>` executes commands inside the project environment without requiring activation. To enter a shell with the environment active, use `uv shell` or `source .venv/bin/activate`.
 
 ### Running Tests
@@ -73,7 +87,7 @@ src/drover/
 ├── __main__.py         # Entry point for python -m drover
 ├── cli.py              # Click CLI commands (classify, tag, evaluate)
 ├── config.py           # Configuration management (Pydantic models)
-├── loader.py           # DocumentLoader - text extraction from documents
+├── loader.py           # DocumentLoader (unstructured) + DoclingLoader (structure-aware, default)
 ├── classifier.py       # LLM-based DocumentClassifier
 ├── path_builder.py     # PathBuilder - generates organized paths
 ├── models.py           # Data models (RawClassification, ClassificationResult)
@@ -106,8 +120,12 @@ src/drover/
 1. CLI (cli.py)
    └── Entry point, orchestrates the pipeline
 
-2. DocumentLoader (loader.py)
-   └── Extracts text from documents with sampling strategies
+2. Loader (loader.py)
+   └── DoclingLoader (default, structure-aware with full-page OCR) or
+       DocumentLoader (unstructured fallback). Selected via --loader or
+       DROVER_LOADER. The Docling path requires `uv sync --extra docling`
+       and a one-time `uv run docling-tools models download` (~500 MB
+       to ~/.cache/docling/models). Decision rationale: ADR-005.
 
 3. DocumentClassifier (classifier.py)
    └── Sends content to LLM using structured output for reliable extraction
@@ -470,7 +488,7 @@ The `evaluation.py` module enables systematic measurement of classification accu
 ```python
 from drover.evaluation import ClassificationEvaluator
 
-evaluator = ClassificationEvaluator(ground_truth_path="eval/ground_truth.jsonl")
+evaluator = ClassificationEvaluator(ground_truth_path="eval/ground_truth/synthetic.jsonl")
 results = await evaluator.evaluate(classifier)
 print(f"Domain accuracy: {results.domain_accuracy:.1%}")
 ```
@@ -487,7 +505,13 @@ JSONL file with expected classifications:
 ### Running Evaluations
 
 ```bash
-drover evaluate eval/ground_truth.jsonl --ai-model gpt-4o --output-format json
+drover evaluate eval/ground_truth/synthetic.jsonl --ai-model gpt-4o --output-format json
+```
+
+To track accuracy over time across models, loaders, and corpora, open `eval/dashboard.html` in a browser. The dashboard reads from `eval/dashboard_data.json`, which is committed and survives deletion of per-run directories. After adding new runs, regenerate the summary with:
+
+```bash
+uv run python scripts/build_eval_dashboard.py
 ```
 
 ## Architecture Decision Records
@@ -498,4 +522,4 @@ Design decisions are documented in `docs/adr/`:
 - [ADR-002](docs/adr/002-privacy-first-design.md): Privacy-first design principles
 - [ADR-003](docs/adr/003-nli-classifier-roadmap.md): Zero-shot NLI classifier roadmap (superseded by ADR-004)
 - [ADR-004](docs/adr/004-local-llm-as-primary-local-path.md): Local LLM (Ollama gemma4) as the primary local classification path
-- [ADR-005](docs/adr/005-docling-evaluation.md): Docling evaluation — rejected as a structure-aware loader replacement
+- [ADR-005](docs/adr/005-docling-evaluation.md): Docling with full-page OCR as the default PDF loader

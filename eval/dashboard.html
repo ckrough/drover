@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drover Eval Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f8f9fa;
+      color: #212529;
+      line-height: 1.5;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px 16px; }
+    h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 4px; }
+    .subtitle { color: #6c757d; font-size: 0.9rem; margin-bottom: 20px; }
+    .info-bar {
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      font-size: 0.875rem;
+    }
+    .info-bar a { color: #0d6efd; text-decoration: none; }
+    .info-bar a:hover { text-decoration: underline; }
+    .controls {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+    .controls label { font-size: 0.875rem; font-weight: 500; }
+    .controls select {
+      padding: 6px 10px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      background: #fff;
+    }
+    .filter-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .pill input[type="checkbox"] { cursor: pointer; }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    .chart-card {
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 16px;
+    }
+    .chart-card h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #343a40;
+    }
+    .chart-wrap { position: relative; height: 220px; }
+    .table-section { margin-top: 8px; }
+    .table-section h2 { font-size: 1rem; font-weight: 600; margin-bottom: 10px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    thead { background: #f1f3f5; }
+    th, td {
+      padding: 7px 10px;
+      text-align: left;
+      border-bottom: 1px solid #dee2e6;
+    }
+    th { font-weight: 600; white-space: nowrap; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8f9fa; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 0.72rem;
+      font-weight: 500;
+    }
+    .badge-synthetic { background: #dbeafe; color: #1e40af; }
+    .badge-real { background: #fce7f3; color: #9d174d; }
+    .note { color: #6c757d; font-size: 0.75rem; max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+    .legend-hint { font-size: 0.78rem; color: #6c757d; margin-top: 8px; }
+    .series-note {
+      font-size: 0.78rem;
+      color: #6c757d;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      padding: 8px 12px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 600px) {
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Drover Classification Accuracy</h1>
+  <p class="subtitle">Historical progression by model, loader, and corpus. Data survives run-directory deletion.</p>
+
+  <div class="info-bar" id="info-bar"></div>
+
+  <div class="controls">
+    <div class="filter-group">
+      <label>Corpus:</label>
+      <label class="pill" style="background:#dbeafe; border-color:#93c5fd;">
+        <input type="checkbox" id="filter-synthetic" checked> Synthetic
+      </label>
+      <label class="pill" style="background:#fce7f3; border-color:#f9a8d4;">
+        <input type="checkbox" id="filter-real" checked> Real-world
+      </label>
+    </div>
+    <div class="filter-group">
+      <label>Metric:</label>
+      <select id="metric-select">
+        <option value="domain_accuracy">Domain</option>
+        <option value="category_accuracy">Category</option>
+        <option value="doctype_accuracy">Doctype</option>
+        <option value="vendor_accuracy">Vendor</option>
+        <option value="date_accuracy">Date</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>View:</label>
+      <select id="view-select">
+        <option value="single">Single metric (large)</option>
+        <option value="all5">All 5 metrics (grid)</option>
+      </select>
+    </div>
+  </div>
+
+  <p class="series-note">
+    Lines are grouped by <strong>model + loader + variant</strong>.
+    Solid line = synthetic corpus; dashed = real-world.
+    Points with <em>unknown</em> dates are plotted at the leftmost position as &ldquo;pre-2026-04-30&rdquo;.
+    Click legend items to hide/show individual series.
+  </p>
+
+  <div id="single-view">
+    <div class="chart-card">
+      <h2 id="single-chart-title">Domain Accuracy</h2>
+      <div class="chart-wrap">
+        <canvas id="chart-single"></canvas>
+      </div>
+      <p class="legend-hint">Hover a point to see all series values for that date.</p>
+    </div>
+  </div>
+
+  <div id="all5-view" style="display:none">
+    <div class="charts-grid">
+      <div class="chart-card"><h2>Domain Accuracy</h2><div class="chart-wrap"><canvas id="chart-domain"></canvas></div></div>
+      <div class="chart-card"><h2>Category Accuracy</h2><div class="chart-wrap"><canvas id="chart-category"></canvas></div></div>
+      <div class="chart-card"><h2>Doctype Accuracy</h2><div class="chart-wrap"><canvas id="chart-doctype"></canvas></div></div>
+      <div class="chart-card"><h2>Vendor Accuracy</h2><div class="chart-wrap"><canvas id="chart-vendor"></canvas></div></div>
+      <div class="chart-card"><h2>Date Accuracy</h2><div class="chart-wrap"><canvas id="chart-date"></canvas></div></div>
+    </div>
+  </div>
+
+  <div class="table-section">
+    <h2>All Runs</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Corpus</th>
+          <th>n</th>
+          <th>Model</th>
+          <th>Loader</th>
+          <th class="num">Domain</th>
+          <th class="num">Category</th>
+          <th class="num">Doctype</th>
+          <th class="num">Vendor</th>
+          <th class="num">Date</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody id="runs-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script id="data" type="application/json">
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-01T10:11:23-04:00",
+  "runs": [
+    {
+      "run_id": "legacy-gemma4_docling",
+      "date": "unknown",
+      "corpus": "synthetic",
+      "corpus_size": 80,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "docling",
+      "domain_accuracy": 0.875,
+      "category_accuracy": 0.3625,
+      "doctype_accuracy": 0.8375,
+      "vendor_accuracy": 0.775,
+      "date_accuracy": 0.9125,
+      "errors": 0,
+      "source": "eval/runs/gemma4_docling.json",
+      "notes": "Pre-ADR-005 baseline run, synthetic corpus, date not recorded in filename."
+    },
+    {
+      "run_id": "legacy-gemma4_unstructured",
+      "date": "unknown",
+      "corpus": "synthetic",
+      "corpus_size": 80,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "unstructured",
+      "domain_accuracy": 0.875,
+      "category_accuracy": 0.4,
+      "doctype_accuracy": 0.8625,
+      "vendor_accuracy": 0.7875,
+      "date_accuracy": 0.8875,
+      "errors": 0,
+      "source": "eval/runs/gemma4_unstructured.json",
+      "notes": "Pre-ADR-005 baseline run, synthetic corpus, date not recorded in filename. Matches baselines.md canonical numbers."
+    },
+    {
+      "run_id": "legacy-haiku_docling",
+      "date": "unknown",
+      "corpus": "synthetic",
+      "corpus_size": 80,
+      "model": "claude-haiku-4-5",
+      "provider": "anthropic",
+      "loader": "docling",
+      "domain_accuracy": 0.9375,
+      "category_accuracy": 0.5375,
+      "doctype_accuracy": 0.9,
+      "vendor_accuracy": 0.9375,
+      "date_accuracy": 0.9375,
+      "errors": 0,
+      "source": "eval/runs/haiku_docling.json",
+      "notes": "Haiku 4.5 anthropic hosted benchmark on synthetic corpus. Date not recorded in filename."
+    },
+    {
+      "run_id": "legacy-haiku_unstructured",
+      "date": "unknown",
+      "corpus": "synthetic",
+      "corpus_size": 80,
+      "model": "claude-haiku-4-5",
+      "provider": "anthropic",
+      "loader": "unstructured",
+      "domain_accuracy": 0.925,
+      "category_accuracy": 0.55,
+      "doctype_accuracy": 0.9,
+      "vendor_accuracy": 0.9625,
+      "date_accuracy": 0.9375,
+      "errors": 0,
+      "source": "eval/runs/haiku_unstructured.json",
+      "notes": "Haiku 4.5 anthropic hosted benchmark on synthetic corpus. Date not recorded in filename."
+    },
+    {
+      "run_id": "legacy-nli_docling",
+      "date": "unknown",
+      "corpus": "synthetic",
+      "corpus_size": 80,
+      "model": "cross-encoder/nli-deberta-v3-base",
+      "provider": "nli_local",
+      "loader": "docling",
+      "domain_accuracy": 0.05,
+      "category_accuracy": 0.0375,
+      "doctype_accuracy": 0.05,
+      "vendor_accuracy": 0.0375,
+      "date_accuracy": 0.8,
+      "errors": 0,
+      "source": "eval/runs/nli_docling.json",
+      "notes": "NLI zero-shot classifier baseline (now removed from codebase). Date not recorded in filename."
+    },
+    {
+      "run_id": "legacy-nli_unstructured",
+      "date": "unknown",
+      "corpus": "synthetic",
+      "corpus_size": 80,
+      "model": "cross-encoder/nli-deberta-v3-base",
+      "provider": "nli_local",
+      "loader": "unstructured",
+      "domain_accuracy": 0.025,
+      "category_accuracy": 0.025,
+      "doctype_accuracy": 0.0625,
+      "vendor_accuracy": 0.0125,
+      "date_accuracy": 0.775,
+      "errors": 0,
+      "source": "eval/runs/nli_unstructured.json",
+      "notes": "NLI zero-shot classifier baseline (now removed from codebase). Date not recorded in filename."
+    },
+    {
+      "run_id": "2026-04-30T165717-gemma4_docling",
+      "date": "2026-04-30",
+      "corpus": "synthetic",
+      "corpus_size": 80,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "docling",
+      "domain_accuracy": 0.8625,
+      "category_accuracy": 0.375,
+      "doctype_accuracy": 0.8375,
+      "vendor_accuracy": 0.7,
+      "date_accuracy": 0.8125,
+      "errors": 0,
+      "source": "eval/runs/2026-04-30T165717/gemma4_docling.json",
+      "notes": "ADR-005 eval run: Docling full-page OCR on synthetic corpus. Wallclock ~35 min."
+    },
+    {
+      "run_id": "2026-04-30T165717-gemma4_unstructured",
+      "date": "2026-04-30",
+      "corpus": "synthetic",
+      "corpus_size": 80,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "unstructured",
+      "domain_accuracy": 0.875,
+      "category_accuracy": 0.4,
+      "doctype_accuracy": 0.8625,
+      "vendor_accuracy": 0.7875,
+      "date_accuracy": 0.8875,
+      "errors": 0,
+      "source": "eval/runs/2026-04-30T165717/gemma4_unstructured.json",
+      "notes": "ADR-005 eval run: unstructured loader on synthetic corpus."
+    },
+    {
+      "run_id": "real-world-2026-04-30T184932-gemma4_docling",
+      "date": "2026-04-30",
+      "corpus": "real-world",
+      "corpus_size": 11,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "docling",
+      "domain_accuracy": 0.5454545454545454,
+      "category_accuracy": 0.45454545454545453,
+      "doctype_accuracy": 0.7272727272727273,
+      "vendor_accuracy": 0.18181818181818182,
+      "date_accuracy": 0.36363636363636365,
+      "errors": 0,
+      "source": "eval/runs/real-world-2026-04-30T184932/gemma4_docling.json",
+      "notes": "First real-world run, full-page OCR. n=11 of 14 (3 LLM_PARSE_ERROR on long docs). Path-joint accuracy: 0.455 vs 0.182 for unstructured."
+    },
+    {
+      "run_id": "real-world-2026-04-30T184932-gemma4_unstructured",
+      "date": "2026-04-30",
+      "corpus": "real-world",
+      "corpus_size": 13,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "unstructured",
+      "domain_accuracy": 0.6923076923076923,
+      "category_accuracy": 0.23076923076923078,
+      "doctype_accuracy": 0.5384615384615384,
+      "vendor_accuracy": 0.3076923076923077,
+      "date_accuracy": 0.6153846153846154,
+      "errors": 0,
+      "source": "eval/runs/real-world-2026-04-30T184932/gemma4_unstructured.json",
+      "notes": "First real-world run, unstructured loader. n=13 of 14 (1 failure). Path-joint accuracy: 0.182."
+    },
+    {
+      "run_id": "real-world-2026-04-30T191002-picture-ocr-gemma4_docling",
+      "date": "2026-04-30",
+      "corpus": "real-world",
+      "corpus_size": 11,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "docling",
+      "loader_variant": "picture-region-ocr",
+      "domain_accuracy": 0.5454545454545454,
+      "category_accuracy": 0.36363636363636365,
+      "doctype_accuracy": 0.6363636363636364,
+      "vendor_accuracy": 0.2727272727272727,
+      "date_accuracy": 0.45454545454545453,
+      "errors": 0,
+      "source": "eval/runs/real-world-2026-04-30T191002-picture-ocr/gemma4_docling.json",
+      "notes": "Picture-region-only OCR (force_full_page_ocr=False). ~50% faster. Vendor/date improve vs full-page; category/doctype regress. n=11 aligned."
+    },
+    {
+      "run_id": "real-world-2026-04-30T191002-picture-ocr-gemma4_unstructured",
+      "date": "2026-04-30",
+      "corpus": "real-world",
+      "corpus_size": 13,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "unstructured",
+      "loader_variant": "picture-region-ocr",
+      "domain_accuracy": 0.6923076923076923,
+      "category_accuracy": 0.23076923076923078,
+      "doctype_accuracy": 0.5384615384615384,
+      "vendor_accuracy": 0.3076923076923077,
+      "date_accuracy": 0.6153846153846154,
+      "errors": 0,
+      "source": "eval/runs/real-world-2026-04-30T191002-picture-ocr/gemma4_unstructured.json",
+      "notes": "Companion unstructured run for picture-region-OCR comparison. n=13 of 14."
+    },
+    {
+      "run_id": "post-audit-2026-05-01T095432-gemma4_docling",
+      "date": "2026-05-01",
+      "corpus": "real-world",
+      "corpus_size": 14,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "docling",
+      "loader_variant": "full-page-ocr",
+      "domain_accuracy": 0.7142857142857143,
+      "category_accuracy": 0.2857142857142857,
+      "doctype_accuracy": 0.6428571428571429,
+      "vendor_accuracy": 0.21428571428571427,
+      "date_accuracy": 0.42857142857142855,
+      "errors": 0,
+      "source": "eval/runs/post-audit-2026-05-01T095432/gemma4_docling.json",
+      "notes": "Post-audit run after phase 3 refactor. n=14 full corpus, 0 errors (long-doc fix verified). Full-page OCR. This is the current production baseline."
+    },
+    {
+      "run_id": "real-world-2026-05-01T070630-structured-gemma4_docling",
+      "date": "2026-05-01",
+      "corpus": "real-world",
+      "corpus_size": 11,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "docling",
+      "loader_variant": "structured-regions",
+      "domain_accuracy": 0.6363636363636364,
+      "category_accuracy": 0.2727272727272727,
+      "doctype_accuracy": 0.6363636363636364,
+      "vendor_accuracy": 0.18181818181818182,
+      "date_accuracy": 0.36363636363636365,
+      "errors": 0,
+      "source": "eval/runs/real-world-2026-05-01T070630-structured/gemma4_docling.json",
+      "notes": "Structured-regions ([TAG] prefix) input experiment. Worse than markdown on category/vendor/date. Production reverted to markdown export."
+    }
+  ]
+}
+</script>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------------------------------------------------------------------------
+  // Load embedded data (no fetch needed, works under file://)
+  // ---------------------------------------------------------------------------
+  const raw = JSON.parse(document.getElementById("data").textContent);
+  const allRuns = raw.runs;
+
+  // ---------------------------------------------------------------------------
+  // Constants
+  // ---------------------------------------------------------------------------
+  const METRICS = [
+    { key: "domain_accuracy",   label: "Domain",   chartId: "chart-domain"   },
+    { key: "category_accuracy", label: "Category", chartId: "chart-category" },
+    { key: "doctype_accuracy",  label: "Doctype",  chartId: "chart-doctype"  },
+    { key: "vendor_accuracy",   label: "Vendor",   chartId: "chart-vendor"   },
+    { key: "date_accuracy",     label: "Date",     chartId: "chart-date"     },
+  ];
+
+  const PALETTE = [
+    "#2563eb", "#dc2626", "#16a34a", "#9333ea",
+    "#ea580c", "#0891b2", "#d97706", "#be185d",
+    "#059669", "#7c3aed",
+  ];
+
+  // ---------------------------------------------------------------------------
+  // Build info bar using safe DOM methods
+  // ---------------------------------------------------------------------------
+  (function buildInfoBar() {
+    const bar = document.getElementById("info-bar");
+
+    const strong = document.createElement("strong");
+    strong.textContent = "Current production baseline";
+    bar.appendChild(strong);
+
+    bar.appendChild(document.createTextNode(
+      " (2026-05-01, post-audit, real-world, n=14): " +
+      "gemma4:latest + Docling full-page OCR — " +
+      "domain 71.4%, category 28.6%, doctype 64.3%, vendor 21.4%, date 42.9%. " +
+      "Path-joint accuracy (domain ∩ category ∩ doctype): ~28.6%. " +
+      "Canonical write-up: "
+    ));
+
+    const a1 = document.createElement("a");
+    a1.href = "baselines.md";
+    a1.textContent = "baselines.md";
+    bar.appendChild(a1);
+
+    bar.appendChild(document.createTextNode(" · Architecture: "));
+
+    const a2 = document.createElement("a");
+    a2.href = "../docs/adr/005-docling-evaluation.md";
+    a2.textContent = "ADR-005";
+    bar.appendChild(a2);
+  })();
+
+  // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
+  function seriesKey(run) {
+    const variant = run.loader_variant ? " (" + run.loader_variant + ")" : "";
+    const model = run.model.length > 22 ? run.model.slice(0, 20) + "…" : run.model;
+    return model + " + " + run.loader + variant;
+  }
+
+  const colorCache = {};
+  let colorIdx = 0;
+  function seriesColor(key) {
+    if (!(key in colorCache)) {
+      colorCache[key] = PALETTE[colorIdx % PALETTE.length];
+      colorIdx++;
+    }
+    return colorCache[key];
+  }
+
+  function pct(v) {
+    return v != null ? Math.round(v * 1000) / 10 : null;
+  }
+
+  function fmtPct(v) {
+    const p = pct(v);
+    return p != null ? p + "%" : "";
+  }
+
+  function runXLabel(run) {
+    return run.date === "unknown" ? "pre-2026-04-30" : run.date;
+  }
+
+  function buildLabels(runs) {
+    const seen = new Set();
+    const labels = [];
+    for (const r of runs) {
+      const d = runXLabel(r);
+      if (!seen.has(d)) { seen.add(d); labels.push(d); }
+    }
+    labels.sort();
+    return labels;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Filter state
+  // ---------------------------------------------------------------------------
+  let showSynthetic = true;
+  let showReal = true;
+
+  function filteredRuns() {
+    return allRuns.filter(r => {
+      if (r.corpus === "synthetic" && !showSynthetic) return false;
+      if (r.corpus === "real-world" && !showReal) return false;
+      return true;
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Chart construction
+  // ---------------------------------------------------------------------------
+  const chartInstances = {};
+
+  function buildChartConfig(metricKey, runs) {
+    const labels = buildLabels(runs);
+
+    const seriesMap = {};
+    for (const r of runs) {
+      const k = seriesKey(r);
+      if (!seriesMap[k]) seriesMap[k] = { key: k, points: {}, hasReal: false, hasSynthetic: false };
+      const x = runXLabel(r);
+      seriesMap[k].points[x] = r;
+      if (r.corpus === "real-world") seriesMap[k].hasReal = true;
+      else seriesMap[k].hasSynthetic = true;
+    }
+
+    const datasets = Object.values(seriesMap).map(s => {
+      const color = seriesColor(s.key);
+      const borderDash = (s.hasReal && s.hasSynthetic) ? [4, 4] : s.hasReal ? [6, 3] : [];
+
+      const data = labels.map(lbl => {
+        const r = s.points[lbl];
+        return r != null ? pct(r[metricKey]) : null;
+      });
+
+      return {
+        label: s.key,
+        data,
+        borderColor: color,
+        backgroundColor: color + "22",
+        borderDash,
+        borderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        spanGaps: false,
+        tension: 0.1,
+      };
+    });
+
+    return {
+      type: "line",
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { font: { size: 10 }, boxWidth: 12, padding: 8 },
+          },
+          tooltip: {
+            callbacks: {
+              label(ctx) {
+                const v = ctx.raw;
+                return v != null
+                  ? ctx.dataset.label + ": " + v + "%"
+                  : ctx.dataset.label + ": no data";
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            ticks: { font: { size: 10 }, maxRotation: 30 },
+            grid: { color: "#e9ecef" },
+          },
+          y: {
+            min: 0,
+            max: 100,
+            ticks: { font: { size: 10 }, callback: v => v + "%" },
+            grid: { color: "#e9ecef" },
+          },
+        },
+      },
+    };
+  }
+
+  function makeChart(canvasId, metricKey) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    if (chartInstances[canvasId]) {
+      chartInstances[canvasId].destroy();
+      delete chartInstances[canvasId];
+    }
+    const cfg = buildChartConfig(metricKey, filteredRuns());
+    chartInstances[canvasId] = new Chart(canvas, cfg);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Table (safe DOM construction, no innerHTML)
+  // ---------------------------------------------------------------------------
+  function renderTable() {
+    const tbody = document.getElementById("runs-tbody");
+    while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+
+    for (const r of filteredRuns()) {
+      const tr = document.createElement("tr");
+
+      function td(text, cls) {
+        const el = document.createElement("td");
+        if (cls) el.className = cls;
+        el.textContent = text;
+        return el;
+      }
+
+      tr.appendChild(td(r.date));
+
+      // Corpus badge
+      const tdCorpus = document.createElement("td");
+      const badge = document.createElement("span");
+      badge.className = r.corpus === "synthetic" ? "badge badge-synthetic" : "badge badge-real";
+      badge.textContent = r.corpus === "synthetic" ? "synthetic" : "real-world";
+      tdCorpus.appendChild(badge);
+      tr.appendChild(tdCorpus);
+
+      tr.appendChild(td(r.corpus_size != null ? String(r.corpus_size) : "", "num"));
+      tr.appendChild(td(r.model));
+
+      const loaderLabel = r.loader_variant
+        ? r.loader + " (" + r.loader_variant + ")"
+        : r.loader;
+      tr.appendChild(td(loaderLabel));
+
+      tr.appendChild(td(fmtPct(r.domain_accuracy), "num"));
+      tr.appendChild(td(fmtPct(r.category_accuracy), "num"));
+      tr.appendChild(td(fmtPct(r.doctype_accuracy), "num"));
+      tr.appendChild(td(fmtPct(r.vendor_accuracy), "num"));
+      tr.appendChild(td(fmtPct(r.date_accuracy), "num"));
+
+      // Notes cell with title tooltip for truncated text
+      const tdNotes = document.createElement("td");
+      const noteSpan = document.createElement("span");
+      noteSpan.className = "note";
+      noteSpan.textContent = r.notes || "";
+      noteSpan.title = r.notes || "";
+      tdNotes.appendChild(noteSpan);
+      tr.appendChild(tdNotes);
+
+      tbody.appendChild(tr);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // View management
+  // ---------------------------------------------------------------------------
+  let currentView = "single";
+  let currentMetric = "domain_accuracy";
+
+  function renderSingleView() {
+    const metric = METRICS.find(m => m.key === currentMetric);
+    const title = document.getElementById("single-chart-title");
+    title.textContent = (metric ? metric.label : "Domain") + " Accuracy";
+    makeChart("chart-single", currentMetric);
+  }
+
+  function renderAll5View() {
+    for (const m of METRICS) {
+      makeChart(m.chartId, m.key);
+    }
+  }
+
+  function render() {
+    renderTable();
+    if (currentView === "single") {
+      document.getElementById("single-view").style.display = "";
+      document.getElementById("all5-view").style.display = "none";
+      renderSingleView();
+    } else {
+      document.getElementById("single-view").style.display = "none";
+      document.getElementById("all5-view").style.display = "";
+      renderAll5View();
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Event wiring
+  // ---------------------------------------------------------------------------
+  document.getElementById("filter-synthetic").addEventListener("change", function (e) {
+    showSynthetic = e.target.checked;
+    render();
+  });
+  document.getElementById("filter-real").addEventListener("change", function (e) {
+    showReal = e.target.checked;
+    render();
+  });
+  document.getElementById("metric-select").addEventListener("change", function (e) {
+    currentMetric = e.target.value;
+    if (currentView === "single") renderSingleView();
+  });
+  document.getElementById("view-select").addEventListener("change", function (e) {
+    currentView = e.target.value;
+    render();
+  });
+
+  // Initial render
+  render();
+})();
+</script>
+</body>
+</html>

@@ -10,7 +10,7 @@
 #   - date: YYYYMMDD, or "00000000" if no date is available
 #
 # Usage (filenames below resolve under --documents-dir):
-#   drover evaluate --ground-truth eval/ground_truth.jsonl --documents-dir eval/samples
+#   drover evaluate --ground-truth eval/ground_truth/synthetic.jsonl --documents-dir eval/samples/synthetic
 {"filename": "medical_bill.pdf", "domain": "medical", "category": "expense", "doctype": "invoice", "vendor": "Northern Virginia Medical Center", "date": "20241101", "subject": "medical services", "notes": "Itemized medical services bill"}
 {"filename": "receipt.pdf", "domain": "pets", "category": "expense", "doctype": "receipt", "vendor": "PetSmart", "date": "20241208", "subject": "pet supplies", "notes": "Retail receipt for pet supplies"}
 {"filename": "user_manual.pdf", "domain": "household", "category": "documentation", "doctype": "manual", "vendor": "smarthub", "date": "20240901", "subject": "smarthub 3000", "notes": "Device manual for SmartHub 3000"}

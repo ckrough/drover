@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 import yaml
 from json_repair import repair_json
 from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_core.runnables import Runnable
 from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
@@ -101,6 +101,11 @@ class TemplateError(ClassificationError):
 # Required placeholders that must be present in prompt templates
 REQUIRED_PLACEHOLDERS = {"{taxonomy_menu}", "{document_content}"}
 
+# Section markers used to split a single template file into system and human
+# prompts. Both must appear as level-1 Markdown headings.
+SYSTEM_SECTION_HEADING = "# System Prompt"
+HUMAN_SECTION_HEADING = "# Human Prompt"
+
 
 class PromptTemplate:
     """Loads and renders prompt templates from Markdown files."""
@@ -142,8 +147,13 @@ class PromptTemplate:
             if self._resource_path is not None:
                 raw = self._resource_path.read_text(encoding="utf-8")
             else:
-                # self.template_path is guaranteed non-None here
-                raw = self.template_path.read_text(encoding="utf-8")  # type: ignore[union-attr]
+                # self.template_path is guaranteed non-None here because
+                # _load() is only reachable when _resource_path is set or
+                # template_path was provided in __init__.
+                template_path = self.template_path
+                if template_path is None:
+                    raise TemplateError("No template path configured")
+                raw = template_path.read_text(encoding="utf-8")
         except FileNotFoundError as e:
             raise TemplateError(f"Template file not found: {source_desc}") from e
         except PermissionError as e:
@@ -198,6 +208,40 @@ class PromptTemplate:
             content = content.replace(f"{{{key}}}", str(value))
         return content
 
+    def render_messages(self, **kwargs: Any) -> tuple[str, str]:
+        """Render template into separate system and human prompts.
+
+        If the template contains both ``# System Prompt`` and ``# Human Prompt``
+        H1 sections, the content is split on those headings. Otherwise the
+        entire rendered template is returned as the human prompt with an empty
+        system prompt (backward compatible with single-section templates).
+
+        Args:
+            **kwargs: Variables to substitute in the template.
+
+        Returns:
+            Tuple of (system_prompt, human_prompt). Either may be empty.
+        """
+        content = self.content
+
+        if SYSTEM_SECTION_HEADING in content and HUMAN_SECTION_HEADING in content:
+            # Split on the human heading; everything before is system,
+            # everything after (excluding the heading line) is human.
+            sys_part, human_part = content.split(HUMAN_SECTION_HEADING, 1)
+            sys_part = sys_part.replace(SYSTEM_SECTION_HEADING, "", 1)
+            system_text = sys_part.strip()
+            human_text = human_part.strip()
+        else:
+            system_text = ""
+            human_text = content
+
+        for key, value in kwargs.items():
+            placeholder = f"{{{key}}}"
+            system_text = system_text.replace(placeholder, str(value))
+            human_text = human_text.replace(placeholder, str(value))
+
+        return system_text, human_text
+
     def _validate_placeholders(self) -> None:
         """Validate that required placeholders are present.
 
@@ -232,6 +276,7 @@ class DocumentClassifier:
         max_retries: int = 3,
         retry_min_wait: float = 2.0,
         retry_max_wait: float = 10.0,
+        max_prompt_chars: int = 20_000,
     ) -> None:
         """Initialize classifier.
 
@@ -247,6 +292,10 @@ class DocumentClassifier:
             max_retries: Maximum retry attempts for transient failures.
             retry_min_wait: Minimum wait between retries in seconds.
             retry_max_wait: Maximum wait between retries in seconds.
+            max_prompt_chars: Maximum characters of document content to include
+                in the prompt. Content exceeding this limit is trimmed using a
+                head+tail pattern to preserve both letterhead and signature/total
+                blocks. Applies only to non-streaming classification.
         """
         self.provider = provider
         self.model = model
@@ -259,8 +308,26 @@ class DocumentClassifier:
         self.max_retries = max_retries
         self.retry_min_wait = retry_min_wait
         self.retry_max_wait = retry_max_wait
+        self.max_prompt_chars = max_prompt_chars
         self._llm: BaseChatModel | None = None
         self._structured_llm: Runnable[Any, Any] | None = None
+
+    def _get_ollama_num_predict(self) -> int | None:
+        """Compute Ollama-specific num_predict budget.
+
+        Ollama's structured output (json_mode) plus the classification
+        prompt can exceed the default 1000-token budget when models like
+        gemma generate any preamble before the JSON object. We raise the
+        floor for Ollama so the model can finish the structured response,
+        while still honoring an explicit user-supplied larger value via
+        ``max_tokens``.
+
+        Non-Ollama providers continue to use ``self.max_tokens`` directly.
+        """
+        ollama_floor = 3072
+        if self.max_tokens is None:
+            return ollama_floor
+        return max(self.max_tokens, ollama_floor)
 
     def _get_llm(self) -> BaseChatModel:
         """Get or create base LLM instance.
@@ -277,7 +344,7 @@ class DocumentClassifier:
                 self._llm = ChatOllama(
                     model=self.model,
                     temperature=self.temperature,
-                    num_predict=self.max_tokens,
+                    num_predict=self._get_ollama_num_predict(),
                     timeout=self.timeout,  # type: ignore[call-arg]
                 )
             case AIProvider.OPENAI:
@@ -362,9 +429,16 @@ class DocumentClassifier:
                     include_raw=True,
                 )
             case AIProvider.OLLAMA:
-                # Ollama uses JSON mode with schema
+                # Use json_mode (sets format="json") rather than json_schema's
+                # constrained decoding. With non-tool-trained models like gemma,
+                # constrained decoding can interact badly with long prompts and
+                # cause the model to fall back to its tool-call template,
+                # producing empty or malformed parsed output. json_mode is
+                # looser; the existing _parse_response fallback handles any
+                # malformed JSON the model emits.
                 self._structured_llm = llm.with_structured_output(
                     RawClassification,
+                    method="json_mode",
                     include_raw=True,
                 )
             case _:
@@ -387,7 +461,7 @@ class DocumentClassifier:
 
     async def _invoke_structured_with_retry(
         self,
-        message: HumanMessage,
+        messages: BaseMessage | list[BaseMessage],
         config: dict[str, Any] | None,
     ) -> dict[str, Any]:
         """Invoke structured LLM with retry logic for transient failures.
@@ -395,7 +469,7 @@ class DocumentClassifier:
         Uses LangChain's with_structured_output() for reliable parsing.
 
         Args:
-            message: The message to send to the LLM.
+            messages: A single message or list of messages to send to the LLM.
             config: Optional invoke config (e.g., callbacks).
 
         Returns:
@@ -406,16 +480,17 @@ class DocumentClassifier:
             Original exception after max retries exhausted.
         """
         structured_llm = self._get_structured_llm()
+        message_list = messages if isinstance(messages, list) else [messages]
 
         @self._make_retry_decorator()
         async def _invoke() -> dict[str, Any]:
             if config is not None:
                 result = await structured_llm.ainvoke(
-                    [message],
+                    message_list,
                     config=config,  # type: ignore[arg-type]
                 )
             else:
-                result = await structured_llm.ainvoke([message])
+                result = await structured_llm.ainvoke(message_list)
             # Result is a dict-like object from LangChain structured output
             return cast("dict[str, Any]", result)
 
@@ -423,7 +498,7 @@ class DocumentClassifier:
 
     async def _invoke_with_retry(
         self,
-        message: HumanMessage,
+        messages: BaseMessage | list[BaseMessage],
         config: dict[str, Any] | None,
     ) -> str:
         """Invoke base LLM with retry logic for transient failures.
@@ -432,7 +507,7 @@ class DocumentClassifier:
         Prefer _invoke_structured_with_retry() for classification.
 
         Args:
-            message: The message to send to the LLM.
+            messages: A single message or list of messages to send to the LLM.
             config: Optional invoke config (e.g., callbacks).
 
         Returns:
@@ -442,16 +517,17 @@ class DocumentClassifier:
             Original exception after max retries exhausted.
         """
         llm = self._get_llm()
+        message_list = messages if isinstance(messages, list) else [messages]
 
         @self._make_retry_decorator()
         async def _invoke() -> str:
             if config is not None:
                 response = await llm.ainvoke(
-                    [message],
+                    message_list,
                     config=config,  # type: ignore[arg-type]
                 )
             else:
-                response = await llm.ainvoke([message])
+                response = await llm.ainvoke(message_list)
             return str(response.content)
 
         return cast("str", await _invoke())
@@ -479,30 +555,40 @@ class DocumentClassifier:
             LLMParseError: If LLM output cannot be parsed.
             TaxonomyValidationError: If strict mode validation fails.
         """
+        prompt_content = self._truncate_content(content)
+
         logger.info(
             "classification_started",
             provider=self.provider.value,
             model=self.model,
-            content_length=len(content),
+            content_length=len(prompt_content),
+            input_format="flat",
         )
 
         taxonomy_menu = self.taxonomy.to_prompt_menu()
-        prompt = self.template.render(
+        system_text, human_text = self.template.render_messages(
             taxonomy_menu=taxonomy_menu,
-            document_content=content,
+            document_content=prompt_content,
         )
 
         debug_info: dict[str, Any] | None = None
         if capture_debug or collect_metrics:
             debug_info = {}
             if capture_debug:
-                debug_info["prompt"] = prompt
+                # Preserve the combined prompt for debug parity with prior
+                # behavior; downstream tooling reads a single prompt string.
+                debug_info["prompt"] = (
+                    f"{system_text}\n\n{human_text}" if system_text else human_text
+                )
 
         metrics_callback = None
         if collect_metrics:
             metrics_callback = create_metrics_callback(self.provider.value, self.model)
 
-        message = HumanMessage(content=prompt)
+        messages: list[BaseMessage] = []
+        if system_text:
+            messages.append(SystemMessage(content=system_text))
+        messages.append(HumanMessage(content=human_text))
 
         # In LangChain 0.3+ callbacks should be passed via the runnable config
         invoke_config: dict[str, Any] | None = None
@@ -510,7 +596,7 @@ class DocumentClassifier:
             invoke_config = {"callbacks": [metrics_callback]}
 
         # Try structured output first (modern LangChain pattern)
-        result = await self._invoke_structured_with_retry(message, invoke_config)
+        result = await self._invoke_structured_with_retry(messages, invoke_config)
 
         # Extract raw response for debugging
         raw_message = result.get("raw")
@@ -575,56 +661,84 @@ class DocumentClassifier:
         content: str,
         on_token: Callable[[str], None] | None = None,
     ) -> RawClassification:
-        """Classify document content with streaming output.
+        """Classify document content with streaming output for display.
 
-        Streams tokens as they arrive from the LLM, providing real-time
-        feedback for interactive use. Falls back to manual parsing since
-        structured output doesn't support streaming.
+        Streams tokens for live UX (callback receives each token) and then
+        produces the authoritative classification via the same
+        structured-output finalizer used by ``classify``. The streamed text
+        is treated as ephemeral display only; the schema-enforced finalizer
+        is the source of truth.
+
+        Choice rationale: option (b) — always finalize via structured output,
+        regardless of stream parse quality. This guarantees parity with
+        ``classify`` (same prompt, same truncation, same taxonomy menu,
+        same schema enforcement) at the cost of one extra round-trip. For
+        interactive streaming use that tradeoff is acceptable.
 
         Args:
             content: Extracted document text content.
             on_token: Optional callback invoked for each token received.
-                     Useful for real-time display in CLI or UI.
+                Useful for real-time display in CLI or UI.
 
         Returns:
             Normalized RawClassification result.
 
         Raises:
-            LLMParseError: If LLM output cannot be parsed.
+            LLMParseError: If the structured finalizer fails and the streamed
+                text also cannot be parsed as a fallback.
             TaxonomyValidationError: If strict mode validation fails.
         """
+        prompt_content = self._truncate_content(content)
+
         logger.info(
             "classification_streaming_started",
             provider=self.provider.value,
             model=self.model,
-            content_length=len(content),
+            content_length=len(prompt_content),
+            input_format="flat",
         )
 
         taxonomy_menu = self.taxonomy.to_prompt_menu()
-        prompt = self.template.render(
+        system_text, human_text = self.template.render_messages(
             taxonomy_menu=taxonomy_menu,
-            document_content=content,
+            document_content=prompt_content,
         )
 
-        message = HumanMessage(content=prompt)
+        messages: list[BaseMessage] = []
+        if system_text:
+            messages.append(SystemMessage(content=system_text))
+        messages.append(HumanMessage(content=human_text))
+
+        # Stream tokens for UX. Output is ephemeral — we do not rely on it
+        # for the final classification.
         llm = self._get_llm()
-
-        # Collect streamed tokens
-        chunks: list[str] = []
-
-        async for chunk in llm.astream([message]):
-            token = str(chunk.content)
-            chunks.append(token)
+        async for chunk in llm.astream(messages):
             if on_token is not None:
-                on_token(token)
+                on_token(str(chunk.content))
 
-        full_response = "".join(chunks)
+        # Authoritative call: schema-enforced structured output.
+        result = await self._invoke_structured_with_retry(messages, None)
+        raw_message = result.get("raw")
+        raw_response = str(raw_message.content) if raw_message else None
+        parsed = result.get("parsed")
+        parsing_error = result.get("parsing_error")
 
-        # Parse the accumulated response
-        classification_dict = self._parse_response(full_response)
-        classification = RawClassification.model_validate(classification_dict)
+        if parsed is not None and parsing_error is None:
+            classification: RawClassification = parsed
+        else:
+            logger.warning(
+                "structured_output_fallback",
+                provider=self.provider.value,
+                model=self.model,
+                error=str(parsing_error) if parsing_error else "No parsed result",
+            )
+            if raw_response is None:
+                raise LLMParseError(
+                    "Structured output failed and no raw response available"
+                )
+            classification_dict = self._parse_response(raw_response)
+            classification = RawClassification.model_validate(classification_dict)
 
-        # Normalize through taxonomy
         normalized = self._normalize_classification(classification)
 
         logger.info(
@@ -637,6 +751,29 @@ class DocumentClassifier:
         )
 
         return normalized
+
+    def _truncate_content(self, content: str) -> str:
+        """Truncate document content to stay within the prompt character cap.
+
+        Preserves signal at both ends of the document: letterhead (vendor, date)
+        typically appears at the top; totals and signatures appear at the bottom.
+        Uses a head+tail split so both ends are present even when the middle is
+        dropped.
+
+        Args:
+            content: Raw document content string.
+
+        Returns:
+            Content truncated to at most `max_prompt_chars` characters.
+        """
+        if len(content) <= self.max_prompt_chars:
+            return content
+
+        head_chars = (self.max_prompt_chars * 14) // 20
+        tail_chars = self.max_prompt_chars - head_chars
+        head = content[:head_chars]
+        tail = content[-tail_chars:]
+        return head + "\n\n[... truncated ...]\n\n" + tail
 
     def _parse_response(self, response: str) -> dict[str, Any]:
         """Parse LLM response as JSON with field validation.
