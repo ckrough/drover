@@ -33,7 +33,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
 
     CANONICAL_CATEGORIES: ClassVar[dict[str, set[str]]] = {
         "financial": {
-            "agreement",
             "banking",
             "credit",
             "investment",
@@ -44,7 +43,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "tax",
         },
         "property": {
-            "agreement",
             "expense",
             "hoa",
             "improvement",
@@ -64,7 +62,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "payment",
             "prescription",
             "primary_care",
-            "record",
             "reference",
             "specialist",
             "vision",
@@ -74,11 +71,9 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "correspondence",
             "court",
             "estate",
-            "identification",
             "reference",
         },
         "education": {
-            "agreement",
             "certification",
             "correspondence",
             "expense",
@@ -125,7 +120,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "water",
         },
         "career": {
-            "agreement",
             "application",
             "benefit",
             "client",
@@ -140,7 +134,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "meeting",
             "presentation",
             "reference",
-            "resume",
             "review",
             "training",
         },
@@ -150,7 +143,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "reference",
         },
         "household": {
-            "agreement",
             "documentation",
             "expense",
             "goods",
@@ -158,7 +150,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "insurance",
             "loans",
             "maintenance",
-            "plan",
             "purchase",
             "reference",
             "registration",
@@ -174,7 +165,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "volunteering",
         },
         "pets": {
-            "agreement",
             "expense",
             "medical",
             "reference",
@@ -182,11 +172,9 @@ class HouseholdTaxonomy(BaseTaxonomy):
         },
         "reference": {
             "documentation",
-            "manual",
             "topic",
         },
         "housing": {
-            "agreement",
             "payment",
             "property",
             "reference",
@@ -284,9 +272,17 @@ class HouseholdTaxonomy(BaseTaxonomy):
     }
 
     CATEGORY_ALIASES: ClassVar[dict[tuple[str, str], str]] = {
-        ("career", "resumes"): "resume",
         ("career", "interviewing"): "job_search",
         ("career", "docs"): "documentation",
+        # Hierarchy rule: artifact-form terms (resume, manual, agreement, ...)
+        # are doctype-only. These aliases redirect LLM-emitted forms to the
+        # appropriate subject category in each domain. Domains without an
+        # entry below deliberately surface the term as drift (canonical: null)
+        # for ground-truth refinement.
+        ("career", "resume"): "job_search",
+        ("reference", "manual"): "documentation",
+        ("property", "agreement"): "mortgage",
+        ("housing", "agreement"): "rental",
         ("personal", "goals"): "identity",
         ("financial", "bank"): "banking",
         ("financial", "checking"): "banking",
@@ -328,12 +324,7 @@ class HouseholdTaxonomy(BaseTaxonomy):
         ("property", "receipts"): "expense",
         ("property", "purchases"): "expense",
         ("property", "spending"): "expense",
-        ("property", "contracts"): "agreement",
         # medical domain
-        ("medical", "health_records"): "record",
-        ("medical", "medical_records"): "record",
-        ("medical", "medical_record"): "record",
-        ("medical", "patient_records"): "record",
         ("medical", "bills"): "expense",
         ("medical", "claims"): "claim",
         ("medical", "rx"): "prescription",
@@ -344,7 +335,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
         ("medical", "exam"): "primary_care",
         ("medical", "visit"): "primary_care",
         ("medical", "behavior_modification"): "mental_health",
-        ("medical", "clinical_trial"): "record",
         # insurance domain
         ("insurance", "car"): "auto",
         ("insurance", "vehicle"): "auto",
@@ -370,19 +360,16 @@ class HouseholdTaxonomy(BaseTaxonomy):
         ("pets", "receipts"): "expense",
         ("pets", "purchases"): "expense",
         ("pets", "spending"): "expense",
-        ("pets", "contracts"): "agreement",
         # household domain
         ("household", "receipts"): "expense",
         ("household", "purchases"): "expense",
         ("household", "spending"): "expense",
-        ("household", "contracts"): "agreement",
         ("household", "vehicle_registration_renewal"): "registration",
         ("household", "vehicle_related_policies"): "insurance",
         # career domain
         ("career", "receipts"): "expense",
         ("career", "purchases"): "expense",
         ("career", "spending"): "expense",
-        ("career", "contracts"): "agreement",
         ("career", "billing"): "compensation",
         # financial domain - additional aliases
         ("financial", "billing"): "payment",
@@ -402,7 +389,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
         ("education", "purchases"): "expense",
         ("education", "spending"): "expense",
         ("education", "tuition"): "expense",
-        ("education", "contracts"): "agreement",
         # singular `purchase` (LLM emits singular alongside plural)
         ("food", "purchase"): "expense",
         ("property", "purchase"): "expense",

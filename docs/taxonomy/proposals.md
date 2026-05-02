@@ -92,9 +92,13 @@ Single occurrence but the concept is real (rate-change letters from utility comp
 
 These are inexpensive aliases that match clear LLM word-choice variations.
 
-## Item 2 — Hierarchy consistency (FLAG, defer)
+## Item 2 — Hierarchy consistency (partially applied 2026-05-02)
 
-Several terms appear at both `category` and `doctype` layers. The harvest shows the LLM is happy to put the same word in both slots:
+**Status:** Moderate-scope refactor applied. See "Item 2 — applied" below for the change set. The remaining straddlers (`reference` plus five newly discovered ones) are documented under "Deferred straddlers".
+
+### Original drift evidence
+
+Several terms appeared at both `category` and `doctype` layers. The harvest showed the LLM was happy to put the same word in both slots:
 
 | Tuple                                       | Count |
 |---------------------------------------------|-------|
@@ -106,10 +110,39 @@ Several terms appear at both `category` and `doctype` layers. The harvest shows 
 | `(financial, reference, reference)`         | 3     |
 | `(pets, reference, reference)`              | 2     |
 
-This is the hierarchy-consistency issue from the plan. A clean rule (categories = subject, doctypes = artifact form) would push `agreement`, `manual`, `resume`, `reference` to doctype-only. **Deferred** because:
-1. The data is low-signal (mostly 1-2 instances per redundant tuple).
-2. A correct refactor needs to coordinate with `classification.md` prompt edits to teach the LLM the new rule.
-3. The user wants to refine with ground-truth documents first.
+A clean rule (categories = subject, doctypes = artifact form) pushes the form-only terms to doctype-only.
+
+## Item 2 — applied
+
+The following six terms are demoted from `CANONICAL_CATEGORIES` and remain canonical doctypes:
+
+| Term | Removed from category in | Replacement |
+|------|--------------------------|-------------|
+| `resume` | career | alias `(career, resume) → job_search` |
+| `manual` | reference | alias `(reference, manual) → documentation` |
+| `record` | medical | gap (drift surfaces for ground-truth refinement) |
+| `identification` | legal | gap |
+| `agreement` | financial, property, education, career, household, pets, housing | aliases `(property, agreement) → mortgage`, `(housing, agreement) → rental`; other domains gap |
+| `plan` | household | gap |
+
+**Prompt change:** `src/drover/prompts/classification.md` Rule 5 now states the subject-vs-form distinction explicitly with three worked examples (resume, agreement, manual) targeting the exact collision tuples above.
+
+**Alias cleanup (CATEGORY_ALIASES):** −11 obsolete rows (the `*_records → record` and `contracts → agreement` chains targeting demoted categories), +4 new rows (`resume`, `manual`, `agreement` redirects above).
+
+**Structural test:** `tests/test_taxonomy.py::TestHouseholdHierarchyRule::test_no_canonical_category_is_also_canonical_doctype` codifies the rule and prevents regressions. Documented exceptions are listed inline in the test's `allowed` set with rationale per pair.
+
+### Deferred straddlers
+
+Discovered during the structural-test pass; left as exceptions for now per the no-"other"/no-forced-fit rule:
+
+- `reference` — canonical category in 13 domains. Dual semantics (subject "reference materials about X" vs form "this IS a reference"). Needs corpus-driven analysis to disambiguate per domain.
+- `contract` (legal) — no clean replacement category; a legal contract's subject is often the contract relationship itself.
+- `application` (career) — could redirect to `job_search`, but the category captures application-specific workflow distinct from broader job search activity.
+- `presentation` (career) — subject of a presentation varies; no clean replacement.
+- `recipe` (food) — the subject of a recipe document is the recipe itself; category and form genuinely coincide.
+- `reservation` (housing) — could redirect to `rental` for short-term bookings, but reservation carries timing/availability semantics that `rental` doesn't.
+
+These may be revisited after re-harvest reveals which (if any) are sources of ongoing LLM confusion.
 
 ## Item 7 — Co-occurrence sanity (FLAG, defer)
 

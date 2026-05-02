@@ -109,11 +109,23 @@ Use functional domains when the document is fundamentally about a specific life 
 
 ### Rule 5: Category and Document Type Selection
 
-After determining the domain:
-1. Review the categories available for that specific domain in the taxonomy
-2. Select the most appropriate category
-3. Review the complete list of document types in the taxonomy
-4. Select the most appropriate document type
+**Category and doctype answer different questions:**
+
+- **Category** describes the *subject* — what the document is about (banking activity, prescription, lease, employment).
+- **Doctype** describes the *form* — what kind of artifact it is (statement, receipt, agreement, manual, resume, record).
+
+A single word can be a doctype but not a category. Examples:
+
+- A resume is always a doctype (form). Its category in the career domain is `job_search`, not `resume`.
+- An agreement is always a doctype (form). A mortgage agreement has category `mortgage`; a lease agreement has category `rental`.
+- A manual is always a doctype (form). Its category in the reference domain is `documentation`, not `manual`.
+
+**Selection steps:**
+
+1. Review the categories available for the chosen domain in the taxonomy.
+2. Pick the category that names the subject. If no category fits, use the closest available — never reuse the doctype as the category.
+3. Review the complete doctype list in the taxonomy.
+4. Pick the doctype that names the form.
 
 Both category and doctype must exist in the provided taxonomy.
 

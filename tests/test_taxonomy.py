@@ -122,6 +122,77 @@ class TestHouseholdTaxonomy:
         assert "Valid Classification Options" in menu
 
 
+class TestHouseholdHierarchyRule:
+    """Tests for the household taxonomy's category-vs-doctype hierarchy rule.
+
+    These tests are content-level (not mechanism-level): they assert a specific
+    structural invariant of HouseholdTaxonomy — categories name subjects, doctypes
+    name forms, and a term cannot be canonical at both layers (with `reference`
+    documented as a deferred exception). See docs/taxonomy/proposals.md.
+    """
+
+    @pytest.fixture
+    def taxonomy(self) -> HouseholdTaxonomy:
+        return HouseholdTaxonomy()
+
+    def test_no_canonical_category_is_also_canonical_doctype(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        doctype_set = taxonomy.CANONICAL_DOCTYPES
+        collisions: list[tuple[str, str]] = []
+        for domain, categories in taxonomy.CANONICAL_CATEGORIES.items():
+            for category in categories:
+                if category in doctype_set:
+                    collisions.append((domain, category))
+        # Documented exceptions (deferred refactors). Each pair stays canonical
+        # at both layers because the demotion has no clean replacement category
+        # or because the term carries genuine subject meaning in that domain.
+        # See docs/taxonomy/proposals.md "Deferred straddlers".
+        allowed = {
+            # `reference` is canonical in 13 domains with dual semantics
+            # (subject "reference materials about X" vs form "this IS a reference").
+            *((d, "reference") for d in taxonomy.CANONICAL_CATEGORIES),
+            # `contract` (legal): no clean replacement; a legal contract's
+            # subject is often the contract itself.
+            ("legal", "contract"),
+            # `application` (career): could redirect to `job_search`, but the
+            # category captures application-specific workflow (offers, follow-ups)
+            # distinct from broader job search activity.
+            ("career", "application"),
+            # `presentation` (career): subject of a presentation varies; no clean
+            # replacement category.
+            ("career", "presentation"),
+            # `recipe` (food): the subject of a recipe document is the recipe
+            # itself; category and form genuinely coincide here.
+            ("food", "recipe"),
+            # `reservation` (housing): could redirect to `rental` for short-term
+            # bookings, but reservation carries timing/availability semantics
+            # that `rental` doesn't.
+            ("housing", "reservation"),
+        }
+        unexpected = [c for c in collisions if c not in allowed]
+        assert unexpected == [], (
+            f"Canonical categories that are also canonical doctypes: {unexpected}. "
+            "Demote them to doctype-only or add to the documented `allowed` set."
+        )
+
+    def test_canonical_category_resume_redirects_to_job_search(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        assert taxonomy.canonical_category("career", "resume") == "job_search"
+
+    def test_canonical_category_manual_redirects_to_documentation(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        assert taxonomy.canonical_category("reference", "manual") == "documentation"
+
+    def test_canonical_category_agreement_leaves_gap_in_career(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        """No alias for career.agreement — surfaces as drift for ground-truth refinement."""
+        assert taxonomy.canonical_category("career", "agreement") is None
+
+
 class TestTaxonomyLoader:
     """Tests for TaxonomyLoader plugin infrastructure."""
 
