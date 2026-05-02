@@ -192,6 +192,23 @@ class TestHouseholdHierarchyRule:
         """No alias for career.agreement — surfaces as drift for ground-truth refinement."""
         assert taxonomy.canonical_category("career", "agreement") is None
 
+    def test_canonical_category_correspondence_demoted_in_personal(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        """correspondence is form-only; surfaces as gap in personal domain."""
+        assert taxonomy.canonical_category("personal", "correspondence") is None
+
+    def test_canonical_category_correspondence_demoted_in_legal(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        assert taxonomy.canonical_category("legal", "correspondence") is None
+
+    def test_canonical_doctype_correspondence_still_routes_to_letter(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        """The doctype alias is unchanged; LLM-emitted 'correspondence' as a doctype still normalizes."""
+        assert taxonomy.canonical_doctype("correspondence") == "letter"
+
 
 class TestTaxonomyLoader:
     """Tests for TaxonomyLoader plugin infrastructure."""

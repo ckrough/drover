@@ -144,14 +144,55 @@ Discovered during the structural-test pass; left as exceptions for now per the n
 
 These may be revisited after re-harvest reveals which (if any) are sources of ongoing LLM confusion.
 
-## Item 7 — Co-occurrence sanity (FLAG, defer)
+## Item 7 — Co-occurrence sanity (analyzed 2026-05-02)
 
-Two tuples that look semantically wrong:
+Both suspect tuples revisited using aggregate signal from the harvest. Verification done from `canonical_tuples` shape and `vendor_frequency` patterns; no document access required.
 
-- `(personal, correspondence, receipt)` — 10 occurrences. "Correspondence" plus "receipt" is an unusual combination; likely the LLM is forcing personal-domain documents into the only canonical category that fits and falling back to receipt as a generic doctype. Without document access we can't tell whether these are genuinely personal correspondence with receipt artifacts or misclassifications.
-- `(financial, loan, reference)` — 4 occurrences. Plausible (loan reference materials) but worth verifying with ground truth.
+### `(financial, loan, reference)` x4 — resolved as plausible
 
-**Deferred:** flagged for ground-truth refinement.
+The financial+loan corner of `canonical_tuples` has only two doctypes:
+
+| Tuple | Count |
+|-------|-------|
+| `(financial, loan, reference)` | 4 |
+| `(financial, loan, contract)` | 1 |
+
+Top loan-related vendors in the corpus: `gmac-mortgage` (14), `american-education-services` (18) — both servicers that routinely send rate-change notices, annual disclosures, and terms summaries. Under the new subject-vs-form rule, `subject=loan, form=reference` is exactly right for "informational materials about a loan." Tuple is legitimate; no taxonomy fix.
+
+### `(personal, correspondence, receipt)` x10 — sharpened hypothesis
+
+Looking at all personal-domain tuples reveals `correspondence` is dominant as a *category*, not just for this tuple:
+
+| Tuple | Count |
+|-------|-------|
+| `(personal, correspondence, receipt)` | 10 |
+| `(personal, correspondence, confirmation)` | 6 |
+| `(personal, correspondence, letter)` | 4 |
+| `(personal, correspondence, report)` | 2 |
+| `(personal, correspondence, invoice)` | 1 |
+| `(personal, None, receipt)` | 5 |
+| `(personal, None, confirmation)` | 5 |
+| `(personal, membership, receipt)` | 3 |
+| `(personal, travel, *)` | 9 (across 4 doctypes) |
+| `(personal, identity, report)` | 1 |
+| `(personal, membership, notice/letter)` | 2 |
+
+23 of ~48 personal-domain tuples have `correspondence` as the category. That's not "this specific tuple is weird" — it's "`correspondence` is functioning as a fallback category when no specific personal subject fits." The form-receipt-on-correspondence-letter pattern is consistent with donation/dues/non-profit acknowledgements that the LLM struggles to slot into `membership`.
+
+**Implication, not action:** `correspondence` is a candidate for the next refactor pass. It's canonical *category* in 6 domains (legal, education, personal, government, utilities, career) AND has the doctype alias `correspondence → letter`. By the new subject-vs-form rule, `correspondence` describes a form (a letter or note), not a subject. Demoting it from CANONICAL_CATEGORIES across all 6 domains would force the LLM to pick a real subject (`membership`, `identity`, etc.) and cleanly route the form to `letter`. This was not in scope for the Moderate hierarchy refactor and needs its own evidence + prompt-side coordination.
+
+**Deferred to a future pass.** The aggregate signal is strong enough to name the next refactor target precisely; a ground-truth document spot-check would confirm whether the donation-acknowledgement hypothesis holds before any code change.
+
+## Item 7 — applied (Round 2, correspondence demotion)
+
+`correspondence` removed from `CANONICAL_CATEGORIES` in 6 domains (career, education, government, legal, personal, utilities). The doctype-layer routing (`correspondence → letter`) is unchanged — LLM-emitted correspondence forms continue to normalize to `letter`.
+
+Per the no-"other" rule, no replacement aliases. When the LLM emits `correspondence` as a category, the result is `canonical: null` — a visible gap for ground-truth refinement.
+
+Expected post-merge behavior (re-harvest signal):
+- The 23 personal-domain `(personal, correspondence, *)` tuples should redistribute. Donation/dues acknowledgements should land on `(personal, membership, letter)`. Generic personal mail should surface as `(personal, null, letter)` — a real gap.
+- Educational correspondence should redistribute among existing categories (`reference`, `transcript`) or surface as gaps.
+- Government correspondence should redistribute toward `federal`/`state`/`local`.
 
 ## Item 5 — External cross-reference (deferred to follow-up)
 

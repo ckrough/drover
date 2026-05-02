@@ -68,14 +68,12 @@ class HouseholdTaxonomy(BaseTaxonomy):
         },
         "legal": {
             "contract",
-            "correspondence",
             "court",
             "estate",
             "reference",
         },
         "education": {
             "certification",
-            "correspondence",
             "expense",
             "financial_aid",
             "payment",
@@ -93,7 +91,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "umbrella",
         },
         "personal": {
-            "correspondence",
             "expense",
             "identity",
             "membership",
@@ -101,14 +98,12 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "travel",
         },
         "government": {
-            "correspondence",
             "federal",
             "local",
             "reference",
             "state",
         },
         "utilities": {
-            "correspondence",
             "electric",
             "expense",
             "gas",
@@ -125,7 +120,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "client",
             "compensation",
             "consulting",
-            "correspondence",
             "documentation",
             "employer",
             "expense",

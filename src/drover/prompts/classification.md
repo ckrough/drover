@@ -119,6 +119,7 @@ A single word can be a doctype but not a category. Examples:
 - A resume is always a doctype (form). Its category in the career domain is `job_search`, not `resume`.
 - An agreement is always a doctype (form). A mortgage agreement has category `mortgage`; a lease agreement has category `rental`.
 - A manual is always a doctype (form). Its category in the reference domain is `documentation`, not `manual`.
+- Correspondence is a form (a letter, note, or piece of mail). The category names what the correspondence is about (membership for a donation acknowledgement, banking for a bank notice, federal/state for a government letter), not "correspondence" itself.
 
 **Selection steps:**
 

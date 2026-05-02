@@ -1,7 +1,24 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-02T09:04:30-04:00",
+  "generated_at": "2026-05-02T10:51:16-04:00",
   "runs": [
+    {
+      "run_id": "correspondence-demotion-post-eval",
+      "date": "unknown",
+      "corpus": "synthetic",
+      "corpus_size": 80,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "unknown",
+      "domain_accuracy": 0.825,
+      "category_accuracy": 0.425,
+      "doctype_accuracy": 0.9125,
+      "vendor_accuracy": 0.825,
+      "date_accuracy": 0.85,
+      "errors": 0,
+      "source": "eval/runs/correspondence-demotion-post/eval.json",
+      "notes": ""
+    },
     {
       "run_id": "hierarchy-refactor-post-eval",
       "date": "unknown",
