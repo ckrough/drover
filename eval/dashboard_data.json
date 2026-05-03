@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-02T10:51:16-04:00",
+  "generated_at": "2026-05-03T08:27:26-04:00",
   "runs": [
     {
       "run_id": "correspondence-demotion-post-eval",
@@ -137,6 +137,23 @@
       "errors": 0,
       "source": "eval/runs/nli_unstructured.json",
       "notes": "NLI zero-shot classifier baseline (now removed from codebase). Date not recorded in filename."
+    },
+    {
+      "run_id": "reference-demotion-post-eval",
+      "date": "unknown",
+      "corpus": "synthetic",
+      "corpus_size": 80,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "unknown",
+      "domain_accuracy": 0.825,
+      "category_accuracy": 0.4875,
+      "doctype_accuracy": 0.95,
+      "vendor_accuracy": 0.8125,
+      "date_accuracy": 0.8125,
+      "errors": 0,
+      "source": "eval/runs/reference-demotion-post/eval.json",
+      "notes": ""
     },
     {
       "run_id": "2026-04-30T165717-gemma4_docling",

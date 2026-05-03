@@ -127,8 +127,8 @@ class TestHouseholdHierarchyRule:
 
     These tests are content-level (not mechanism-level): they assert a specific
     structural invariant of HouseholdTaxonomy — categories name subjects, doctypes
-    name forms, and a term cannot be canonical at both layers (with `reference`
-    documented as a deferred exception). See docs/taxonomy/proposals.md.
+    name forms, and a term cannot be canonical at both layers (with a small
+    documented set of straddler exceptions). See docs/taxonomy/proposals.md.
     """
 
     @pytest.fixture
@@ -149,9 +149,6 @@ class TestHouseholdHierarchyRule:
         # or because the term carries genuine subject meaning in that domain.
         # See docs/taxonomy/proposals.md "Deferred straddlers".
         allowed = {
-            # `reference` is canonical in 13 domains with dual semantics
-            # (subject "reference materials about X" vs form "this IS a reference").
-            *((d, "reference") for d in taxonomy.CANONICAL_CATEGORIES),
             # `contract` (legal): no clean replacement; a legal contract's
             # subject is often the contract itself.
             ("legal", "contract"),
@@ -208,6 +205,25 @@ class TestHouseholdHierarchyRule:
     ) -> None:
         """The doctype alias is unchanged; LLM-emitted 'correspondence' as a doctype still normalizes."""
         assert taxonomy.canonical_doctype("correspondence") == "letter"
+
+    def test_canonical_category_reference_demoted_in_financial(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        """reference is form-only; surfaces as gap in financial domain."""
+        assert taxonomy.canonical_category("financial", "reference") is None
+
+    def test_canonical_category_reference_demoted_in_medical(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        assert taxonomy.canonical_category("medical", "reference") is None
+
+    def test_canonical_doctype_reference_still_canonical(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        """The doctype layer is unchanged; LLM-emitted 'reference' as a doctype still resolves."""
+        assert taxonomy.canonical_doctype("reference") == "reference"
+        assert taxonomy.canonical_doctype("article") == "reference"
+        assert taxonomy.canonical_doctype("webpage") == "reference"
 
 
 class TestTaxonomyLoader:
