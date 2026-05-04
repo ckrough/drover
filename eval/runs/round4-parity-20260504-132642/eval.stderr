@@ -1,0 +1,720 @@
+[32m[INFO] 2026-05-04 13:26:45,994 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:26:45,997 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:26:45,997 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:26:46,011 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:26:46,012 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:26:46,012 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:26:46,020 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:26:46,024 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:26:46,024 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:02,572 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:27:02,575 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:02,575 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:02,592 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:27:02,593 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:02,593 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:02,602 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:27:02,607 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:02,607 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:13,872 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:27:13,875 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:13,875 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:13,893 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:27:13,894 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:13,894 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:13,905 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:27:13,910 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:13,910 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:27,661 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:27:27,664 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:27,664 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:27,681 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:27:27,681 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:27,681 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:27,691 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:27:27,696 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:27,696 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:44,519 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:27:44,522 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:44,522 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:44,539 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:27:44,540 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:44,540 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:44,551 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:27:44,556 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:27:44,556 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:02,489 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:28:02,492 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:02,492 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:02,510 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:28:02,511 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:02,511 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:02,521 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:28:02,527 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:02,527 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:15,560 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:28:15,563 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:15,563 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:15,580 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:28:15,580 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:15,581 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:15,590 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:28:15,595 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:15,595 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:29,366 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:28:29,368 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:29,368 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:29,385 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:28:29,386 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:29,386 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:29,396 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:28:29,402 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:29,402 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:43,869 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:28:43,872 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:43,872 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:43,888 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:28:43,888 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:43,888 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:43,900 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:28:43,905 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:43,905 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:57,063 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:28:57,066 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:57,066 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:57,083 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:28:57,084 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:57,084 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:57,094 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:28:57,099 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:28:57,099 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:08,965 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:29:08,968 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:08,968 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:08,983 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:29:08,983 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:08,983 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:08,992 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:29:08,997 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:08,997 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:21,218 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:29:21,221 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:21,221 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:21,238 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:29:21,239 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:21,239 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:21,248 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:29:21,253 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:21,253 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:38,748 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:29:38,751 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:38,752 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:38,770 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:29:38,771 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:38,771 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:38,781 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:29:38,786 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:29:38,786 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:04,642 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:30:04,644 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:04,644 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:04,661 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:30:04,661 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:04,661 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:04,672 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:30:04,677 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:04,678 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:24,018 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:30:24,021 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:24,021 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:24,038 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:30:24,039 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:24,039 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:24,049 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:30:24,054 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:24,054 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:43,676 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:30:43,678 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:43,679 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:43,696 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:30:43,696 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:43,696 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:43,706 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:30:43,711 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:30:43,711 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:01,581 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:31:01,583 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:01,584 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:01,601 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:31:01,601 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:01,601 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:01,611 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:31:01,616 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:01,616 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:20,660 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:31:20,662 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:20,663 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:20,679 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:31:20,679 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:20,679 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:20,689 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:31:20,694 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:20,694 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:38,823 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:31:38,826 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:38,826 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:38,840 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:31:38,841 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:38,841 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:38,850 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:31:38,855 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:38,855 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:57,037 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:31:57,040 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:57,040 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:57,056 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:31:57,056 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:57,056 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:57,066 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:31:57,071 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:31:57,071 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:16,055 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:32:16,058 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:16,058 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:16,075 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:32:16,076 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:16,076 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:16,086 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:32:16,091 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:16,091 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:33,213 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:32:33,216 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:33,216 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:33,233 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:32:33,233 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:33,234 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:33,243 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:32:33,248 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:33,248 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:47,767 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:32:47,769 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:47,770 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:47,787 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:32:47,787 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:47,787 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:47,797 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:32:47,802 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:32:47,802 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:08,788 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:33:08,791 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:08,791 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:08,808 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:33:08,809 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:08,809 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:08,819 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:33:08,824 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:08,825 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:25,707 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:33:25,710 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:25,710 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:25,726 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:33:25,726 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:25,726 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:25,736 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:33:25,740 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:25,740 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:42,056 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:33:42,059 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:42,059 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:42,076 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:33:42,076 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:42,076 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:42,086 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:33:42,091 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:33:42,091 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:02,376 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:34:02,379 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:02,379 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:02,396 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:34:02,396 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:02,397 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:02,406 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:34:02,411 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:02,411 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:22,081 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:34:22,084 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:22,084 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:22,101 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:34:22,101 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:22,101 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:22,111 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:34:22,116 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:22,116 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:37,902 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:34:37,907 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:37,907 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:37,923 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:34:37,924 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:37,924 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:37,935 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:34:37,942 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:37,942 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:58,183 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:34:58,185 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:58,185 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:58,201 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:34:58,201 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:58,201 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:58,212 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:34:58,217 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:34:58,217 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:13,671 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:35:13,674 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:13,674 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:13,691 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:35:13,692 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:13,692 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:13,702 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:35:13,706 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:13,707 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:25,531 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:35:25,534 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:25,534 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:25,551 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:35:25,552 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:25,552 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:25,562 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:35:25,566 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:25,566 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:43,911 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:35:43,913 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:43,914 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:43,930 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:35:43,930 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:43,930 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:43,940 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:35:43,945 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:35:43,945 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:07,801 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:36:07,804 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:07,804 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:07,821 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:36:07,821 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:07,822 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:07,831 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:36:07,836 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:07,836 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:22,981 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:36:22,983 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:22,983 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:22,998 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:36:22,998 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:22,998 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:23,007 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:36:23,012 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:23,012 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:38,104 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:36:38,106 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:38,106 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:38,122 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:36:38,123 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:38,123 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:38,132 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:36:38,137 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:38,137 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:51,833 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:36:51,836 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:51,836 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:51,853 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:36:51,853 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:51,853 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:51,863 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:36:51,868 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:36:51,868 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:09,783 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:37:09,786 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:09,786 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:09,803 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:37:09,803 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:09,803 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:09,813 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:37:09,818 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:09,818 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:25,511 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:37:25,513 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:25,514 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:25,531 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:37:25,531 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:25,531 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:25,541 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:37:25,546 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:25,546 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:41,181 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:37:41,184 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:41,184 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:41,201 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:37:41,201 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:41,201 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:41,211 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:37:41,216 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:41,216 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:55,794 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:37:55,797 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:55,797 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:55,814 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:37:55,815 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:55,815 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:55,824 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:37:55,829 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:37:55,829 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:12,242 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:38:12,244 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:12,244 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:12,257 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:38:12,258 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:12,258 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:12,266 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:38:12,271 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:12,271 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:27,752 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:38:27,755 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:27,755 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:27,771 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:38:27,771 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:27,771 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:27,781 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:38:27,785 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:27,785 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:45,453 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:38:45,456 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:45,456 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:45,471 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:38:45,472 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:45,472 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:45,481 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:38:45,486 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:45,486 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:59,630 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:38:59,633 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:59,633 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:59,650 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:38:59,650 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:59,650 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:59,660 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:38:59,665 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:38:59,665 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:21,330 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:39:21,333 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:21,333 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:21,350 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:39:21,351 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:21,351 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:21,361 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:39:21,365 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:21,365 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:39,447 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:39:39,449 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:39,449 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:39,465 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:39:39,466 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:39,466 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:39,476 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:39:39,481 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:39,481 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:54,095 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:39:54,098 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:54,098 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:54,115 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:39:54,115 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:54,115 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:54,125 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:39:54,130 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:39:54,130 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:12,108 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:40:12,111 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:12,111 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:12,128 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:40:12,128 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:12,128 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:12,138 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:40:12,143 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:12,143 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:26,352 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:40:26,355 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:26,355 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:26,370 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:40:26,371 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:26,371 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:26,380 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:40:26,385 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:26,385 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:44,184 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:40:44,187 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:44,187 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:44,204 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:40:44,204 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:44,204 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:44,214 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:40:44,219 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:44,219 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:59,216 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:40:59,219 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:59,219 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:59,236 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:40:59,236 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:59,236 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:59,246 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:40:59,251 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:40:59,251 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:41:18,979 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:41:18,982 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:41:18,982 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:41:18,997 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:41:18,997 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:41:18,997 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:41:19,007 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:41:19,011 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:41:19,011 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:41:33,368 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:41:33,371 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:41:33,371 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:41:33,385 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:41:33,386 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:41:33,386 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:41:33,395 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:41:33,400 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:41:33,400 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:46:45,760 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:46:45,765 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:46:45,765 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:46:45,782 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:46:45,783 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:46:45,783 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:46:45,793 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:46:45,800 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:46:45,800 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:46:59,326 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:46:59,329 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:46:59,329 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:46:59,346 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:46:59,347 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:46:59,347 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:46:59,357 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:46:59,362 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:46:59,362 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:15,521 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:47:15,524 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:15,524 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:15,539 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:47:15,540 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:15,540 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:15,549 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:47:15,554 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:15,554 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:26,375 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:47:26,377 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:26,378 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:26,395 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:47:26,395 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:26,395 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:26,405 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:47:26,410 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:26,410 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:42,765 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:47:42,767 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:42,768 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:42,784 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:47:42,785 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:42,785 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:42,795 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:47:42,800 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:42,800 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:54,767 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:47:54,770 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:54,770 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:54,787 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:47:54,787 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:54,787 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:54,797 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:47:54,802 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:47:54,802 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:11,687 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:48:11,690 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:11,690 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:11,707 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:48:11,707 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:11,707 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:11,717 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:48:11,722 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:11,722 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:31,397 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:48:31,399 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:31,399 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:31,416 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:48:31,417 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:31,417 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:31,427 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:48:31,431 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:31,431 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:43,299 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:48:43,301 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:43,301 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:43,317 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:48:43,318 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:43,318 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:43,328 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:48:43,332 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:48:43,332 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:02,198 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:49:02,201 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:02,201 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:02,218 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:49:02,219 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:02,219 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:02,229 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:49:02,233 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:02,233 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:15,826 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:49:15,829 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:15,830 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:15,843 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:49:15,843 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:15,843 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:15,852 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:49:15,856 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:15,856 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:29,379 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:49:29,382 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:29,382 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:29,399 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:49:29,399 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:29,399 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:29,410 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:49:29,415 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:29,415 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:49,744 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:49:49,747 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:49,747 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:49,763 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:49:49,763 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:49,764 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:49,773 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:49:49,778 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:49:49,778 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:13,115 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:50:13,118 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:13,118 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:13,135 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:50:13,136 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:13,136 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:13,146 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:50:13,151 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:13,151 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:29,935 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:50:29,938 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:29,938 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:29,955 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:50:29,956 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:29,956 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:29,966 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:50:29,971 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:29,971 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:46,790 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:50:46,793 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:46,793 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:46,809 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:50:46,810 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:46,810 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:46,820 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:50:46,824 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:50:46,825 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:09,684 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:51:09,687 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:09,687 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:09,704 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:51:09,705 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:09,705 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:09,715 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:51:09,719 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:09,720 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:32,010 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:51:32,013 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:32,013 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:32,030 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:51:32,030 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:32,030 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:32,040 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:51:32,045 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:32,045 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:54,358 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:51:54,360 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:54,361 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:54,378 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:51:54,378 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:54,378 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:54,388 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:51:54,393 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:51:54,393 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:11,945 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:52:11,948 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:11,948 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:11,964 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:52:11,965 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:11,965 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:11,975 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:52:11,980 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:11,980 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:31,078 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:52:31,081 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:31,081 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:31,099 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:52:31,100 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:31,100 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:31,111 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:52:31,117 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:31,117 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:45,953 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:52:45,956 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:45,956 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:45,973 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:52:45,973 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:45,973 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:45,983 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:52:45,988 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:52:45,988 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:08,124 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:53:08,127 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:08,127 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:08,144 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:53:08,145 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:08,145 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:08,155 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:53:08,160 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:08,160 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:30,266 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:53:30,268 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:30,268 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:30,283 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:53:30,283 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:30,283 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:30,292 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:53:30,297 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:30,297 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:46,126 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:53:46,128 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:46,128 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:46,144 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:53:46,145 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:46,145 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:46,154 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:53:46,159 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:53:46,159 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:54:08,023 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:54:08,026 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:54:08,026 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:54:08,043 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:54:08,044 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:54:08,044 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:54:08,054 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-05-04 13:54:08,060 [RapidOCR] download_file.py:60: File exists and is valid: /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-05-04 13:54:08,060 [RapidOCR] main.py:57: Using /Users/ckrough/Code/open-source/drover/.claude/worktrees/drover-taxonomy/.venv/lib/python3.13/site-packages/rapidocr/models/ch_PP-OCRv4_rec_mobile.onnx[0m

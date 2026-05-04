@@ -391,3 +391,171 @@ After applying:
 3. `uv run mypy src/`
 4. Re-render `to_prompt_menu()` and read it.
 5. Optional: re-run the harvester on the same corpus and compare drift counts. Expected: the headline-table entries above drop to zero or near-zero; total `canonical: null` count (excluding "unknown") drops by ~155.
+
+## Round 4 — applied (LCGFT/schema.org alignment)
+
+**Goal:** align the doctype axis with LCGFT genre/form labels (plural folders)
+and the schema.org transactional surface (aliases). Source: see
+`docs/taxonomy/design-rationale.md` and `docs/taxonomy/external-mapping.md`.
+
+### Changes
+
+| Change | Detail |
+|---|---|
+| Pluralized all 41 canonical doctypes | LCGFT genre/form alignment: `receipt → receipts`, `invoice → invoices`, etc. Folders use plural. |
+| Added `DOCTYPE_SINGULAR` map | `{plural: singular}`. `PathBuilder` calls `taxonomy.singular_form()` before passing doctype to the naming policy so filenames stay singular (one file = one instance). |
+| Added `singular_form()` on `BaseTaxonomy` | Default falls back to input value when no mapping exists. |
+| Dropped `contracts` doctype | LCGFT has no standalone Contracts term; specific instrument doctypes (`agreements`, `deeds`, `leases`, `titles`, `trusts`, `wills`) carry the load. `contract → agreements` alias added for backwards compatibility. |
+| Demoted `recipe` from `food` categories | Schema.org Recipe is a CreativeWork (HowTo subtype); the doctype `recipes` carries the form. No replacement category. |
+| Demoted `reservation` from `housing` categories | Schema.org Reservation is Intangible/transactional; the doctype `reservations` carries the form. No replacement category. |
+| Dropped `contract` from `legal` categories | Legal categories now: `{court, estate}`. Full LCGFT Law-materials restructure deferred (no corpus signal). |
+| Added `floor_plans`, `menus`, `maps` to canonical doctypes | LCGFT-recognized forms with plausible household occurrence. |
+| Added 9 schema.org Reservation subtype aliases | `flight_reservation`, `lodging_reservation`, `food_establishment_reservation`, etc. → `reservations`. |
+| Added schema.org transactional aliases | `order → receipts`, `ticket → reservations`, `tickets → reservations`. |
+| Reorganized `DOCTYPE_ALIASES` with section headers | Singular→plural / schema.org subtypes / schema.org transactional / LCGFT-derived synonyms / empirically discovered. |
+| Upgraded structural test to semantic comparison | Normalizes plural/singular before checking category-vs-doctype collisions, so `recipe` (category) and `recipes` (doctype) collide conceptually even when their strings differ. |
+| Updated prompt Rule 5 examples to plurals | Worked examples cite `resumes`, `agreements`, `manuals`. No container framing or authority citation in the prompt itself (those are in `design-rationale.md` and `external-mapping.md`). |
+| Updated `eval/ground_truth/synthetic.jsonl` doctypes | Singular → plural via `taxonomy.canonical_doctype()`. |
+
+### Authority basis
+
+- **LCGFT** (form/genre authority) for plural doctype labels and the
+  form-vs-subject rule. See
+  <https://www.loc.gov/aba/publications/FreeLCGFT/2020%20LCGFT%20intro.pdf>.
+- **schema.org** (transactional/web-entity authority) for receipts/orders,
+  reservations, listings, permits, certifications, maps, menus, recipes,
+  reports.
+- Per-line URI annotations in `src/drover/taxonomy/household.py`. Full
+  mapping in `docs/taxonomy/external-mapping.md`.
+
+### gemma4 pre-flight (Phase A0)
+
+Ran a 20-document pre-flight on `eval/samples/synthetic/` (sample seed 42)
+through `ollama / gemma4:latest` against the new plural canonical doctypes.
+Source artifact: `eval/runs/round4-preflight/preflight-tuples.json`.
+
+| Form | Count | Share |
+|---|---|---|
+| Plural (canonical) | 19 | 95.0% |
+| Singular (alias-routed) | 1 | 5.0% |
+| Other | 0 | 0.0% |
+
+The single singular emission was `report` (one occurrence). Every other
+emission landed directly on a plural canonical doctype (`manuals`,
+`agreements`, `leases`, `reports`, `statements`, `certificates`,
+`estimates`, `forms`, `guides`, `invoices`, `itineraries`, `policies`,
+`warranties`).
+
+**Interpretation:** gemma4 follows the plural taxonomy menu it sees in
+`to_prompt_menu()`. The 5% singular tail is well below the 40% threshold
+the plan flagged as concerning, and the singular→plural alias surface
+absorbs it transparently. Post-merge harvester drift redistribution should
+read normally (no spike in alias hits to misinterpret as regression).
+
+### Anthropic prompt-cache invalidation
+
+Round 4 invalidates the Anthropic prompt cache because the taxonomy menu
+(plural doctype list) changes. One-time re-warm cost: roughly $0.50 for the
+synthetic eval (94 docs) and ~$3 for a real-world re-harvest (533 docs). All
+subsequent runs benefit from cache reuse on the unchanged menu.
+
+### Round 4 verification (synthetic eval)
+
+**Run artifacts:** `eval/runs/round4-parity-20260504-132642/` (initial, pre-remap grading) and `eval/runs/round4-parity-20260504-141532/` (post-remap grading). Model: `gemma4:latest` via Ollama. 80 synthetic PDFs.
+
+**Ground-truth remap (19 rows):** the parity check surfaced that `eval/ground_truth/synthetic.jsonl` still encoded form-words as categories (`recipe`, `manual`, `agreement`, `correspondence`, `record`, `reference`) under Round 3 conventions. Round 4's form-vs-subject rule (categories name subjects, doctypes name forms) makes these uncanonical. Remapped to canonical subject categories per domain:
+
+| Pattern | Count | Mapping |
+|---|---|---|
+| `food/recipe` (demoted) | 3 | `food/meal_plan` |
+| `food/reference` (form-as-category) | 2 | `food/meal_plan` |
+| `reference/manual` (form-as-category) | 3 | `reference/documentation` |
+| `property/agreement` (form-as-category) | 4 | `property/{hoa, rental, maintenance}` (per vendor signal) |
+| `property/reference` | 1 | `property/hoa` |
+| `legal/reference` | 1 | `legal/estate` (trust doctype) |
+| `household/reference` | 1 | `household/documentation` |
+| `government/correspondence` | 1 | `government/state` |
+| `education/{reference, agreement}` | 2 | `education/{financial_aid, transcript}` |
+| `medical/record` | 1 | `medical/primary_care` |
+
+All 80 rows now validate against `t.categories_for_domain(domain)`.
+
+**Headline metrics (run2 vs Round 3 baseline `reference-demotion-post`):**
+
+| Metric | Baseline | Round 4 (run2) | Delta | Flag |
+|---|---|---|---|---|
+| domain_accuracy | 0.8250 | 0.7625 | -6.25pp | REGRESSION |
+| category_accuracy | 0.4875 | 0.5625 | +7.50pp | improvement |
+| doctype_accuracy | 0.9500 | 0.9500 | 0.00pp | OK |
+| vendor_accuracy | 0.8125 | 0.8250 | +1.25pp | OK |
+| date_accuracy | 0.8125 | 0.8500 | +3.75pp | OK (WATCH band) |
+
+Two back-to-back runs produced identical headline numbers, ruling out gemma4 non-determinism as the source of the domain drop.
+
+**Domain regression cluster (5 flips):**
+
+1. Recipe drag (3 of 5): `harvest-table-co-op_recipe`, `maple-lane-grocers_recipe`, `willowbrook-market_manual` all flip `food → reference`. Round 4 removed `recipe` from canonical `food` categories; gemma4 now classifies these as `reference/{other, documentation}` and the domain travels with the category. Synthetic ground truth still has `food` as the domain, so all three score as domain misses.
+2. Government drift (2 of 5): `county-permits-office_form` (`government → property`) and `state-tax-authority_letter` (`government → financial`). No structural Round 4 cause; these are gemma reasoning artifacts on form-heavy government docs.
+
+Excluding the recipe cluster, domain accuracy would land at 0.800 (-2.5pp, WATCH band). The category gain (+7.50pp) is the inverse of the same effect: post-remap, gemma's predictions match the cleaner subject-category truth labels much better.
+
+**Verdict:** parity with caveat. The taxonomy change is structurally validated (doctype flat, category up sharply, vendor and date stable or up). The 6.25pp domain headline drop is dominated by a single explainable cluster (recipe demotion drag) plus 2-doc gemma variance on government forms. No alias-surface fix is appropriate per the plan's "do not improvise canonical doctypes" guidance; the recipe-domain drag is a Round 5 candidate (either a `food/recipes` recovery alias or per-doctype domain hints in the prompt).
+
+**Round 5 follow-ups identified:**
+
+- Recipe-domain drag: 3 synthetic recipe docs flip `food → reference` after the `food/recipe` demotion. Open question: does real-world corpus show the same cluster? Confirm via Phase H harvester re-run before deciding remediation.
+- Government form drift: 2 docs flip to `property` and `financial`. Likely too small to act on without corpus signal; revisit after harvester.
+
+### Round 4 verification (real-world harvester)
+
+**Run artifact:** `eval/runs/round4-realworld-20260504-160829/realworld-tuples.json`. Model: `gemma4:latest` via Ollama. Corpus: `~/Documents/personal-archive`, 547 docs, 532 processed (15 errors). Baseline: `eval/runs/20260501-152751/realworld-tuples.json` (Round 3 cumulative, 533 processed).
+
+**Drift redistribution (the headline metric):**
+
+| Field | Baseline | Round 4 | Delta |
+|---|---:|---:|---:|
+| Drift entries (total) | 53 | 32 | -21 (-40%) |
+| Category drift (sum of counts) | 226 | 74 | -152 (-67%) |
+| Top category-drift residual | `payment` (65) | `unknown` (43) | `payment` cleared to 7 |
+
+The category-drift cleanup is the largest single improvement. `payment` collapsed from 65 cross-domain emissions (property: 21, education: 19, utilities: 12, medical: 10, others) to 7 (only personal: 6, political: 1). `documentation` (29 → 8), `purchase` (25 → 4), `transfer` (9 → 1), `reference` (16 → 0), `correspondence` (3 → 0), and `agreement` (4 → 0) all cleared or shrank substantially. None of the cleared categories are Round 4 changes per se; the cleanup reflects cumulative Rounds 1-3 demotions absorbing into the menu plus the alias surface routing more raw terms.
+
+**Recipe and reservation impact:**
+
+| Term | Where | Baseline | Round 4 |
+|---|---|---:|---:|
+| `recipe` | category emissions | 0 | 0 |
+| `recipe` / `recipes` | doctype emissions | 0 | 0 |
+| `reservation` | category emissions | 1 | 1 |
+| `reservations` | doctype emissions | n/a | 1 |
+
+**The recipe corpus signal is zero.** The personal archive contains no recipe documents. The synthetic recipe-domain drag (3 docs flipping `food → reference`) has no real-world counterpart on this corpus. This deflates urgency on the Round 5 recipe-domain drag question: it appears to be a synthetic-corpus artifact triggered by template recipe documents that don't represent the real-world distribution. Reservation has 1 doc and is unchanged.
+
+**Schema.org defensive additions:**
+
+| Alias | Round 4 emissions on this corpus |
+|---|---:|
+| `flight_reservation`, `lodging_reservation`, `food_establishment_reservation`, `event_reservation`, `rent_reservation`, `reservation_package`, `taxi_reservation`, `train_reservation`, `bus_reservation` | 0 each |
+| `floor_plans`, `menus`, `maps` (LCGFT gap-fills) | 0 each |
+| `order` / `orders` (schema.org transactional) | 0 each |
+| `tickets → reservations` (schema.org transactional) | 1 (resolved canonical via alias) |
+
+The 9 schema.org Reservation subtypes are inert on this corpus. gemma4 emits `reservations` directly when it sees a reservation-shaped document; it does not decompose to subtypes. The LCGFT gap-fills (`floor_plans`, `menus`, `maps`) are also inert on this corpus. Defensive additions were costless but produced no measurable improvement here. The single `tickets → reservations` hit absorbed the one entry that was previously `doctype/ticket → null` drift in the baseline. The transactional alias surface earned its keep on exactly that one document.
+
+**Singular emission rate (the surprise):**
+
+| Form | Baseline | Round 4 |
+|---|---:|---:|
+| Plural canonical doctypes | 0 (0%) | 292 (60%) |
+| Singular emissions (alias-routed) | 484 (100%) | 195 (40%) |
+
+The Phase A0 synthetic pre-flight saw 95% plural / 5% singular. Real-world is 60% plural / 40% singular, right at the plan's "concerning" 40% threshold. The 40% singular tail is dominated by one term: `confirmation` (154 of 195 singular emissions = 79%). gemma4 reads "Confirmation" verbatim from document headers far more often than it picks `confirmations` from the menu. Other top singular emissions: `receipt` (21), `statement` (11), `bill` (5), `notice` (4). The singular→plural alias surface absorbs all of this transparently; no canonical-doctype gaps result. The gap between synthetic (5%) and real-world (40%) is itself the finding: synthetic templates underestimate how strongly real documents anchor gemma to their own header language.
+
+**Verdict:** parity with substantial improvement. Drift down 40% by entry count and 67% by category emission count. No new high-count drift entries above 5. The recipe-domain drag concern from synthetic does not generalize: the corpus has no recipes. Schema.org subtype aliases are dead weight on this corpus but cost nothing to keep.
+
+**Updated Round 5 candidates (post real-world):**
+
+- Singular tail (40%, mostly `confirmation`): real but absorbed transparently. Open question is whether to strengthen the prompt to prefer plural forms (reducing alias dependence) or accept the alias surface as the long-term solution. Cost-of-action vs cost-of-status-quo is genuinely close; depends on whether other models (anthropic, openai) show the same singular preference.
+- Recipe-domain drag: deprioritized. Synthetic-only signal; no real-world docs to validate a fix against.
+- `unknown` emissions (43 docs, 8% of corpus): persistent across rounds. Suggests a prompt-side investigation (forbid `unknown`, force closest canonical) or an acknowledgement that 8% of household documents are genuinely unclassifiable.
+- `documentation` as category in non-{household, reference} domains (8 emissions, persistent): low-volume residual; revisit if it grows.

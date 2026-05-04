@@ -138,34 +138,32 @@ class TestHouseholdHierarchyRule:
     def test_no_canonical_category_is_also_canonical_doctype(
         self, taxonomy: HouseholdTaxonomy
     ) -> None:
-        doctype_set = taxonomy.CANONICAL_DOCTYPES
+        # Round 4: doctypes are plural (LCGFT genre containers) while
+        # categories remain singular subject terms. The structural rule still
+        # bans semantic collisions, so we normalize both sides through the
+        # singular form before comparing — `recipe` (category) and `recipes`
+        # (doctype) collide conceptually even when their strings differ.
+        def to_singular(value: str) -> str:
+            return taxonomy.DOCTYPE_SINGULAR.get(value, value)
+
+        doctype_singulars = {to_singular(d) for d in taxonomy.CANONICAL_DOCTYPES}
         collisions: list[tuple[str, str]] = []
         for domain, categories in taxonomy.CANONICAL_CATEGORIES.items():
             for category in categories:
-                if category in doctype_set:
+                if to_singular(category) in doctype_singulars:
                     collisions.append((domain, category))
-        # Documented exceptions (deferred refactors). Each pair stays canonical
-        # at both layers because the demotion has no clean replacement category
-        # or because the term carries genuine subject meaning in that domain.
+
+        # Documented exceptions (deferred straddlers). Each pair stays
+        # canonical at both layers because no authority commits cleanly.
         # See docs/taxonomy/proposals.md "Deferred straddlers".
         allowed = {
-            # `contract` (legal): no clean replacement; a legal contract's
-            # subject is often the contract itself.
-            ("legal", "contract"),
             # `application` (career): could redirect to `job_search`, but the
-            # category captures application-specific workflow (offers, follow-ups)
-            # distinct from broader job search activity.
+            # category captures application-specific workflow distinct from
+            # broader job search activity.
             ("career", "application"),
-            # `presentation` (career): subject of a presentation varies; no clean
-            # replacement category.
+            # `presentation` (career): subject of a presentation varies; no
+            # clean replacement category.
             ("career", "presentation"),
-            # `recipe` (food): the subject of a recipe document is the recipe
-            # itself; category and form genuinely coincide here.
-            ("food", "recipe"),
-            # `reservation` (housing): could redirect to `rental` for short-term
-            # bookings, but reservation carries timing/availability semantics
-            # that `rental` doesn't.
-            ("housing", "reservation"),
         }
         unexpected = [c for c in collisions if c not in allowed]
         assert unexpected == [], (
@@ -204,7 +202,7 @@ class TestHouseholdHierarchyRule:
         self, taxonomy: HouseholdTaxonomy
     ) -> None:
         """The doctype alias is unchanged; LLM-emitted 'correspondence' as a doctype still normalizes."""
-        assert taxonomy.canonical_doctype("correspondence") == "letter"
+        assert taxonomy.canonical_doctype("correspondence") == "letters"
 
     def test_canonical_category_reference_demoted_in_financial(
         self, taxonomy: HouseholdTaxonomy
@@ -221,9 +219,93 @@ class TestHouseholdHierarchyRule:
         self, taxonomy: HouseholdTaxonomy
     ) -> None:
         """The doctype layer is unchanged; LLM-emitted 'reference' as a doctype still resolves."""
-        assert taxonomy.canonical_doctype("reference") == "reference"
-        assert taxonomy.canonical_doctype("article") == "reference"
-        assert taxonomy.canonical_doctype("webpage") == "reference"
+        assert taxonomy.canonical_doctype("reference") == "references"
+        assert taxonomy.canonical_doctype("references") == "references"
+        assert taxonomy.canonical_doctype("article") == "references"
+        assert taxonomy.canonical_doctype("webpage") == "references"
+
+
+class TestRound4LCGFTAlignment:
+    """Round 4: LCGFT plural doctypes, schema.org aliases, demotions."""
+
+    @pytest.fixture
+    def taxonomy(self) -> HouseholdTaxonomy:
+        return HouseholdTaxonomy()
+
+    def test_canonical_doctypes_are_plural(self, taxonomy: HouseholdTaxonomy) -> None:
+        for plural in ("receipts", "invoices", "statements", "agreements", "letters"):
+            assert plural in taxonomy.CANONICAL_DOCTYPES
+
+    def test_singular_emissions_route_to_plural(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        assert taxonomy.canonical_doctype("receipt") == "receipts"
+        assert taxonomy.canonical_doctype("invoice") == "invoices"
+        assert taxonomy.canonical_doctype("agreement") == "agreements"
+
+    def test_singular_form_round_trip(self, taxonomy: HouseholdTaxonomy) -> None:
+        for plural in taxonomy.CANONICAL_DOCTYPES:
+            singular = taxonomy.singular_form(plural)
+            assert singular, f"missing singular for {plural}"
+            assert taxonomy.canonical_doctype(singular) == plural, (
+                f"singular {singular} did not round-trip back to {plural}"
+            )
+
+    def test_singular_form_passthrough_for_unknown(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        assert taxonomy.singular_form("nonexistent_xyz") == "nonexistent_xyz"
+
+    def test_contract_doctype_dropped(self, taxonomy: HouseholdTaxonomy) -> None:
+        assert "contract" not in taxonomy.CANONICAL_DOCTYPES
+        assert "contracts" not in taxonomy.CANONICAL_DOCTYPES
+        assert taxonomy.canonical_doctype("contract") == "agreements"
+        assert taxonomy.canonical_doctype("contracts") == "agreements"
+
+    def test_legal_contract_category_dropped(self, taxonomy: HouseholdTaxonomy) -> None:
+        legal = taxonomy.CANONICAL_CATEGORIES["legal"]
+        assert "contract" not in legal
+        assert taxonomy.canonical_category("legal", "contract") is None
+
+    def test_food_recipe_category_dropped(self, taxonomy: HouseholdTaxonomy) -> None:
+        assert "recipe" not in taxonomy.CANONICAL_CATEGORIES["food"]
+        assert taxonomy.canonical_category("food", "recipe") is None
+
+    def test_housing_reservation_category_dropped(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        assert "reservation" not in taxonomy.CANONICAL_CATEGORIES["housing"]
+        assert taxonomy.canonical_category("housing", "reservation") is None
+
+    def test_schema_org_reservation_subtypes_alias_to_reservations(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        subtypes = [
+            "boat_reservation",
+            "bus_reservation",
+            "event_reservation",
+            "flight_reservation",
+            "food_establishment_reservation",
+            "lodging_reservation",
+            "rental_car_reservation",
+            "reservation_package",
+            "taxi_reservation",
+            "train_reservation",
+        ]
+        for subtype in subtypes:
+            assert taxonomy.canonical_doctype(subtype) == "reservations", subtype
+
+    def test_schema_org_transactional_aliases(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        assert taxonomy.canonical_doctype("order") == "receipts"
+        assert taxonomy.canonical_doctype("ticket") == "reservations"
+        assert taxonomy.canonical_doctype("tickets") == "reservations"
+
+    def test_authority_gap_fills_present(self, taxonomy: HouseholdTaxonomy) -> None:
+        for plural in ("floor_plans", "menus", "maps"):
+            assert plural in taxonomy.CANONICAL_DOCTYPES
+            assert taxonomy.singular_form(plural)
 
 
 class TestTaxonomyLoader:

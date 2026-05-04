@@ -42,7 +42,7 @@ class TestClassificationPipeline:
         assert isinstance(result, RawClassification)
         assert result.domain == "financial"
         assert result.category == "banking"
-        assert result.doctype == "statement"
+        assert result.doctype == "statements"
         assert result.vendor  # Should have extracted vendor name
         assert result.date  # Should have extracted date
 
@@ -67,7 +67,7 @@ class TestClassificationPipeline:
         assert result.domain == "financial"
         # Invoice could be categorized as business or other financial category
         assert result.category in {"business", "tax", "banking", "other"}
-        assert result.doctype in {"invoice", "receipt", "statement", "other"}
+        assert result.doctype in {"invoices", "receipts", "statements", "other"}
         assert result.date  # Should have extracted date
 
     @pytest.mark.asyncio

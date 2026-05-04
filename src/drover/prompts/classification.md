@@ -116,11 +116,11 @@ Use functional domains when the document is fundamentally about a specific life 
 
 A single word can be a doctype but not a category. Examples:
 
-- A resume is always a doctype (form). Its category in the career domain is `job_search`, not `resume`.
-- An agreement is always a doctype (form). A mortgage agreement has category `mortgage`; a lease agreement has category `rental`.
-- A manual is always a doctype (form). Its category in the reference domain is `documentation`, not `manual`.
-- Correspondence is a form (a letter, note, or piece of mail). The category names what the correspondence is about (membership for a donation acknowledgement, banking for a bank notice, federal/state for a government letter), not "correspondence" itself.
-- Reference is a form (a reference work, manual, or article). The category names what the reference is about (loan for a loan terms summary, banking for a bank rate sheet, mortgage for a closing-disclosure reference), not "reference" itself. When the document genuinely has no specific subject (a generic article, webpage, or list), leave the category gap visible rather than reusing "reference" as a placeholder.
+- A resume is always a doctype (`resumes`). Its category in the career domain is `job_search`, not `resume`.
+- An agreement is always a doctype (`agreements`). A mortgage agreement has category `mortgage`; a lease agreement has category `rental`.
+- A manual is always a doctype (`manuals`). Its category in the reference domain is `documentation`, not `manual`.
+- Correspondence is a form (a letter, note, or piece of mail; doctype `letters`). The category names what the correspondence is about (membership for a donation acknowledgement, banking for a bank notice, federal/state for a government letter), not "correspondence" itself.
+- Reference is a form (a reference work, manual, or article; doctype `references`). The category names what the reference is about (loan for a loan terms summary, banking for a bank rate sheet, mortgage for a closing-disclosure reference), not "reference" itself. When the document genuinely has no specific subject (a generic article, webpage, or list), leave the category gap visible rather than reusing "reference" as a placeholder.
 
 **Selection steps:**
 

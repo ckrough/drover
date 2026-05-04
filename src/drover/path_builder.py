@@ -11,6 +11,7 @@ from pathlib import Path
 
 from drover.models import ClassificationResult, PathConstraints, RawClassification
 from drover.naming.base import BaseNamingPolicy
+from drover.taxonomy.base import BaseTaxonomy
 
 
 class PathConstraintError(Exception):
@@ -28,15 +29,20 @@ class PathBuilder:
         self,
         naming_policy: BaseNamingPolicy,
         constraints: PathConstraints | None = None,
+        taxonomy: BaseTaxonomy | None = None,
     ) -> None:
         """Initialize path builder.
 
         Args:
             naming_policy: Policy for generating filenames.
             constraints: Path constraints, or None for defaults.
+            taxonomy: Optional taxonomy used to map plural canonical doctypes
+                to their singular instance form for filename generation.
+                Folders always use the plural form; filenames use the singular.
         """
         self.naming_policy = naming_policy
         self.constraints = constraints or PathConstraints()
+        self.taxonomy = taxonomy
 
     def build(
         self,
@@ -58,8 +64,13 @@ class PathBuilder:
             doctype=classification.doctype,
         )
 
+        filename_doctype = (
+            self.taxonomy.singular_form(classification.doctype)
+            if self.taxonomy is not None
+            else classification.doctype
+        )
         filename = self.naming_policy.format_filename(
-            doctype=classification.doctype,
+            doctype=filename_doctype,
             vendor=classification.vendor,
             subject=classification.subject,
             date=classification.date,
@@ -151,6 +162,7 @@ def build_suggested_path(
     original_path: Path,
     naming_policy: BaseNamingPolicy,
     constraints: PathConstraints | None = None,
+    taxonomy: BaseTaxonomy | None = None,
 ) -> ClassificationResult:
     """Convenience function to build a suggested path.
 
@@ -159,9 +171,14 @@ def build_suggested_path(
         original_path: Original document file path.
         naming_policy: Naming policy for filename generation.
         constraints: Path constraints, or None for defaults.
+        taxonomy: Optional taxonomy for singular-form filename generation.
 
     Returns:
         ClassificationResult with suggested path.
     """
-    builder = PathBuilder(naming_policy=naming_policy, constraints=constraints)
+    builder = PathBuilder(
+        naming_policy=naming_policy,
+        constraints=constraints,
+        taxonomy=taxonomy,
+    )
     return builder.build(classification, original_path)

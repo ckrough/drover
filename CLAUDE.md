@@ -192,6 +192,8 @@ def test_parse_response_direct_json() -> None:
 
 11. **ADRs:** Architectural decisions are documented in `docs/adr/`. ADR-004 standardized on the local LLM (Ollama gemma4) as the primary local path. ADR-005 sets Docling with full-page OCR as the default PDF loader; fall back via `--loader unstructured` or `DROVER_LOADER=unstructured`. First-time Docling setup requires `uv sync --extra docling` and `uv run docling-tools models download`. Beads issue: `prof-m78`.
 
+    **Taxonomy (Round 4):** Canonical doctypes are plural (LCGFT genre/form alignment): folders use the plural (`receipts/`, `invoices/`, `agreements/`); filenames use the singular instance form (`receipt-...pdf`). `BaseTaxonomy.singular_form()` and `HouseholdTaxonomy.DOCTYPE_SINGULAR` mediate the split, applied by `PathBuilder` before the naming policy formats the filename. Cross-references to LCGFT and schema.org live in `docs/taxonomy/external-mapping.md`; design rationale in `docs/taxonomy/design-rationale.md`. The form-vs-subject structural rule (categories name subjects, doctypes name forms) is enforced by `tests/test_taxonomy.py::test_no_canonical_category_is_also_canonical_doctype`.
+
 12. **Docling first-run failure signature:** If every doc errors with `Docling models not found at ~/.cache/docling/models`, run `uv run docling-tools models download` once. The error is actionable but easy to miss in batch eval logs.
 
 13. **Sandbox + Ollama:** The Bash sandbox blocks localhost (`127.0.0.1:11434`). Run any command that calls the Ollama provider with `dangerouslyDisableSandbox: true` (drover classify/evaluate, ollama list, etc.).

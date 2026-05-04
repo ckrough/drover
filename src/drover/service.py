@@ -71,7 +71,10 @@ class ClassificationService:
                 max_pages=config.max_pages,
             )
         self._classifier = self._create_classifier()
-        self._path_builder = PathBuilder(naming_policy=self._naming_policy)
+        self._path_builder = PathBuilder(
+            naming_policy=self._naming_policy,
+            taxonomy=self._taxonomy,
+        )
 
     def _create_classifier(self) -> DocumentClassifier:
         """Create the LLM-based document classifier."""
