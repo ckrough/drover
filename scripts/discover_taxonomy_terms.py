@@ -6,16 +6,17 @@ Runs Drover in fallback mode on documents and captures the raw LLM suggestions
 for taxonomy improvement.
 
 Usage:
-    python scripts/taxonomy_discover.py documents/*.pdf
-    python scripts/taxonomy_discover.py --format json ~/Documents
-    python scripts/taxonomy_discover.py --output discovered.py documents/
-    python scripts/taxonomy_discover.py --sample 50 ~/Documents
-    python scripts/taxonomy_discover.py --sample 100 --seed 42 ~/Documents
+    python scripts/discover_taxonomy_terms.py documents/*.pdf
+    python scripts/discover_taxonomy_terms.py --format json ~/Documents
+    python scripts/discover_taxonomy_terms.py --output discovered.py documents/
+    python scripts/discover_taxonomy_terms.py --sample 50 ~/Documents
+    python scripts/discover_taxonomy_terms.py --sample 100 --seed 42 ~/Documents
 """
 
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import random
 import re
@@ -29,14 +30,14 @@ import click
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from drover.config import (  # noqa: E402
+from drover.config import (
     AIConfig,
     AIProvider,
     DroverConfig,
     SampleStrategy,
     TaxonomyMode,
 )
-from drover.service import ClassificationService  # noqa: E402
+from drover.service import ClassificationService
 
 
 class TaxonomyCollector:
@@ -139,10 +140,8 @@ def parse_llm_response(response: str) -> dict[str, Any] | None:
     parsed = None
 
     # Try direct JSON parse
-    try:
+    with contextlib.suppress(json.JSONDecodeError):
         parsed = json.loads(response)
-    except json.JSONDecodeError:
-        pass
 
     # Handle template-style double-brace wrappers like `{{ ... }}`
     if parsed is None and response.startswith("{{") and response.endswith("}}"):
@@ -157,19 +156,15 @@ def parse_llm_response(response: str) -> dict[str, Any] | None:
         code_match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", response)
         if code_match:
             block = code_match.group(1).strip()
-            try:
+            with contextlib.suppress(json.JSONDecodeError):
                 parsed = json.loads(block)
-            except json.JSONDecodeError:
-                pass
 
     # Try extracting largest JSON object
     if parsed is None:
         candidate = _extract_largest_json_object(response)
         if candidate is not None:
-            try:
+            with contextlib.suppress(json.JSONDecodeError):
                 parsed = json.loads(candidate)
-            except json.JSONDecodeError:
-                pass
 
     if parsed is None:
         return None
@@ -193,10 +188,7 @@ def _extract_largest_json_object(text: str) -> str | None:
     for idx, ch in enumerate(text):
         if ch == '"' and not escape:
             in_string = not in_string
-        if ch == "\\" and not escape:
-            escape = True
-        else:
-            escape = False
+        escape = ch == "\\" and not escape
 
         if in_string:
             continue
@@ -223,27 +215,24 @@ def _extract_largest_json_object(text: str) -> str | None:
 
 def expand_paths(paths: list[Path]) -> list[Path]:
     """Expand directories to document files and filter to supported types."""
+    # Mirror Docling's officially-supported set (ADR-006). Keep this in sync
+    # with `src/drover/loader.py:_SUPPORTED_EXTENSIONS`.
     supported_extensions = {
         ".pdf",
-        ".doc",
         ".docx",
-        ".xls",
         ".xlsx",
-        ".ppt",
         ".pptx",
         ".txt",
         ".md",
-        ".rtf",
-        ".odt",
-        ".ods",
-        ".odp",
+        ".html",
+        ".htm",
+        ".csv",
         ".png",
         ".jpg",
         ".jpeg",
-        ".gif",
         ".tiff",
+        ".tif",
         ".bmp",
-        ".webp",
     }
 
     result = []
@@ -280,7 +269,7 @@ async def run_discovery(
             # We'll modify our approach - use the classifier directly
             loaded = await service._loader.load(file_path)
 
-            classification, debug_info = await service._classifier.classify(
+            _classification, debug_info = await service._classifier.classify(
                 content=loaded.content,
                 capture_debug=True,
                 collect_metrics=False,
@@ -293,7 +282,8 @@ async def run_discovery(
                     collector.add(raw["domain"], raw["category"], raw["doctype"])
                     if verbose:
                         click.echo(
-                            f"    -> {raw['domain']}/{raw['category']}/{raw['doctype']}", err=True
+                            f"    -> {raw['domain']}/{raw['category']}/{raw['doctype']}",
+                            err=True,
                         )
                 else:
                     collector.error_count += 1
@@ -311,7 +301,9 @@ async def run_discovery(
 
 
 @click.command()
-@click.argument("paths", nargs=-1, type=click.Path(exists=True, path_type=Path), required=True)
+@click.argument(
+    "paths", nargs=-1, type=click.Path(exists=True, path_type=Path), required=True
+)
 @click.option(
     "--format",
     "output_format",
@@ -374,11 +366,11 @@ def main(
 
     \b
     Examples:
-        python scripts/taxonomy_discover.py documents/*.pdf
-        python scripts/taxonomy_discover.py --format json ~/Documents
-        python scripts/taxonomy_discover.py -v --output discovered.py documents/
-        python scripts/taxonomy_discover.py --sample 50 ~/Documents
-        python scripts/taxonomy_discover.py --sample 100 --seed 42 ~/Documents
+        python scripts/discover_taxonomy_terms.py documents/*.pdf
+        python scripts/discover_taxonomy_terms.py --format json ~/Documents
+        python scripts/discover_taxonomy_terms.py -v --output discovered.py documents/
+        python scripts/discover_taxonomy_terms.py --sample 50 ~/Documents
+        python scripts/discover_taxonomy_terms.py --sample 100 --seed 42 ~/Documents
     """
     # Expand paths and collect files
     files = expand_paths(list(paths))
@@ -391,8 +383,8 @@ def main(
     # Apply random sampling if requested
     if sample is not None and sample > 0 and sample < len(files):
         if seed is not None:
-            random.seed(seed)
-        files = random.sample(files, sample)
+            random.seed(seed)  # nosec B311 - non-cryptographic sampling
+        files = random.sample(files, sample)  # nosec B311 - non-cryptographic sampling
         click.echo(f"Found {total_found} documents, sampling {len(files)}", err=True)
     else:
         click.echo(f"Found {len(files)} documents to classify", err=True)
@@ -420,10 +412,7 @@ def main(
     asyncio.run(run_discovery(files, config, collector, verbose))
 
     # Generate output
-    if output_format == "python":
-        result = collector.to_python()
-    else:
-        result = collector.to_json()
+    result = collector.to_python() if output_format == "python" else collector.to_json()
 
     if output:
         output.write_text(result)

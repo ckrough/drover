@@ -140,43 +140,15 @@
         <input type="checkbox" id="filter-real" checked> Real-world
       </label>
     </div>
-    <div class="filter-group">
-      <label>Metric:</label>
-      <select id="metric-select">
-        <option value="domain_accuracy">Domain</option>
-        <option value="category_accuracy">Category</option>
-        <option value="doctype_accuracy">Doctype</option>
-        <option value="vendor_accuracy">Vendor</option>
-        <option value="date_accuracy">Date</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <label>View:</label>
-      <select id="view-select">
-        <option value="single">Single metric (large)</option>
-        <option value="all5">All 5 metrics (grid)</option>
-      </select>
-    </div>
   </div>
 
   <p class="series-note">
     Lines are grouped by <strong>model + loader + variant</strong>.
     Solid line = synthetic corpus; dashed = real-world.
-    Points with <em>unknown</em> dates are plotted at the leftmost position as &ldquo;pre-2026-04-30&rdquo;.
     Click legend items to hide/show individual series.
   </p>
 
-  <div id="single-view">
-    <div class="chart-card">
-      <h2 id="single-chart-title">Domain Accuracy</h2>
-      <div class="chart-wrap">
-        <canvas id="chart-single"></canvas>
-      </div>
-      <p class="legend-hint">Hover a point to see all series values for that date.</p>
-    </div>
-  </div>
-
-  <div id="all5-view" style="display:none">
+  <div id="all5-view">
     <div class="charts-grid">
       <div class="chart-card"><h2>Domain Accuracy</h2><div class="chart-wrap"><canvas id="chart-domain"></canvas></div></div>
       <div class="chart-card"><h2>Category Accuracy</h2><div class="chart-wrap"><canvas id="chart-category"></canvas></div></div>
@@ -195,7 +167,8 @@
           <th>Corpus</th>
           <th>n</th>
           <th>Model</th>
-          <th>Loader</th>
+          <th>Commit</th>
+          <th class="num">Runtime/doc</th>
           <th class="num">Domain</th>
           <th class="num">Category</th>
           <th class="num">Doctype</th>
@@ -212,111 +185,9 @@
 <!-- Regenerator-managed: contents replaced by scripts/build_eval_dashboard.py -->
 <script id="data" type="application/json">
 {
-  "schema_version": 1,
-  "generated_at": "2026-05-01T11:41:19-04:00",
+  "schema_version": 2,
+  "generated_at": "2026-05-05T07:29:07-04:00",
   "runs": [
-    {
-      "run_id": "legacy-gemma4_docling",
-      "date": "unknown",
-      "corpus": "synthetic",
-      "corpus_size": 80,
-      "model": "gemma4:latest",
-      "provider": "ollama",
-      "loader": "docling",
-      "domain_accuracy": 0.875,
-      "category_accuracy": 0.3625,
-      "doctype_accuracy": 0.8375,
-      "vendor_accuracy": 0.775,
-      "date_accuracy": 0.9125,
-      "errors": 0,
-      "source": "eval/runs/gemma4_docling.json",
-      "notes": "Pre-ADR-005 baseline run, synthetic corpus, date not recorded in filename."
-    },
-    {
-      "run_id": "legacy-gemma4_unstructured",
-      "date": "unknown",
-      "corpus": "synthetic",
-      "corpus_size": 80,
-      "model": "gemma4:latest",
-      "provider": "ollama",
-      "loader": "unstructured",
-      "domain_accuracy": 0.875,
-      "category_accuracy": 0.4,
-      "doctype_accuracy": 0.8625,
-      "vendor_accuracy": 0.7875,
-      "date_accuracy": 0.8875,
-      "errors": 0,
-      "source": "eval/runs/gemma4_unstructured.json",
-      "notes": "Pre-ADR-005 baseline run, synthetic corpus, date not recorded in filename. Matches baselines.md canonical numbers."
-    },
-    {
-      "run_id": "legacy-haiku_docling",
-      "date": "unknown",
-      "corpus": "synthetic",
-      "corpus_size": 80,
-      "model": "claude-haiku-4-5",
-      "provider": "anthropic",
-      "loader": "docling",
-      "domain_accuracy": 0.9375,
-      "category_accuracy": 0.5375,
-      "doctype_accuracy": 0.9,
-      "vendor_accuracy": 0.9375,
-      "date_accuracy": 0.9375,
-      "errors": 0,
-      "source": "eval/runs/haiku_docling.json",
-      "notes": "Haiku 4.5 anthropic hosted benchmark on synthetic corpus. Date not recorded in filename."
-    },
-    {
-      "run_id": "legacy-haiku_unstructured",
-      "date": "unknown",
-      "corpus": "synthetic",
-      "corpus_size": 80,
-      "model": "claude-haiku-4-5",
-      "provider": "anthropic",
-      "loader": "unstructured",
-      "domain_accuracy": 0.925,
-      "category_accuracy": 0.55,
-      "doctype_accuracy": 0.9,
-      "vendor_accuracy": 0.9625,
-      "date_accuracy": 0.9375,
-      "errors": 0,
-      "source": "eval/runs/haiku_unstructured.json",
-      "notes": "Haiku 4.5 anthropic hosted benchmark on synthetic corpus. Date not recorded in filename."
-    },
-    {
-      "run_id": "legacy-nli_docling",
-      "date": "unknown",
-      "corpus": "synthetic",
-      "corpus_size": 80,
-      "model": "cross-encoder/nli-deberta-v3-base",
-      "provider": "nli_local",
-      "loader": "docling",
-      "domain_accuracy": 0.05,
-      "category_accuracy": 0.0375,
-      "doctype_accuracy": 0.05,
-      "vendor_accuracy": 0.0375,
-      "date_accuracy": 0.8,
-      "errors": 0,
-      "source": "eval/runs/nli_docling.json",
-      "notes": "NLI zero-shot classifier baseline (now removed from codebase). Date not recorded in filename."
-    },
-    {
-      "run_id": "legacy-nli_unstructured",
-      "date": "unknown",
-      "corpus": "synthetic",
-      "corpus_size": 80,
-      "model": "cross-encoder/nli-deberta-v3-base",
-      "provider": "nli_local",
-      "loader": "unstructured",
-      "domain_accuracy": 0.025,
-      "category_accuracy": 0.025,
-      "doctype_accuracy": 0.0625,
-      "vendor_accuracy": 0.0125,
-      "date_accuracy": 0.775,
-      "errors": 0,
-      "source": "eval/runs/nli_unstructured.json",
-      "notes": "NLI zero-shot classifier baseline (now removed from codebase). Date not recorded in filename."
-    },
     {
       "run_id": "2026-04-30T165717-gemma4_docling",
       "date": "2026-04-30",
@@ -456,6 +327,42 @@
       "source": "eval/runs/real-world-2026-05-01T070630-structured/gemma4_docling.json",
       "notes": "Structured-regions ([TAG] prefix) input experiment. Worse than markdown on category/vendor/date. Production reverted to markdown export.",
       "loader_variant": "structured-regions"
+    },
+    {
+      "run_id": "round4-parity-20260504-132642-eval",
+      "date": "2026-05-04",
+      "corpus": "synthetic",
+      "corpus_size": 80,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "unknown",
+      "domain_accuracy": 0.7625,
+      "category_accuracy": 0.4625,
+      "doctype_accuracy": 0.95,
+      "vendor_accuracy": 0.825,
+      "date_accuracy": 0.85,
+      "errors": 0,
+      "source": "eval/runs/round4-parity-20260504-132642/eval.json",
+      "notes": "",
+      "runtime_seconds": 1643
+    },
+    {
+      "run_id": "round4-parity-20260504-141532-eval",
+      "date": "2026-05-04",
+      "corpus": "synthetic",
+      "corpus_size": 80,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "unknown",
+      "domain_accuracy": 0.7625,
+      "category_accuracy": 0.5625,
+      "doctype_accuracy": 0.95,
+      "vendor_accuracy": 0.825,
+      "date_accuracy": 0.85,
+      "errors": 0,
+      "source": "eval/runs/round4-parity-20260504-141532/eval.json",
+      "notes": "",
+      "runtime_seconds": 1172
     }
   ]
 }
@@ -548,7 +455,7 @@
   }
 
   function runXLabel(run) {
-    return run.date === "unknown" ? "pre-2026-04-30" : run.date;
+    return run.date;
   }
 
   function buildLabels(runs) {
@@ -556,10 +463,25 @@
     const labels = [];
     for (const r of runs) {
       const d = runXLabel(r);
-      if (!seen.has(d)) { seen.add(d); labels.push(d); }
+      if (d && !seen.has(d)) { seen.add(d); labels.push(d); }
     }
     labels.sort();
     return labels;
+  }
+
+  function fmtRuntimePerDoc(r) {
+    if (r.runtime_seconds == null || !r.corpus_size) return "";
+    const perDoc = r.runtime_seconds / r.corpus_size;
+    if (perDoc >= 60) {
+      const m = Math.floor(perDoc / 60);
+      const s = Math.round(perDoc - m * 60);
+      return m + "m " + s + "s";
+    }
+    return perDoc.toFixed(1) + "s";
+  }
+
+  function fmtCommit(r) {
+    return r.commit_hash ? r.commit_hash.slice(0, 7) : "";
   }
 
   // ---------------------------------------------------------------------------
@@ -697,10 +619,11 @@
       tr.appendChild(td(r.corpus_size != null ? String(r.corpus_size) : "", "num"));
       tr.appendChild(td(r.model));
 
-      const loaderLabel = r.loader_variant
-        ? r.loader + " (" + r.loader_variant + ")"
-        : r.loader;
-      tr.appendChild(td(loaderLabel));
+      const commitTd = td(fmtCommit(r));
+      if (r.commit_hash) commitTd.title = r.commit_hash;
+      tr.appendChild(commitTd);
+
+      tr.appendChild(td(fmtRuntimePerDoc(r), "num"));
 
       tr.appendChild(td(fmtPct(r.domain_accuracy), "num"));
       tr.appendChild(td(fmtPct(r.category_accuracy), "num"));
@@ -721,41 +644,13 @@
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // View management
-  // ---------------------------------------------------------------------------
-  let currentView = "single";
-  let currentMetric = "domain_accuracy";
-
-  function renderSingleView() {
-    const metric = METRICS.find(m => m.key === currentMetric);
-    const title = document.getElementById("single-chart-title");
-    title.textContent = (metric ? metric.label : "Domain") + " Accuracy";
-    makeChart("chart-single", currentMetric);
-  }
-
-  function renderAll5View() {
+  function render() {
+    renderTable();
     for (const m of METRICS) {
       makeChart(m.chartId, m.key);
     }
   }
 
-  function render() {
-    renderTable();
-    if (currentView === "single") {
-      document.getElementById("single-view").style.display = "";
-      document.getElementById("all5-view").style.display = "none";
-      renderSingleView();
-    } else {
-      document.getElementById("single-view").style.display = "none";
-      document.getElementById("all5-view").style.display = "";
-      renderAll5View();
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // Event wiring
-  // ---------------------------------------------------------------------------
   document.getElementById("filter-synthetic").addEventListener("change", function (e) {
     showSynthetic = e.target.checked;
     render();
@@ -764,16 +659,7 @@
     showReal = e.target.checked;
     render();
   });
-  document.getElementById("metric-select").addEventListener("change", function (e) {
-    currentMetric = e.target.value;
-    if (currentView === "single") renderSingleView();
-  });
-  document.getElementById("view-select").addEventListener("change", function (e) {
-    currentView = e.target.value;
-    render();
-  });
 
-  // Initial render
   render();
 })();
 </script>

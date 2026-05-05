@@ -5,9 +5,14 @@ This script runs classification experiments across multiple models and documents
 recording results for analysis.
 
 Usage:
-    python scripts/eval_runner.py run eval/experiment.yaml
-    python scripts/eval_runner.py report eval/results/experiment-*.jsonl
-    python scripts/eval_runner.py validate eval/experiment.yaml
+    python scripts/run_eval_experiments.py run eval/experiment.yaml
+    python scripts/run_eval_experiments.py report eval/results/experiment-*.jsonl
+    python scripts/run_eval_experiments.py validate eval/experiment.yaml
+
+Dashboard hint:
+    After producing eval runs that you want surfaced in the dashboard, run
+    `uv run python scripts/build_eval_dashboard.py` to refresh
+    `eval/dashboard.html` and `eval/dashboard_data.json`.
 """
 
 from __future__ import annotations
@@ -28,15 +33,15 @@ from pydantic import BaseModel, Field, ValidationError, field_validator
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from drover.config import (  # noqa: E402
+from drover.config import (
     AIConfig,
     AIProvider,
     DroverConfig,
     SampleStrategy,
     TaxonomyMode,
 )
-from drover.models import ClassificationErrorResult, ClassificationResult  # noqa: E402
-from drover.service import ClassificationService  # noqa: E402
+from drover.models import ClassificationErrorResult, ClassificationResult
+from drover.service import ClassificationService
 
 # -----------------------------------------------------------------------------
 # Manifest Schema (Pydantic Models)
@@ -196,9 +201,12 @@ def compare_results(
         future enhancement.
     """
     matches: dict[str, bool] = {
-        field: getattr(result, field) == getattr(expected, field) for field in _STRICT_FIELDS
+        field: getattr(result, field) == getattr(expected, field)
+        for field in _STRICT_FIELDS
     }
-    matches["vendor"] = _normalized_vendor(result.vendor) == _normalized_vendor(expected.vendor)
+    matches["vendor"] = _normalized_vendor(result.vendor) == _normalized_vendor(
+        expected.vendor
+    )
     matches["subject"] = _subject_matches(result.subject, expected.subject)
     return {field: matches[field] for field in COMPARISON_FIELDS}
 
@@ -303,7 +311,9 @@ async def run_experiment(
 
                     model_str = f"{model_config.provider.value}/{model_config.model}"
                     progress = f"[{current_run}/{total_runs}]{eta_str}"
-                    click.echo(f"{progress} {doc_entry.path.name} + {model_str}", err=True)
+                    click.echo(
+                        f"{progress} {doc_entry.path.name} + {model_str}", err=True
+                    )
 
                 try:
                     record = await run_single_classification(
@@ -333,7 +343,11 @@ async def run_experiment(
                 f.flush()
 
                 if verbose:
-                    status = "PASS" if record.all_match else ("FAIL" if record.success else "ERROR")
+                    status = (
+                        "PASS"
+                        if record.all_match
+                        else ("FAIL" if record.success else "ERROR")
+                    )
                     click.echo(f"    -> {status} ({record.latency_ms}ms)", err=True)
 
     return records
@@ -398,14 +412,18 @@ def generate_report(records: list[RunRecord]) -> str:
     lines.append(header)
 
     for provider, model in models:
-        model_records = [r for r in successful if r.provider == provider and r.model == model]
+        model_records = [
+            r for r in successful if r.provider == provider and r.model == model
+        ]
         if not model_records:
             continue
 
         model_name = f"{provider}/{model}"
         row = f"  {model_name:<40}"
         for field in COMPARISON_FIELDS:
-            correct = sum(1 for r in model_records if r.matches and r.matches.get(field, False))
+            correct = sum(
+                1 for r in model_records if r.matches and r.matches.get(field, False)
+            )
             pct = (correct / len(model_records) * 100) if model_records else 0
             row += f" {pct:>5.0f}%"
 
@@ -422,7 +440,9 @@ def generate_report(records: list[RunRecord]) -> str:
     lines.append("-" * 80)
 
     for field in COMPARISON_FIELDS:
-        correct = sum(1 for r in successful if r.matches and r.matches.get(field, False))
+        correct = sum(
+            1 for r in successful if r.matches and r.matches.get(field, False)
+        )
         total = len(successful)
         pct = (correct / total * 100) if total else 0
         lines.append(f"  {field:<12} {pct:>5.0f}% ({correct}/{total})")
@@ -436,11 +456,15 @@ def generate_report(records: list[RunRecord]) -> str:
     lines.append("-" * 80)
     lines.append("Latency by Model (milliseconds)")
     lines.append("-" * 80)
-    lines.append(f"  {'Provider/Model':<40} {'p50':>8} {'p95':>8} {'mean':>8} {'max':>8}")
+    lines.append(
+        f"  {'Provider/Model':<40} {'p50':>8} {'p95':>8} {'mean':>8} {'max':>8}"
+    )
 
     for provider, model in models:
         model_runs = [
-            r for r in records if r.provider == provider and r.model == model and r.success
+            r
+            for r in records
+            if r.provider == provider and r.model == model and r.success
         ]
         latencies = sorted(r.latency_ms for r in model_runs)
         if not latencies:
@@ -481,7 +505,9 @@ def generate_report(records: list[RunRecord]) -> str:
                     if not r.matches.get(field, True):
                         expected_val = r.expected.get(field, "?")
                         got_val = r.result.get(field, "?")
-                        lines.append(f"    {field}: expected={expected_val}, got={got_val}")
+                        lines.append(
+                            f"    {field}: expected={expected_val}, got={got_val}"
+                        )
             lines.append("")
 
     lines.append("=" * 80)
@@ -500,14 +526,18 @@ def generate_json_report(records: list[RunRecord]) -> str:
     # Calculate accuracy by model
     model_accuracy = {}
     for provider, model in models:
-        model_records = [r for r in successful if r.provider == provider and r.model == model]
+        model_records = [
+            r for r in successful if r.provider == provider and r.model == model
+        ]
         if not model_records:
             continue
 
         key = f"{provider}/{model}"
         field_accuracy = {}
         for field in COMPARISON_FIELDS:
-            correct = sum(1 for r in model_records if r.matches and r.matches.get(field, False))
+            correct = sum(
+                1 for r in model_records if r.matches and r.matches.get(field, False)
+            )
             field_accuracy[field] = correct / len(model_records) if model_records else 0
 
         all_correct = sum(1 for r in model_records if r.all_match)
@@ -520,7 +550,9 @@ def generate_json_report(records: list[RunRecord]) -> str:
     # Calculate overall field accuracy
     field_accuracy = {}
     for field in COMPARISON_FIELDS:
-        correct = sum(1 for r in successful if r.matches and r.matches.get(field, False))
+        correct = sum(
+            1 for r in successful if r.matches and r.matches.get(field, False)
+        )
         field_accuracy[field] = correct / len(successful) if successful else 0
 
     all_correct = sum(1 for r in successful if r.all_match)
@@ -623,9 +655,9 @@ def cli() -> None:
 
     \b
     Examples:
-        python scripts/eval_runner.py validate eval/experiment.yaml
-        python scripts/eval_runner.py run eval/experiment.yaml -v
-        python scripts/eval_runner.py report eval/results/experiment-*.jsonl
+        python scripts/run_eval_experiments.py validate eval/experiment.yaml
+        python scripts/run_eval_experiments.py run eval/experiment.yaml -v
+        python scripts/run_eval_experiments.py report eval/results/experiment-*.jsonl
     """
     pass
 
@@ -643,12 +675,12 @@ def cli() -> None:
 def run(manifest_path: Path, output: Path | None, verbose: bool, dry_run: bool) -> None:
     """Run an evaluation experiment from a YAML manifest.
 
-    Executes classification for each (document × model) combination and
+    Executes classification for each (document x model) combination and
     records results to a JSONL file for analysis.
 
     \b
     Example:
-        python scripts/eval_runner.py run eval/my-experiment.yaml -v
+        python scripts/run_eval_experiments.py run eval/my-experiment.yaml -v
     """
     try:
         manifest = ExperimentManifest.from_yaml(manifest_path)
@@ -679,7 +711,10 @@ def run(manifest_path: Path, output: Path | None, verbose: bool, dry_run: bool) 
         click.echo("", err=True)
         for doc in manifest.documents:
             for model in manifest.models:
-                click.echo(f"  {doc.path.name} × {model.provider.value}/{model.model}", err=True)
+                click.echo(
+                    f"  {doc.path.name} x {model.provider.value}/{model.model}",
+                    err=True,
+                )
         click.echo("", err=True)
         click.echo(f"Output would be: {output}", err=True)
         return
@@ -698,7 +733,9 @@ def run(manifest_path: Path, output: Path | None, verbose: bool, dry_run: bool) 
         click.echo("\n\nInterrupted! Partial results saved to:", err=True)
         click.echo(f"  {output}", err=True)
         click.echo("Generate partial report with:", err=True)
-        click.echo(f"  python scripts/eval_runner.py report {output}", err=True)
+        click.echo(
+            f"  python scripts/run_eval_experiments.py report {output}", err=True
+        )
         sys.exit(130)  # Standard SIGINT exit code
 
     # Print summary

@@ -6,7 +6,7 @@ import pytest
 
 from drover.actions.base import ActionPlan, ActionResult
 from drover.actions.runner import ActionRunner
-from drover.config import DroverConfig, ErrorMode, LoaderType
+from drover.config import DroverConfig, ErrorMode
 from drover.models import ClassificationResult
 
 
@@ -69,13 +69,27 @@ def _make_fake_classify(tmp_path: Path):
     return fake_classify
 
 
-def _unstructured_config(**kwargs: object) -> DroverConfig:
-    """Build a DroverConfig that uses the unstructured loader for action tests.
+def _stub_runner_loader(runner: ActionRunner, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Replace the runner's underlying loader with a stub.
 
-    Action tests exercise orchestration, not loader behaviour; using the
-    unstructured backend avoids the Docling model pre-flight check.
+    Action tests exercise orchestration, not loader behaviour; bypassing
+    Docling keeps the tests hermetic and avoids the model pre-flight.
     """
-    return DroverConfig(loader=LoaderType.UNSTRUCTURED, **kwargs)  # type: ignore[arg-type]
+    from drover.loader import DocumentLoadError, LoadedDocument
+
+    async def fake_load(path: Path) -> LoadedDocument:
+        if not path.exists():
+            raise DocumentLoadError(f"File not found: {path}")
+        return LoadedDocument(
+            path=path,
+            content="dummy content",
+            page_count=1,
+            pages_sampled=1,
+            loader_backend="docling",
+            loader_latency_ms=0.0,
+        )
+
+    monkeypatch.setattr(runner._service._loader, "load", fake_load)
 
 
 class TestActionPlan:
@@ -136,7 +150,7 @@ class TestActionRunner:
 
     async def test_empty_files_returns_zero(self) -> None:
         """Empty file list returns exit code 0."""
-        config = _unstructured_config()
+        config = DroverConfig()
         action = MockAction()
         runner = ActionRunner(config, action)
 
@@ -153,9 +167,10 @@ class TestActionRunner:
         doc_path = tmp_path / "test.txt"
         doc_path.write_text("test content")
 
-        config = _unstructured_config()
+        config = DroverConfig()
         action = MockAction()
         runner = ActionRunner(config, action)
+        _stub_runner_loader(runner, monkeypatch)
 
         monkeypatch.setattr(
             runner._service._classifier, "classify", _make_fake_classify(tmp_path)
@@ -181,9 +196,10 @@ class TestActionRunner:
         doc_path = tmp_path / "test.txt"
         doc_path.write_text("test content")
 
-        config = _unstructured_config()
+        config = DroverConfig()
         action = MockAction()
         runner = ActionRunner(config, action)
+        _stub_runner_loader(runner, monkeypatch)
 
         monkeypatch.setattr(
             runner._service._classifier, "classify", _make_fake_classify(tmp_path)
@@ -210,9 +226,10 @@ class TestActionRunner:
         doc_path = tmp_path / "test.txt"
         doc_path.write_text("test content")
 
-        config = _unstructured_config()
+        config = DroverConfig()
         action = MockAction(should_fail=True)
         runner = ActionRunner(config, action)
+        _stub_runner_loader(runner, monkeypatch)
 
         monkeypatch.setattr(
             runner._service._classifier, "classify", _make_fake_classify(tmp_path)
@@ -227,7 +244,7 @@ class TestActionRunner:
         """Classification errors don't trigger action planning."""
         missing_file = tmp_path / "missing.pdf"
 
-        config = _unstructured_config(on_error=ErrorMode.CONTINUE)
+        config = DroverConfig(on_error=ErrorMode.CONTINUE)
         action = MockAction()
         runner = ActionRunner(config, action)
 

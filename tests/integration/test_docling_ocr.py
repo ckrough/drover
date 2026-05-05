@@ -1,14 +1,10 @@
 """Integration test: Docling OCR on a synthetic scanned PDF (prof-kjg).
 
 The 80-doc eval corpus is 100% born-digital, so it cannot exercise
-Docling's OCR fallback. This test builds a privacy-safe, image-only
+Docling's OCR pipeline. This test builds a privacy-safe, image-only
 PDF at runtime (PIL renders text to a PNG, then saves the PNG as a
-single-page PDF — no embedded text layer) and asserts:
-
-  1. The current `unstructured` loader cannot recover text — either
-     because PDF support is missing (no poppler) or because there is
-     no text layer to partition.
-  2. The new `DoclingLoader` extracts the rendered text via OCR.
+single-page PDF — no embedded text layer) and asserts that
+`DoclingLoader` extracts the rendered text via OCR.
 
 OCR engine: Docling defaults to RapidOCR (ONNX runtime, MIT-licensed,
 verified working on macOS arm64). On first run, RapidOCR downloads
@@ -16,9 +12,7 @@ verified working on macOS arm64). On first run, RapidOCR downloads
 the docling extra's site-packages. Subsequent runs are offline.
 
 Opt-in only: set `DROVER_RUN_OCR_TEST=1` to run. Default `pytest`
-runs skip these tests because they need network on first invocation
-and a sufficiently complete `unstructured[pdf]` install to compare
-fairly.
+runs skip this test because it needs network on first invocation.
 """
 
 from __future__ import annotations
@@ -28,7 +22,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from drover.loader import DoclingLoader, DocumentLoader, DocumentLoadError
+from drover.loader import DoclingLoader
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -58,8 +52,7 @@ SCAN_TEXT_LINES = [
 def _build_image_only_pdf(target: Path) -> None:
     """Render `SCAN_TEXT_LINES` to a PNG and save as a single-page PDF.
 
-    The resulting PDF has no text layer. `pdftotext` / `unstructured`
-    cannot recover the text; OCR is the only path.
+    The resulting PDF has no text layer; OCR is the only path.
     """
     from PIL import Image, ImageDraw, ImageFont
 
@@ -78,35 +71,6 @@ def _build_image_only_pdf(target: Path) -> None:
         y += 120
 
     img.save(target, "PDF", resolution=200.0)
-
-
-@pytest.mark.integration
-async def test_unstructured_loader_returns_empty_on_image_only_pdf(
-    tmp_path: Path,
-) -> None:
-    """Document the gap: `unstructured` cannot read scanned PDFs without OCR."""
-    pdf_path = tmp_path / "scanned_invoice.pdf"
-    _build_image_only_pdf(pdf_path)
-
-    loader = DocumentLoader()
-
-    try:
-        loaded = await loader.load(pdf_path)
-    except DocumentLoadError:
-        # Any DocumentLoadError is fair evidence of the gap — the loader
-        # could not turn the scanned PDF into useful text. This includes
-        # both "No text content" (parsed but empty) and the
-        # "Unable to get page count. Is poppler installed and in PATH?"
-        # signature seen on macOS without poppler.
-        return
-
-    # If extraction succeeded, the content must be near-empty (no real text
-    # tokens recovered from the image).
-    text = loaded.content.strip()
-    assert len(text) < 20, (
-        f"Expected near-empty content from unstructured on image-only PDF, "
-        f"got {len(text)} chars: {text!r}"
-    )
 
 
 @pytest.mark.integration

@@ -2,8 +2,8 @@
 # Copy this file and customize for your evaluation runs.
 #
 # Usage:
-#   python scripts/eval_runner.py run eval/my_experiment.yaml
-#   python scripts/eval_runner.py report eval/results/my_experiment-*.jsonl
+#   python scripts/run_eval_experiments.py run eval/my_experiment.yaml
+#   python scripts/run_eval_experiments.py report eval/results/my_experiment-*.jsonl
 
 name: "example-model-comparison"
 description: "Example experiment comparing models on test documents"

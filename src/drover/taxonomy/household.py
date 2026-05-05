@@ -2,6 +2,16 @@
 
 A comprehensive taxonomy covering typical household document categories
 including financial, property, medical, legal, and personal documents.
+
+Authority alignment (Round 4):
+- Doctypes are LCGFT-style genre/form containers (folder layer); filenames
+  use the singular instance form. See ``DOCTYPE_SINGULAR``.
+- LCGFT (Library of Congress Genre/Form Terms) authority for doctype labels.
+- schema.org for transactional and web-entity aliases.
+
+Detailed cross-references live in ``docs/taxonomy/external-mapping.md``.
+The form-vs-subject design rationale (LCGFT alignment) lives in
+``docs/taxonomy/design-rationale.md``.
 """
 
 from typing import ClassVar
@@ -42,13 +52,12 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "tax",
         },
         "property": {
-            "agreement",
             "expense",
             "hoa",
             "improvement",
             "maintenance",
             "mortgage",
-            "reference",
+            "payment",
             "rental",
             "search",
         },
@@ -58,67 +67,65 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "immunization",
             "lab_result",
             "mental_health",
+            "payment",
             "prescription",
             "primary_care",
-            "record",
-            "reference",
             "specialist",
             "vision",
         },
+        # Round 4: `contract` removed from legal categories. LCGFT has no
+        # standalone Contracts term; specific instrument doctypes (agreements,
+        # deeds, leases, titles, trusts, wills) carry the load. The fuller
+        # LCGFT Law-materials restructure (instruments, claims, court_records,
+        # statutes) is deferred until corpus signal supports it (Drover's
+        # evidence-first precedent).
         "legal": {
-            "contract",
-            "correspondence",
             "court",
             "estate",
-            "identification",
-            "reference",
         },
         "education": {
-            "agreement",
             "certification",
-            "correspondence",
             "expense",
             "financial_aid",
-            "reference",
+            "payment",
             "transcript",
         },
         "insurance": {
             "auto",
+            "claim",
+            "health",
             "home",
             "life",
-            "health",
+            "payment",
             "umbrella",
-            "claim",
         },
         "personal": {
+            "expense",
             "identity",
-            "correspondence",
             "membership",
             "travel",
         },
         "government": {
-            "correspondence",
             "federal",
             "local",
-            "reference",
             "state",
         },
         "utilities": {
             "electric",
+            "expense",
             "gas",
             "internet",
+            "payment",
             "phone",
             "trash",
             "water",
         },
         "career": {
-            "agreement",
             "application",
             "benefit",
             "client",
             "compensation",
             "consulting",
-            "correspondence",
             "documentation",
             "employer",
             "expense",
@@ -126,18 +133,17 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "leadership",
             "meeting",
             "presentation",
-            "reference",
-            "resume",
             "review",
             "training",
         },
+        # Round 4: `recipe` demoted from food categories. Schema.org Recipe is
+        # a CreativeWork (HowTo subtype); the doctype `recipes` carries the
+        # form. Food-domain recipe artifacts surface as drift for ground-truth
+        # refinement.
         "food": {
             "meal_plan",
-            "recipe",
-            "reference",
         },
         "household": {
-            "agreement",
             "documentation",
             "expense",
             "goods",
@@ -145,9 +151,7 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "insurance",
             "loans",
             "maintenance",
-            "plan",
             "purchase",
-            "reference",
             "registration",
             "vehicle",
         },
@@ -160,68 +164,126 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "volunteering",
         },
         "pets": {
-            "agreement",
             "expense",
             "medical",
             "registration",
         },
         "reference": {
-            "manual",
+            "documentation",
             "topic",
         },
+        # Round 4: `reservation` demoted from housing categories. Schema.org
+        # Reservation is Intangible/transactional; the doctype `reservations`
+        # carries the form (with 9 schema.org subtype aliases below).
         "housing": {
+            "payment",
             "property",
-            "reference",
             "rental",
-            "reservation",
             "search",
         },
     }
 
+    # Doctype axis = LCGFT-style genre/form containers (folder labels).
+    # Each holds individual instances; filenames use the singular form
+    # via DOCTYPE_SINGULAR. See docs/taxonomy/external-mapping.md for the
+    # full LCGFT/schema.org cross-reference.
     CANONICAL_DOCTYPES: ClassVar[set[str]] = {
-        "agreement",
-        "application",
-        "bill",
-        "certificate",
-        "confirmation",
-        "contract",
-        "deed",
-        "estimate",
-        "form",
-        "guide",
-        "identification",
-        "invoice",
-        "itinerary",
-        "journal",
-        "lease",
-        "letter",
-        "license",
-        "listing",
-        "manual",
-        "notice",
-        "offer",
-        "passport",
-        "paystub",
-        "permit",
-        "plan",
-        "policy",
-        "portfolio",
-        "presentation",
-        "quote",
-        "receipt",
-        "recipe",
-        "record",
-        "reference",
-        "referral",
-        "report",
-        "reservation",
-        "resume",
-        "return",
-        "statement",
-        "title",
-        "trust",
-        "warranty",
-        "will",
+        "agreements",  # LCGFT Legal instruments (under Records (Documents))
+        "applications",  # deferred straddler — no authority commits
+        "bills",  # no authority; aliased pattern with invoices
+        "certificates",  # schema.org/Certification
+        "confirmations",  # documented gap; no clean external authority
+        "deeds",  # LCGFT subject heading
+        "estimates",
+        "floor_plans",  # LCGFT Floor plans (under Informational works)
+        "forms",  # LCGFT Blank forms
+        "guides",  # LCGFT gf2014026108 (Guidebooks)
+        "identifications",
+        "invoices",  # schema.org/Invoice (Intangible)
+        "itineraries",
+        "journals",  # LCGFT gf2014026085 (Diaries)
+        "leases",
+        "letters",  # LCGFT gf2014026141 (Personal correspondence)
+        "licenses",
+        "listings",  # schema.org/RealEstateListing
+        "manuals",  # LCGFT gf2014026109 (Handbooks and manuals)
+        "maps",  # LCGFT gf2011026387; schema.org/Map
+        "menus",  # LCGFT Menus; schema.org/Menu
+        "notices",  # adversarial/regulatory connotation; distinct from letters
+        "offers",  # documented gap; schema.org/Offer is price/availability
+        "passports",
+        "paystubs",
+        "permits",  # schema.org/Permit
+        "plans",
+        "policies",  # insurance — no clean external authority
+        "portfolios",
+        "presentations",  # deferred straddler
+        "quotes",
+        "receipts",  # schema.org/Order ("confirmation of a transaction (a receipt)")
+        "recipes",  # schema.org/Recipe (CreativeWork > HowTo > Recipe)
+        "records",  # LCGFT gf2014026163 (Records (Documents))
+        "references",  # LCGFT Reference works (under Informational works)
+        "referrals",
+        "reports",  # schema.org/Report (CreativeWork > Article > Report)
+        "reservations",  # schema.org/Reservation (9 subtypes accepted via aliases)
+        "resumes",
+        "returns",  # tax returns
+        "statements",  # documented gap; no clean external authority
+        "titles",
+        "trusts",
+        "warranties",
+        "wills",
+    }
+
+    # Plural canonical -> singular instance form for filename use.
+    # NARAPolicyNaming.format_filename() consults this so folders stay plural
+    # (LCGFT genre alignment) and filenames read as one-instance artifacts.
+    DOCTYPE_SINGULAR: ClassVar[dict[str, str]] = {
+        "agreements": "agreement",
+        "applications": "application",
+        "bills": "bill",
+        "certificates": "certificate",
+        "confirmations": "confirmation",
+        "deeds": "deed",
+        "estimates": "estimate",
+        "floor_plans": "floor_plan",
+        "forms": "form",
+        "guides": "guide",
+        "identifications": "identification",
+        "invoices": "invoice",
+        "itineraries": "itinerary",
+        "journals": "journal",
+        "leases": "lease",
+        "letters": "letter",
+        "licenses": "license",
+        "listings": "listing",
+        "manuals": "manual",
+        "maps": "map",
+        "menus": "menu",
+        "notices": "notice",
+        "offers": "offer",
+        "passports": "passport",
+        "paystubs": "paystub",
+        "permits": "permit",
+        "plans": "plan",
+        "policies": "policy",
+        "portfolios": "portfolio",
+        "presentations": "presentation",
+        "quotes": "quote",
+        "receipts": "receipt",
+        "recipes": "recipe",
+        "records": "record",
+        "references": "reference",
+        "referrals": "referral",
+        "reports": "report",
+        "reservations": "reservation",
+        "resumes": "resume",
+        "returns": "return",
+        "statements": "statement",
+        "titles": "title",
+        "trusts": "trust",
+        "warranties": "warranty",
+        "wills": "will",
     }
 
     DOMAIN_ALIASES: ClassVar[dict[str, str]] = {
@@ -258,6 +320,7 @@ class HouseholdTaxonomy(BaseTaxonomy):
         "travel": "lifestyle",
         "truck": "household",
         "university": "education",
+        "vehicle": "household",
         "vehicles": "household",
         "work": "career",
         "non_profit": "personal",
@@ -265,9 +328,17 @@ class HouseholdTaxonomy(BaseTaxonomy):
     }
 
     CATEGORY_ALIASES: ClassVar[dict[tuple[str, str], str]] = {
-        ("career", "resumes"): "resume",
         ("career", "interviewing"): "job_search",
         ("career", "docs"): "documentation",
+        # Hierarchy rule: artifact-form terms (resume, manual, agreement, ...)
+        # are doctype-only. These aliases redirect LLM-emitted forms to the
+        # appropriate subject category in each domain. Domains without an
+        # entry below deliberately surface the term as drift (canonical: null)
+        # for ground-truth refinement.
+        ("career", "resume"): "job_search",
+        ("reference", "manual"): "documentation",
+        ("property", "agreement"): "mortgage",
+        ("housing", "agreement"): "rental",
         ("personal", "goals"): "identity",
         ("financial", "bank"): "banking",
         ("financial", "checking"): "banking",
@@ -309,12 +380,7 @@ class HouseholdTaxonomy(BaseTaxonomy):
         ("property", "receipts"): "expense",
         ("property", "purchases"): "expense",
         ("property", "spending"): "expense",
-        ("property", "contracts"): "agreement",
         # medical domain
-        ("medical", "health_records"): "record",
-        ("medical", "medical_records"): "record",
-        ("medical", "medical_record"): "record",
-        ("medical", "patient_records"): "record",
         ("medical", "bills"): "expense",
         ("medical", "claims"): "claim",
         ("medical", "rx"): "prescription",
@@ -325,7 +391,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
         ("medical", "exam"): "primary_care",
         ("medical", "visit"): "primary_care",
         ("medical", "behavior_modification"): "mental_health",
-        ("medical", "clinical_trial"): "record",
         # insurance domain
         ("insurance", "car"): "auto",
         ("insurance", "vehicle"): "auto",
@@ -351,19 +416,16 @@ class HouseholdTaxonomy(BaseTaxonomy):
         ("pets", "receipts"): "expense",
         ("pets", "purchases"): "expense",
         ("pets", "spending"): "expense",
-        ("pets", "contracts"): "agreement",
         # household domain
         ("household", "receipts"): "expense",
         ("household", "purchases"): "expense",
         ("household", "spending"): "expense",
-        ("household", "contracts"): "agreement",
         ("household", "vehicle_registration_renewal"): "registration",
         ("household", "vehicle_related_policies"): "insurance",
         # career domain
         ("career", "receipts"): "expense",
         ("career", "purchases"): "expense",
         ("career", "spending"): "expense",
-        ("career", "contracts"): "agreement",
         ("career", "billing"): "compensation",
         # financial domain - additional aliases
         ("financial", "billing"): "payment",
@@ -383,100 +445,186 @@ class HouseholdTaxonomy(BaseTaxonomy):
         ("education", "purchases"): "expense",
         ("education", "spending"): "expense",
         ("education", "tuition"): "expense",
-        ("education", "contracts"): "agreement",
+        # singular `purchase` (LLM emits singular alongside plural)
+        ("food", "purchase"): "expense",
+        ("property", "purchase"): "expense",
+        ("personal", "purchase"): "expense",
+        ("lifestyle", "purchase"): "expense",
+        ("career", "purchase"): "expense",
+        # gerund variants of `travel`
+        ("personal", "traveling"): "travel",
+        ("lifestyle", "traveling"): "travel",
+        # `billing` is what the LLM calls a payment notice
+        ("insurance", "billing"): "payment",
+        ("medical", "billing"): "payment",
+        # one-off but unambiguous
+        ("lifestyle", "gift_giving"): "expense",
     }
 
     DOCTYPE_ALIASES: ClassVar[dict[str, str]] = {
-        "bank_statement": "statement",
-        "account_statement": "statement",
-        "monthly_statement": "statement",
-        "bill": "invoice",
-        "payment": "receipt",
-        "purchase": "receipt",
-        "transaction": "receipt",
-        "service_agreement": "agreement",
-        "correspondence": "letter",
-        "mail": "letter",
-        "notification": "notice",
-        "alert": "notice",
-        "reminder": "notice",
-        "document": "form",
-        "paperwork": "form",
-        "insurance_policy": "policy",
-        "coverage": "policy",
-        "cert": "certificate",
-        "certification": "certificate",
-        "credential": "certificate",
-        "assessment": "report",
-        "summary": "report",
-        "analysis": "report",
-        "history": "record",
-        "log": "record",
-        "proposal": "estimate",
-        "bid": "quote",
-        "owner_manual": "manual",
-        "instructions": "guide",
-        "how_to": "guide",
-        "1040": "return",
-        "w2": "form",
-        "w-2": "form",
-        "1099": "form",
-        "property_deed": "deed",
-        "car_title": "title",
-        "vehicle_title": "title",
-        "drivers_license": "license",
-        "registration": "license",
-        "cookbook": "recipe",
-        "cv": "resume",
-        "shot_record": "record",
-        "travel_plan": "itinerary",
+        # --- Singular -> plural (LLM emission normalization) ---
+        # Models trained on individual-document language emit the singular
+        # ("receipt", "invoice"); we route to the plural folder/genre form.
+        "agreement": "agreements",
+        "application": "applications",
+        "bill": "bills",
+        "certificate": "certificates",
+        "confirmation": "confirmations",
+        "deed": "deeds",
+        "estimate": "estimates",
+        "floor_plan": "floor_plans",
+        "form": "forms",
+        "guide": "guides",
+        "identification": "identifications",
+        "invoice": "invoices",
+        "itinerary": "itineraries",
+        "journal": "journals",
+        "lease": "leases",
+        "letter": "letters",
+        "license": "licenses",
+        "listing": "listings",
+        "manual": "manuals",
+        "map": "maps",
+        "menu": "menus",
+        "notice": "notices",
+        "offer": "offers",
+        "passport": "passports",
+        "paystub": "paystubs",
+        "permit": "permits",
+        "plan": "plans",
+        "policy": "policies",
+        "portfolio": "portfolios",
+        "presentation": "presentations",
+        "quote": "quotes",
+        "receipt": "receipts",
+        "recipe": "recipes",
+        "record": "records",
+        "reference": "references",
+        "referral": "referrals",
+        "report": "reports",
+        "reservation": "reservations",
+        "resume": "resumes",
+        "return": "returns",
+        "statement": "statements",
+        "title": "titles",
+        "trust": "trusts",
+        "warranty": "warranties",
+        "will": "wills",
+        # --- schema.org Reservation subtypes ---
+        # https://schema.org/Reservation has 9 subtypes; route each to the
+        # plural reservations container so schema.org-trained emissions land
+        # without expanding the doctype axis.
+        "boat_reservation": "reservations",
+        "bus_reservation": "reservations",
+        "event_reservation": "reservations",
+        "flight_reservation": "reservations",
+        "food_establishment_reservation": "reservations",
+        "lodging_reservation": "reservations",
+        "rental_car_reservation": "reservations",
+        "reservation_package": "reservations",
+        "taxi_reservation": "reservations",
+        "train_reservation": "reservations",
+        # --- schema.org transactional types ---
+        # Order = "a confirmation of a transaction (a receipt)" per schema.org.
+        "order": "receipts",
+        "ticket": "reservations",
+        "tickets": "reservations",
+        # Round 4: legacy `contract` doctype dropped; route to the closest
+        # LCGFT-aligned legal-instrument container for backwards compatibility
+        # with prior LLM emissions.
+        "contract": "agreements",
+        "contracts": "agreements",
+        # --- LCGFT-derived synonyms ---
+        # Plural-target aliases for prior singular-routed synonyms.
+        "bank_statement": "statements",
+        "account_statement": "statements",
+        "monthly_statement": "statements",
+        "service_agreement": "agreements",
+        "correspondence": "letters",
+        "mail": "letters",
+        "notification": "notices",
+        "alert": "notices",
+        "reminder": "notices",
+        "document": "forms",
+        "paperwork": "forms",
+        "insurance_policy": "policies",
+        "coverage": "policies",
+        "cert": "certificates",
+        "certification": "certificates",
+        "credential": "certificates",
+        "assessment": "reports",
+        "summary": "reports",
+        "analysis": "reports",
+        "history": "records",
+        "log": "records",
+        "proposal": "estimates",
+        "bid": "quotes",
+        "owner_manual": "manuals",
+        "instructions": "guides",
+        "how_to": "guides",
+        "1040": "returns",
+        "w2": "forms",
+        "w-2": "forms",
+        "1099": "forms",
+        "property_deed": "deeds",
+        "car_title": "titles",
+        "vehicle_title": "titles",
+        "drivers_license": "licenses",
+        "registration": "licenses",
+        "cookbook": "recipes",
+        "cv": "resumes",
+        "shot_record": "records",
+        "travel_plan": "itineraries",
         # paystub aliases
-        "pay_stub": "paystub",
-        "paycheck": "paystub",
-        "earnings_statement": "paystub",
+        "pay_stub": "paystubs",
+        "paycheck": "paystubs",
+        "earnings_statement": "paystubs",
         # lease aliases
-        "rental_agreement": "lease",
-        "apartment_lease": "lease",
-        "rental_lease": "lease",
+        "rental_agreement": "leases",
+        "apartment_lease": "leases",
+        "rental_lease": "leases",
         # listing aliases
-        "property_listing": "listing",
-        "mls_listing": "listing",
-        "real_estate_listing": "listing",
+        "property_listing": "listings",
+        "mls_listing": "listings",
+        "real_estate_listing": "listings",
         # offer aliases
-        "purchase_offer": "offer",
-        "real_estate_offer": "offer",
+        "purchase_offer": "offers",
+        "real_estate_offer": "offers",
         # closing aliases
-        "closing_docs": "statement",
-        "settlement_statement": "statement",
-        "hud1": "statement",
+        "closing_docs": "statements",
+        "settlement_statement": "statements",
+        "hud1": "statements",
         # hoa aliases
-        "hoa_dues": "statement",
-        "hoa_bill": "statement",
-        # discovered aliases
-        "billing_statement": "statement",
-        "claim_confirmation": "confirmation",
-        "insurance": "policy",
-        "lease_agreement": "lease",
-        "mortgage": "agreement",
-        "pay_bill": "receipt",
-        "payment_confirmation": "confirmation",
-        "payment_receipt": "receipt",
-        "payment_scheduled": "confirmation",
-        "request_for_termination_of_service": "notice",
-        "transfer_money_confirmation": "confirmation",
+        "hoa_dues": "statements",
+        "hoa_bill": "statements",
+        # --- Empirically discovered (eval drift) ---
+        "billing_statement": "statements",
+        "claim_confirmation": "confirmations",
+        "insurance": "policies",
+        "lease_agreement": "leases",
+        "mortgage": "agreements",
+        "pay_bill": "receipts",
+        "payment": "receipts",
+        "payment_confirmation": "confirmations",
+        "payment_receipt": "receipts",
+        "payment_scheduled": "confirmations",
+        "purchase": "receipts",
+        "transaction": "receipts",
+        "request_for_termination_of_service": "notices",
+        "transfer_money_confirmation": "confirmations",
         # discovered aliases - job search and reference
-        "article": "reference",
-        "call_notes": "record",
-        "job_listing": "listing",
-        "job_posting": "listing",
+        "article": "references",
+        "call_notes": "records",
+        "job_listing": "listings",
+        "job_posting": "listings",
         # discovered aliases - healthcare
-        "list": "reference",
-        "medical_billing_statement": "statement",
-        "patient_care_summary": "report",
+        "list": "references",
+        "medical_billing_statement": "statements",
+        "patient_care_summary": "reports",
         # discovered aliases - lifestyle
-        "discharge_summary": "report",
-        "service_record": "record",
-        "webpage": "reference",
+        "discharge_summary": "reports",
+        "service_record": "records",
+        "webpage": "references",
     }
 
     @property

@@ -1,4 +1,4 @@
-"""Tests for the comparison helpers in scripts/eval_runner.py."""
+"""Tests for the comparison helpers in scripts/run_eval_experiments.py."""
 
 from __future__ import annotations
 
@@ -8,9 +8,9 @@ import pytest
 
 from drover.models import ClassificationResult
 
-eval_runner = pytest.importorskip("eval_runner")
-ExpectedClassification = eval_runner.ExpectedClassification
-compare_results = eval_runner.compare_results
+run_eval_experiments = pytest.importorskip("run_eval_experiments")
+ExpectedClassification = run_eval_experiments.ExpectedClassification
+compare_results = run_eval_experiments.compare_results
 
 
 def _result(**overrides: Any) -> ClassificationResult:
@@ -138,7 +138,7 @@ class TestStrictFields:
 class TestReturnedShape:
     def test_returns_all_comparison_fields_in_order(self) -> None:
         matches = compare_results(_result(), _expected())
-        assert list(matches.keys()) == eval_runner.COMPARISON_FIELDS
+        assert list(matches.keys()) == run_eval_experiments.COMPARISON_FIELDS
 
     def test_full_match_returns_all_true(self) -> None:
         matches = compare_results(_result(), _expected())

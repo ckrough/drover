@@ -87,7 +87,7 @@ src/drover/
 ├── __main__.py         # Entry point for python -m drover
 ├── cli.py              # Click CLI commands (classify, tag, evaluate)
 ├── config.py           # Configuration management (Pydantic models)
-├── loader.py           # DocumentLoader (unstructured) + DoclingLoader (structure-aware, default)
+├── loader.py           # DoclingLoader (sole loader; structure-aware with full-page OCR)
 ├── classifier.py       # LLM-based DocumentClassifier
 ├── path_builder.py     # PathBuilder - generates organized paths
 ├── models.py           # Data models (RawClassification, ClassificationResult)
@@ -121,11 +121,10 @@ src/drover/
    └── Entry point, orchestrates the pipeline
 
 2. Loader (loader.py)
-   └── DoclingLoader (default, structure-aware with full-page OCR) or
-       DocumentLoader (unstructured fallback). Selected via --loader or
-       DROVER_LOADER. The Docling path requires `uv sync --extra docling`
-       and a one-time `uv run docling-tools models download` (~500 MB
-       to ~/.cache/docling/models). Decision rationale: ADR-005.
+   └── DoclingLoader (sole loader; structure-aware with full-page OCR).
+       Requires `uv sync --extra docling` and a one-time
+       `uv run docling-tools models download` (~500 MB to
+       ~/.cache/docling/models). Decision rationale: ADR-005, ADR-006.
 
 3. DocumentClassifier (classifier.py)
    └── Sends content to LLM using structured output for reliable extraction

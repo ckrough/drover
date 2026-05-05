@@ -2,11 +2,13 @@
 
 import asyncio
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 from drover.classifier import LLMParseError
-from drover.config import DroverConfig, ErrorMode, LoaderType
+from drover.config import DroverConfig, ErrorMode
+from drover.loader import LoadedDocument
 from drover.models import ClassificationErrorResult, ClassificationResult
 from drover.service import ClassificationService
 
@@ -40,13 +42,43 @@ def _make_error_result(filename: str) -> ClassificationErrorResult:
     )
 
 
-def _unstructured_config(**kwargs: object) -> DroverConfig:
-    """Build a DroverConfig that uses the unstructured loader.
+def _stub_loader(
+    service: ClassificationService,
+    monkeypatch: pytest.MonkeyPatch,
+    content: str = "dummy content",
+) -> None:
+    """Replace the service's loader with a stub returning fixed content.
 
-    Service tests that exercise the loader path use this to avoid the
-    Docling model pre-flight check.
+    Service-level tests don't exercise Docling; bypassing it keeps tests
+    hermetic and avoids the model pre-flight check.
     """
-    return DroverConfig(loader=LoaderType.UNSTRUCTURED, **kwargs)  # type: ignore[arg-type]
+
+    async def fake_load(path: Path) -> LoadedDocument:
+        if not path.exists():
+            from drover.loader import DocumentLoadError
+
+            raise DocumentLoadError(f"File not found: {path}")
+        return LoadedDocument(
+            path=path,
+            content=content,
+            page_count=1,
+            pages_sampled=1,
+            loader_backend="docling",
+            loader_latency_ms=0.0,
+        )
+
+    monkeypatch.setattr(service._loader, "load", fake_load)
+
+
+def _make_service(
+    monkeypatch: pytest.MonkeyPatch | None = None, **config_kwargs: Any
+) -> ClassificationService:
+    """Build a ClassificationService with a stubbed loader for unit tests."""
+    cfg = DroverConfig(**config_kwargs)
+    service = ClassificationService(cfg)
+    if monkeypatch is not None:
+        _stub_loader(service, monkeypatch)
+    return service
 
 
 async def test_classification_service_empty_files() -> None:
@@ -59,14 +91,15 @@ async def test_classification_service_empty_files() -> None:
     assert exit_code == 0
 
 
-async def test_classification_service_error_modes_continue(tmp_path: Path) -> None:
+async def test_classification_service_error_modes_continue(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Service should continue on errors when ErrorMode.CONTINUE is set.
 
     We feed it a non-existent file to force a DocumentLoadError and
     ensure it maps to an error result and exit code 2 when all fail.
     """
-    cfg = _unstructured_config(on_error=ErrorMode.CONTINUE)
-    service = ClassificationService(cfg)
+    service = _make_service(monkeypatch, on_error=ErrorMode.CONTINUE)
 
     missing = tmp_path / "does_not_exist.pdf"
 
@@ -90,8 +123,10 @@ async def test_debug_dir_writes_files(
     doc_path = tmp_path / "doc.txt"
     doc_path.write_text("dummy content")
 
-    cfg = _unstructured_config(capture_debug=True, debug_dir=tmp_path / "debug")
-    service = ClassificationService(cfg)
+    service = _make_service(
+        monkeypatch, capture_debug=True, debug_dir=tmp_path / "debug"
+    )
+    cfg = service.config
 
     async def fake_classify(
         content: str,
@@ -142,10 +177,12 @@ async def test_debug_capture_on_llm_parse_failure(
     doc_path.write_text("dummy content")
 
     debug_dir = tmp_path / "debug"
-    cfg = _unstructured_config(
-        capture_debug=True, debug_dir=debug_dir, on_error=ErrorMode.CONTINUE
+    service = _make_service(
+        monkeypatch,
+        capture_debug=True,
+        debug_dir=debug_dir,
+        on_error=ErrorMode.CONTINUE,
     )
-    service = ClassificationService(cfg)
 
     async def fake_classify_that_fails(
         content: str,
@@ -441,8 +478,7 @@ class TestUnexpectedErrors:
         doc = tmp_path / "doc.txt"
         doc.write_text("test content")
 
-        cfg = _unstructured_config()
-        service = ClassificationService(cfg)
+        service = _make_service(monkeypatch)
 
         # Mock classifier to succeed
         async def fake_classify(

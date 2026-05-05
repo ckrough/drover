@@ -64,3 +64,6 @@ tests/integration/config.yaml
 
 # Beads issue tracker
 .beads/
+
+# Local-only tools and scratch (kept out of repo by convention)
+.local/

@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 
 from drover.classifier import DocumentClassifier
-from drover.loader import DocumentLoader
+from drover.loader import DoclingLoader
 from drover.models import RawClassification
 from drover.naming.nara import NARAPolicyNaming
 from drover.path_builder import PathBuilder
@@ -26,7 +26,7 @@ class TestClassificationPipeline:
     async def test_classify_bank_statement(
         self,
         integration_classifier: DocumentClassifier,
-        integration_loader: DocumentLoader,
+        integration_loader: DoclingLoader,
         sample_text_file: Path,
     ) -> None:
         """Test classifying a bank statement document."""
@@ -42,7 +42,7 @@ class TestClassificationPipeline:
         assert isinstance(result, RawClassification)
         assert result.domain == "financial"
         assert result.category == "banking"
-        assert result.doctype == "statement"
+        assert result.doctype == "statements"
         assert result.vendor  # Should have extracted vendor name
         assert result.date  # Should have extracted date
 
@@ -50,7 +50,7 @@ class TestClassificationPipeline:
     async def test_classify_invoice(
         self,
         integration_classifier: DocumentClassifier,
-        integration_loader: DocumentLoader,
+        integration_loader: DoclingLoader,
         sample_invoice_file: Path,
     ) -> None:
         """Test classifying an invoice document."""
@@ -67,14 +67,14 @@ class TestClassificationPipeline:
         assert result.domain == "financial"
         # Invoice could be categorized as business or other financial category
         assert result.category in {"business", "tax", "banking", "other"}
-        assert result.doctype in {"invoice", "receipt", "statement", "other"}
+        assert result.doctype in {"invoices", "receipts", "statements", "other"}
         assert result.date  # Should have extracted date
 
     @pytest.mark.asyncio
     async def test_full_pipeline_produces_valid_path(
         self,
         integration_classifier: DocumentClassifier,
-        integration_loader: DocumentLoader,
+        integration_loader: DoclingLoader,
         sample_text_file: Path,
     ) -> None:
         """Test that classification produces a valid suggested path."""
@@ -105,7 +105,7 @@ class TestClassificationPipeline:
     async def test_classification_with_metrics(
         self,
         integration_classifier: DocumentClassifier,
-        integration_loader: DocumentLoader,
+        integration_loader: DoclingLoader,
         sample_text_file: Path,
     ) -> None:
         """Test that metrics collection works with real LLM."""
@@ -127,7 +127,7 @@ class TestDocumentLoading:
     @pytest.mark.asyncio
     async def test_load_text_file(
         self,
-        integration_loader: DocumentLoader,
+        integration_loader: DoclingLoader,
         sample_text_file: Path,
     ) -> None:
         """Test loading a plain text file."""
@@ -141,7 +141,7 @@ class TestDocumentLoading:
     @pytest.mark.asyncio
     async def test_load_preserves_content(
         self,
-        integration_loader: DocumentLoader,
+        integration_loader: DoclingLoader,
         sample_text_file: Path,
     ) -> None:
         """Test that loading preserves key content."""

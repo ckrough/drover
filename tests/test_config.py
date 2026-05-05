@@ -11,7 +11,6 @@ from drover.config import (
     AIProvider,
     DroverConfig,
     ErrorMode,
-    LoaderType,
     LogLevel,
     SampleStrategy,
     TaxonomyMode,
@@ -194,35 +193,6 @@ class TestDroverConfig:
         with patch.dict(os.environ, {"DROVER_PROMPT": "/env/prompt.md"}):
             env_data = DroverConfig.from_env()
         assert env_data["prompt"] == "/env/prompt.md"
-
-    def test_loader_default_is_docling(self) -> None:
-        """Default loader is `docling` (structure-aware) on this branch."""
-        config = DroverConfig()
-        assert config.loader == LoaderType.DOCLING
-
-    def test_loader_from_env(self) -> None:
-        """DROVER_LOADER environment variable selects the unstructured backend."""
-        with patch.dict(os.environ, {"DROVER_LOADER": "unstructured"}):
-            config = DroverConfig.model_validate(DroverConfig.from_env())
-        assert config.loader == LoaderType.UNSTRUCTURED
-
-    def test_loader_with_overrides(self) -> None:
-        """CLI override for loader takes precedence over default."""
-        config = DroverConfig()
-        new_config = config.with_overrides(loader="docling")
-        assert new_config.loader == LoaderType.DOCLING
-
-    def test_loader_cli_override_beats_env(self) -> None:
-        """with_overrides applied on top of env-loaded config wins."""
-        with patch.dict(os.environ, {"DROVER_LOADER": "unstructured"}):
-            config = DroverConfig.model_validate(DroverConfig.from_env())
-        new_config = config.with_overrides(loader="docling")
-        assert new_config.loader == LoaderType.DOCLING
-
-    def test_loader_rejects_unknown_value(self) -> None:
-        """Validation rejects loaders outside the known set."""
-        with pytest.raises(ValueError):
-            DroverConfig.model_validate({"loader": "magic"})
 
 
 class TestAIConfig:

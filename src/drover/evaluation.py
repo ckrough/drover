@@ -18,7 +18,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from drover.classifier import DocumentClassifier
-from drover.loader import DocumentLoaderProtocol
+from drover.loader import DoclingLoader
 from drover.logging import get_logger
 from drover.models import RawClassification
 
@@ -202,16 +202,14 @@ class ClassificationEvaluator:
     async def evaluate(
         self,
         classifier: DocumentClassifier,
-        loader: DocumentLoaderProtocol,
+        loader: DoclingLoader,
         test_files: Sequence[str | Path] | None = None,
     ) -> EvaluationResult:
         """Run classification on test files and compare to ground truth.
 
         Args:
             classifier: Configured DocumentClassifier instance.
-            loader: Document loader for text extraction. Must be explicitly
-                provided so the caller's loader configuration (docling vs
-                unstructured) is honoured rather than silently defaulted.
+            loader: Document loader for text extraction.
             test_files: Specific files to test. If None, uses all files
                        that have ground truth entries.
 
@@ -379,7 +377,7 @@ class ClassificationEvaluator:
 async def compare_models(
     classifier_a: DocumentClassifier,
     classifier_b: DocumentClassifier,
-    loader: DocumentLoaderProtocol,
+    loader: DoclingLoader,
     ground_truth_path: str | Path,
     documents_dir: str | Path | None = None,
 ) -> tuple[EvaluationResult, EvaluationResult]:

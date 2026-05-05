@@ -27,6 +27,7 @@ class BaseTaxonomy(ABC):
     DOMAIN_ALIASES: ClassVar[dict[str, str]]
     CATEGORY_ALIASES: ClassVar[dict[tuple[str, str], str]]
     DOCTYPE_ALIASES: ClassVar[dict[str, str]]
+    DOCTYPE_SINGULAR: ClassVar[dict[str, str]] = {}
 
     @property
     @abstractmethod
@@ -93,6 +94,15 @@ class BaseTaxonomy(ABC):
             return self.DOCTYPE_ALIASES[normalized]
 
         return None
+
+    def singular_form(self, doctype: str) -> str:
+        """Return the singular instance form of a (plural) canonical doctype.
+
+        Folders use plural canonical doctypes (LCGFT genre alignment); filenames
+        use the singular form (one file = one instance). Falls back to the input
+        when no mapping exists, so callers can pass any string safely.
+        """
+        return self.DOCTYPE_SINGULAR.get(doctype, doctype)
 
     def all_domains(self) -> list[str]:
         """Return sorted list of all canonical domains."""

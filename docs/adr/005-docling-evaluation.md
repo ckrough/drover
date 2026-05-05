@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted (2026-05-01).
+Accepted (2026-05-01). Superseded-in-part by [ADR-006](006-standardize-on-docling.md) (2026-05-05): the `unstructured` fallback path is removed; Docling is the sole loader. Format-coverage trade-offs from this ADR remain authoritative.
 
 ## Context
 

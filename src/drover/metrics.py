@@ -51,7 +51,7 @@ class AIMetrics(BaseModel):
     )
     loader_backend: str | None = Field(
         default=None,
-        description="Document loader backend (unstructured | docling)",
+        description="Document loader backend (docling)",
     )
 
 

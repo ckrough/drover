@@ -75,7 +75,7 @@ async def test_classify_passes_callbacks_via_config(monkeypatch) -> None:
 
     assert classification.domain == "financial"
     assert classification.category == "banking"
-    assert classification.doctype == "statement"
+    assert classification.doctype == "statements"
     assert debug_info is not None
     assert "metrics" in debug_info
 

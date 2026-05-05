@@ -50,13 +50,6 @@ class ErrorMode(StrEnum):
     SKIP = "skip"  # Silently skip failures
 
 
-class LoaderType(StrEnum):
-    """Document loader backend."""
-
-    UNSTRUCTURED = "unstructured"  # Fallback: unstructured.partition.auto
-    DOCLING = "docling"  # Default: structure-aware loader (Docling)
-
-
 class AIConfig(BaseModel):
     """AI provider configuration."""
 
@@ -89,10 +82,6 @@ class DroverConfig(BaseModel):
     naming_style: str = Field(default="nara")
     sample_strategy: SampleStrategy = Field(default=SampleStrategy.ADAPTIVE)
     max_pages: int = Field(default=10)
-    loader: LoaderType = Field(
-        default=LoaderType.DOCLING,
-        description="Document loader backend (docling | unstructured)",
-    )
     log_level: LogLevel = Field(default=LogLevel.QUIET)
     on_error: ErrorMode = Field(default=ErrorMode.FAIL)
     concurrency: int = Field(default=1)
@@ -143,7 +132,6 @@ class DroverConfig(BaseModel):
             "DROVER_NAMING_STYLE": ("naming_style",),
             "DROVER_SAMPLE_STRATEGY": ("sample_strategy",),
             "DROVER_MAX_PAGES": ("max_pages",),
-            "DROVER_LOADER": ("loader",),
             "DROVER_LOG_LEVEL": ("log_level",),
             "DROVER_ON_ERROR": ("on_error",),
             "DROVER_CONCURRENCY": ("concurrency",),
