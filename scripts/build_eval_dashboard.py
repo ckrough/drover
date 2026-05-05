@@ -26,7 +26,7 @@ from __future__ import annotations
 
 import json
 import re
-import subprocess
+import subprocess  # nosec B404 - fixed-argv invocations only
 from pathlib import Path
 from typing import Any
 
@@ -73,7 +73,7 @@ def _extract_aggregate(raw: dict[str, Any]) -> dict[str, Any]:
 
 def _rfc3339_now() -> str:
     """Return current time as an RFC 3339 string (local timezone)."""
-    result = subprocess.run(
+    result = subprocess.run(  # nosec B603 B607 - fixed argv, no shell, trusted PATH
         ["date", "-Iseconds"], capture_output=True, text=True, check=True
     )
     return result.stdout.strip()

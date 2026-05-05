@@ -14,7 +14,7 @@ Usage:
 from __future__ import annotations
 
 import json
-import subprocess
+import subprocess  # nosec B404 - drover/tag CLI invocations only
 import sys
 from pathlib import Path
 
@@ -75,7 +75,7 @@ def classify_files(
     if verbose:
         click.echo(f"Running: {' '.join(cmd[:6])}... ({len(files)} files)")
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True)  # nosec B603 - drover CLI, fixed argv
 
     # Parse JSONL output
     results: dict[Path, dict] = {}
@@ -219,12 +219,16 @@ def tag_file(
 
         if dry_run:
             cmd.append("--dry-run")
-            click.echo(f"  -> Would tag: domain={domain}, category={category}, doctype={doctype}")
+            click.echo(
+                f"  -> Would tag: domain={domain}, category={category}, doctype={doctype}"
+            )
             return True
 
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(cmd, capture_output=True, text=True)  # nosec B603 - drover tag CLI, fixed argv
         if result.returncode == 0:
-            click.echo(f"  -> Tagged: domain={domain}, category={category}, doctype={doctype}")
+            click.echo(
+                f"  -> Tagged: domain={domain}, category={category}, doctype={doctype}"
+            )
             return True
         else:
             click.echo(f"  -> Error tagging: {result.stderr}", err=True)
@@ -331,9 +335,15 @@ def main(
         category = result.get("category", "")
         doctype = result.get("doctype", "")
 
-        if domain and category and doctype:
-            if tag_file(file_path, domain, category, doctype, config_path, dry_run, verbose):
-                tagged_count += 1
+        if (
+            domain
+            and category
+            and doctype
+            and tag_file(
+                file_path, domain, category, doctype, config_path, dry_run, verbose
+            )
+        ):
+            tagged_count += 1
 
     # Summary
     click.echo("\n" + "=" * 40)

@@ -846,8 +846,8 @@ class DocumentClassifier:
                         repaired = repair_json(block, return_objects=True)
                         if isinstance(repaired, dict):
                             parsed = repaired
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        logger.debug("json_repair_codeblock_failed", error=str(exc))
 
         # Use json-repair as final fallback - handles malformed JSON,
         # surrounding text, trailing commas, unquoted keys, etc.
@@ -856,8 +856,8 @@ class DocumentClassifier:
                 repaired = repair_json(response, return_objects=True)
                 if isinstance(repaired, dict):
                     parsed = repaired
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.debug("json_repair_final_failed", error=str(exc))
 
         if parsed is None:
             raise LLMParseError(

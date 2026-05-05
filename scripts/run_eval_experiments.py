@@ -33,15 +33,15 @@ from pydantic import BaseModel, Field, ValidationError, field_validator
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from drover.config import (  # noqa: E402
+from drover.config import (
     AIConfig,
     AIProvider,
     DroverConfig,
     SampleStrategy,
     TaxonomyMode,
 )
-from drover.models import ClassificationErrorResult, ClassificationResult  # noqa: E402
-from drover.service import ClassificationService  # noqa: E402
+from drover.models import ClassificationErrorResult, ClassificationResult
+from drover.service import ClassificationService
 
 # -----------------------------------------------------------------------------
 # Manifest Schema (Pydantic Models)
@@ -675,7 +675,7 @@ def cli() -> None:
 def run(manifest_path: Path, output: Path | None, verbose: bool, dry_run: bool) -> None:
     """Run an evaluation experiment from a YAML manifest.
 
-    Executes classification for each (document × model) combination and
+    Executes classification for each (document x model) combination and
     records results to a JSONL file for analysis.
 
     \b
@@ -712,7 +712,7 @@ def run(manifest_path: Path, output: Path | None, verbose: bool, dry_run: bool) 
         for doc in manifest.documents:
             for model in manifest.models:
                 click.echo(
-                    f"  {doc.path.name} × {model.provider.value}/{model.model}",
+                    f"  {doc.path.name} x {model.provider.value}/{model.model}",
                     err=True,
                 )
         click.echo("", err=True)

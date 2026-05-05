@@ -597,7 +597,7 @@ def _coverage_plan(
     count: int, min_long: int, seed: int, taxonomy: BaseTaxonomy
 ) -> list[Triple]:
     """Pick triples covering all 16 domains, filling long-doc target first."""
-    rng = random.Random(seed)
+    rng = random.Random(seed)  # nosec B311 - non-cryptographic eval sampling
     domains = sorted(taxonomy.CANONICAL_DOMAINS)
     picks: list[Triple] = []
 
@@ -649,12 +649,16 @@ def _load_tokenizer(offline: bool = True) -> PreTrainedTokenizerBase:
     from transformers import AutoTokenizer  # type: ignore[import-not-found]
 
     try:
-        return AutoTokenizer.from_pretrained(NLI_TOKENIZER_ID, local_files_only=offline)
+        return AutoTokenizer.from_pretrained(  # nosec B615 - eval-time helper; revision pin deferred
+            NLI_TOKENIZER_ID, local_files_only=offline
+        )
     except Exception as exc:
         if not offline:
             raise
         logger.warning("tokenizer_offline_miss", model=NLI_TOKENIZER_ID, error=str(exc))
-        return AutoTokenizer.from_pretrained(NLI_TOKENIZER_ID, local_files_only=False)
+        return AutoTokenizer.from_pretrained(  # nosec B615 - eval-time helper; revision pin deferred
+            NLI_TOKENIZER_ID, local_files_only=False
+        )
 
 
 def _token_count(text: str, tokenizer: PreTrainedTokenizerBase) -> int:
@@ -998,7 +1002,7 @@ def _topup_plan(
     3. Pad each domain up to target_per_domain total docs, biasing toward
        LONG_TRIPLES when available so long-doc coverage stays healthy.
     """
-    rng = random.Random(seed)
+    rng = random.Random(seed)  # nosec B311 - non-cryptographic eval sampling
     domains = sorted(taxonomy.CANONICAL_DOMAINS)
 
     counts: dict[str, int] = dict.fromkeys(domains, 0)
@@ -1201,7 +1205,7 @@ async def _run(
     target_doctypes: int,
 ) -> None:
     taxonomy = get_taxonomy("household")
-    rng = random.Random(seed)
+    rng = random.Random(seed)  # nosec B311 - non-cryptographic eval sampling
 
     if top_up:
         existing_rows = _read_existing_rows(ground_truth)

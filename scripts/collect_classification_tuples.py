@@ -327,8 +327,8 @@ def main(
     total_found = len(files)
     if sample is not None and 0 < sample < len(files):
         if seed is not None:
-            random.seed(seed)
-        files = random.sample(files, sample)
+            random.seed(seed)  # nosec B311 - non-cryptographic sampling
+        files = random.sample(files, sample)  # nosec B311 - non-cryptographic sampling
         click.echo(f"Found {total_found} documents, sampling {len(files)}.", err=True)
     else:
         click.echo(f"Found {len(files)} documents.", err=True)
