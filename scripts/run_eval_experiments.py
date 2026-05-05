@@ -5,9 +5,9 @@ This script runs classification experiments across multiple models and documents
 recording results for analysis.
 
 Usage:
-    python scripts/eval_runner.py run eval/experiment.yaml
-    python scripts/eval_runner.py report eval/results/experiment-*.jsonl
-    python scripts/eval_runner.py validate eval/experiment.yaml
+    python scripts/run_eval_experiments.py run eval/experiment.yaml
+    python scripts/run_eval_experiments.py report eval/results/experiment-*.jsonl
+    python scripts/run_eval_experiments.py validate eval/experiment.yaml
 """
 
 from __future__ import annotations
@@ -623,9 +623,9 @@ def cli() -> None:
 
     \b
     Examples:
-        python scripts/eval_runner.py validate eval/experiment.yaml
-        python scripts/eval_runner.py run eval/experiment.yaml -v
-        python scripts/eval_runner.py report eval/results/experiment-*.jsonl
+        python scripts/run_eval_experiments.py validate eval/experiment.yaml
+        python scripts/run_eval_experiments.py run eval/experiment.yaml -v
+        python scripts/run_eval_experiments.py report eval/results/experiment-*.jsonl
     """
     pass
 
@@ -648,7 +648,7 @@ def run(manifest_path: Path, output: Path | None, verbose: bool, dry_run: bool) 
 
     \b
     Example:
-        python scripts/eval_runner.py run eval/my-experiment.yaml -v
+        python scripts/run_eval_experiments.py run eval/my-experiment.yaml -v
     """
     try:
         manifest = ExperimentManifest.from_yaml(manifest_path)
@@ -698,7 +698,7 @@ def run(manifest_path: Path, output: Path | None, verbose: bool, dry_run: bool) 
         click.echo("\n\nInterrupted! Partial results saved to:", err=True)
         click.echo(f"  {output}", err=True)
         click.echo("Generate partial report with:", err=True)
-        click.echo(f"  python scripts/eval_runner.py report {output}", err=True)
+        click.echo(f"  python scripts/run_eval_experiments.py report {output}", err=True)
         sys.exit(130)  # Standard SIGINT exit code
 
     # Print summary

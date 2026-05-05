@@ -6,11 +6,11 @@ Runs Drover in fallback mode on documents and captures the raw LLM suggestions
 for taxonomy improvement.
 
 Usage:
-    python scripts/taxonomy_discover.py documents/*.pdf
-    python scripts/taxonomy_discover.py --format json ~/Documents
-    python scripts/taxonomy_discover.py --output discovered.py documents/
-    python scripts/taxonomy_discover.py --sample 50 ~/Documents
-    python scripts/taxonomy_discover.py --sample 100 --seed 42 ~/Documents
+    python scripts/discover_taxonomy_terms.py documents/*.pdf
+    python scripts/discover_taxonomy_terms.py --format json ~/Documents
+    python scripts/discover_taxonomy_terms.py --output discovered.py documents/
+    python scripts/discover_taxonomy_terms.py --sample 50 ~/Documents
+    python scripts/discover_taxonomy_terms.py --sample 100 --seed 42 ~/Documents
 """
 
 from __future__ import annotations
@@ -374,11 +374,11 @@ def main(
 
     \b
     Examples:
-        python scripts/taxonomy_discover.py documents/*.pdf
-        python scripts/taxonomy_discover.py --format json ~/Documents
-        python scripts/taxonomy_discover.py -v --output discovered.py documents/
-        python scripts/taxonomy_discover.py --sample 50 ~/Documents
-        python scripts/taxonomy_discover.py --sample 100 --seed 42 ~/Documents
+        python scripts/discover_taxonomy_terms.py documents/*.pdf
+        python scripts/discover_taxonomy_terms.py --format json ~/Documents
+        python scripts/discover_taxonomy_terms.py -v --output discovered.py documents/
+        python scripts/discover_taxonomy_terms.py --sample 50 ~/Documents
+        python scripts/discover_taxonomy_terms.py --sample 100 --seed 42 ~/Documents
     """
     # Expand paths and collect files
     files = expand_paths(list(paths))

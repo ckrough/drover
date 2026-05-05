@@ -51,25 +51,6 @@ uv run drover evaluate \
   --loader unstructured
 ```
 
-Side-by-side benchmark (writes per-loader JSON for diff):
-
-```bash
-TS=$(date +%Y-%m-%dT%H%M%S)
-OUT_DIR=eval/runs/real-world-${TS}
-mkdir -p ${OUT_DIR}
-
-unset ALL_PROXY all_proxy FTP_PROXY GRPC_PROXY
-
-for LOADER in docling unstructured; do
-  uv run python scripts/benchmark_docling_loaders.py \
-    --loader ${LOADER} \
-    --ai-provider ollama --ai-model gemma4:latest \
-    --ground-truth eval/ground_truth/real-world.jsonl \
-    --documents-dir eval/samples/real-world \
-    --out-json ${OUT_DIR}/gemma4_${LOADER}.json
-done
-```
-
 ## Sanity checks before running
 
 ```bash

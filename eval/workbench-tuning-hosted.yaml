@@ -4,8 +4,8 @@
 #
 # Usage:
 #   export ANTHROPIC_API_KEY="your-key-here"
-#   python scripts/eval_runner.py run eval/workbench-tuning.yaml -v
-#   python scripts/eval_runner.py report eval/results/anthropic-workbench-tuning-*.jsonl
+#   python scripts/run_eval_experiments.py run eval/workbench-tuning.yaml -v
+#   python scripts/run_eval_experiments.py report eval/results/anthropic-workbench-tuning-*.jsonl
 
 name: "anthropic-workbench-tuning"
 description: "Classification experiment using Anthropic Claude Sonnet 4.5 for Workbench analysis"

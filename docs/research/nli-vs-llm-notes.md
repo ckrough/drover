@@ -288,7 +288,7 @@ env -u ALL_PROXY -u all_proxy -u FTP_PROXY -u GRPC_PROXY \
 - Anthropic prompt caching: 0 cache reads despite `cache_control: ephemeral`. The system block was below the 1024-token threshold. Either dead code or a misconfigured optimization, depending on framing.
 - TMPDIR confusion in the bench script: the bash bench script inherits the user's `TMPDIR`, not the Claude session's; outputs went to a hidden `/var/folders/...` path that took several `lsof` calls to locate.
 - `drover evaluate` stdout pollution. JSON output is preceded by `Warning:` lines from the loader; bench parsers must scan to the first `{`.
-- 14 pre-existing lint errors in `scripts/` (`batch_organize.py`, `eval_runner.py`, `taxonomy_discover.py`) confirmed pre-existing via `git stash`; not addressed in scope.
+- 14 pre-existing lint errors in `scripts/` (`organize_directory_tree.py`, `run_eval_experiments.py`, `discover_taxonomy_terms.py`) confirmed pre-existing via `git stash`; not addressed in scope.
 - `total_documents` field in eval JSON returns `None` instead of the count.
 - Per-domain category and doctype diversity is uneven (medical=4 cats but most domains=2 cats). Top-up planner satisfies the AC but does not pursue maximum diversity.
 - Vendor pool size (3-4 names per domain) is small enough that synthetic vendors repeat across documents.

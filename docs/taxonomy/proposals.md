@@ -367,7 +367,7 @@ The drift section of the harvest aggregate (count ≥ 5) now contains only `unkn
 | Straddler `reservation` (housing) | KEEP DEFERRED. No signal. |
 | Round 4 implementation | NOT INDICATED. No corpus signal warrants further refactor. |
 | External cross-reference (NARA, FamilySearch) | KEEP DEFERRED. Unblocked by this validation but not in scope. |
-| Throwaway harvester `scripts/collect_classification_tuples.py` | FILE NEW BEADS TASK to delete. All rounds verified, no remaining open items rely on it. |
+| Harvester `scripts/collect_classification_tuples.py` | KEEP. Repeatedly useful across rounds; documented in `scripts/README.md`. |
 
 ## Item 5 — External cross-reference (deferred to follow-up)
 

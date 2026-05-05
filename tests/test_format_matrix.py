@@ -9,7 +9,7 @@ remains visible. Adding a new extension to KNOWN_REGRESSIONS without
 a matching entry in `eval/format_matrix.md` (or the ADR) is a no-go
 trigger.
 
-See `scripts/format_matrix.py` for the markdown report consumed by
+See `scripts/build_format_matrix.py` for the markdown report consumed by
 ADR-005 and `eval/format_matrix.md`.
 """
 

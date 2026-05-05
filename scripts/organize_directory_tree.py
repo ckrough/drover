@@ -6,9 +6,9 @@ renames them to the suggested filename (in-place), and tags them with
 domain, category, and doctype metadata.
 
 Usage:
-    python scripts/batch_organize.py /path/to/directory --config drover.yaml
-    python scripts/batch_organize.py ~/Documents --config ~/.config/drover/config.yaml --dry-run
-    python scripts/batch_organize.py ./inbox --config drover.yaml -v
+    python scripts/organize_directory_tree.py /path/to/directory --config drover.yaml
+    python scripts/organize_directory_tree.py ~/Documents --config ~/.config/drover/config.yaml --dry-run
+    python scripts/organize_directory_tree.py ./inbox --config drover.yaml -v
 """
 
 from __future__ import annotations
