@@ -62,7 +62,21 @@ def integration_classifier(integration_config: DroverConfig) -> DocumentClassifi
 
 @pytest.fixture(scope="session")
 def integration_loader() -> DoclingLoader:
-    """Create a document loader for integration tests."""
+    """Create a document loader for integration tests.
+
+    Skips integration tests that depend on the loader if the Docling model
+    cache is not present (CI runners without `docling-tools models download`,
+    fresh dev environments).
+    """
+    from drover.loader import DocumentLoadError, _check_docling_models_available
+
+    try:
+        _check_docling_models_available()
+    except DocumentLoadError as e:
+        pytest.skip(
+            f"Docling models not available: {e}. "
+            "Run `uv run docling-tools models download` to enable."
+        )
     return DoclingLoader()
 
 
