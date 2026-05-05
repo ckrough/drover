@@ -71,9 +71,6 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras
 
-      - name: Download NLTK data
-        run: uv run python -c "import nltk; nltk.download('averaged_perceptron_tagger_eng'); nltk.download('punkt_tab')"
-
       - name: Run tests with coverage
         run: uv run pytest tests/ --cov=src --cov-report=xml --cov-report=term-missing
 

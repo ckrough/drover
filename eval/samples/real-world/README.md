@@ -2,7 +2,7 @@
 
 This directory holds a small set of real-world PDFs (receipts, quotes, manuals, recipes, medical reports, shareholder letters, etc.) for evaluating drover's classifier against documents that carry **logos, embedded images, and graphical structure**, not just clean born-digital text.
 
-It exists to test the hypothesis ADR-005's synthetic 80-doc corpus could not exercise: that real-world documents with vendor identity in logos and image-borne text favor Docling's OCR-aware loader over `unstructured`'s text-layer extraction. See [docs/adr/005-docling-evaluation.md](../../docs/adr/005-docling-evaluation.md) §"What would change the decision."
+It exists to test the hypothesis ADR-005's synthetic 80-doc corpus could not exercise: that real-world documents with vendor identity in logos and image-borne text benefit from Docling's OCR-aware structure parser. See [docs/adr/005-docling-evaluation.md](../../../docs/adr/005-docling-evaluation.md) §"What would change the decision." The `unstructured` fallback path described in older revisions of that ADR has since been removed by [ADR-006](../../../docs/adr/006-standardize-on-docling.md).
 
 ## Files
 
@@ -34,22 +34,14 @@ Quick reference:
 
 ## Running the eval
 
-Single-loader runs (summary output):
-
 ```bash
-# Docling (default on this branch — full-page OCR enabled)
 uv run drover evaluate \
   --ground-truth eval/ground_truth/real-world.jsonl \
   --documents-dir eval/samples/real-world \
   --ai-provider ollama --ai-model gemma4:latest
-
-# Unstructured (fallback)
-uv run drover evaluate \
-  --ground-truth eval/ground_truth/real-world.jsonl \
-  --documents-dir eval/samples/real-world \
-  --ai-provider ollama --ai-model gemma4:latest \
-  --loader unstructured
 ```
+
+Docling (full-page OCR enabled) is the sole loader per [ADR-006](../../../docs/adr/006-standardize-on-docling.md).
 
 ## Sanity checks before running
 
@@ -74,6 +66,6 @@ for f in stubs:
 
 ## Interpreting results
 
-- **Vendor accuracy** is the load-bearing metric: real-world receipts/invoices typically encode vendor identity in logos and image regions, which `unstructured` flattens to nothing. If Docling lifts vendor accuracy by 5+ points on this corpus, that supports reopening ADR-005.
-- **Category accuracy** is the original axis ADR-005 measured. Flat synthetic data showed −3.8pp for Docling; this corpus will tell us whether structural cues help on real layouts.
+- **Vendor accuracy** is the load-bearing metric: real-world receipts/invoices typically encode vendor identity in logos and image regions. Docling's full-page OCR is what makes that text reachable.
+- **Category accuracy** is the original axis ADR-005 measured. Flat synthetic data showed −3.8pp during evaluation; this corpus tells us whether structural cues help on real layouts.
 - **Date and doctype accuracy** are sensitive to OCR transcription noise. If Docling's `force_full_page_ocr` setting (currently enabled in `src/drover/loader.py:_build_docling_converter`) corrupts dates by re-OCRing born-digital text, that is a known trade-off and may motivate switching to picture-region-only OCR.

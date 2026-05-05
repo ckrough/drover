@@ -9,7 +9,7 @@ aliases: ["Docling Spike PRD"]
 
 # Docling Evaluation Spike for Drover Document Pipeline
 
-> **Status: HISTORICAL.** This is the spike PRD that scoped the Docling evaluation. The spike has been completed and the outcome (no-go) is recorded in [ADR-005](../adr/005-docling-evaluation.md). The spike infrastructure has been removed from Drover. References to `nli_classifier.py`, `DoclingLoader`, `--loader docling`, and the Llama 3.2 baseline below describe the spike scaffolding as it existed during evaluation, not Drover's current behavior. The current loader is still `unstructured`, the current classifier is the local LLM path described in [ADR-004](../adr/004-local-llm-as-primary-local-path.md), and there is no NLI classifier.
+> **Status: HISTORICAL.** This is the spike PRD that scoped the Docling evaluation. The spike has been completed: [ADR-005](../adr/005-docling-evaluation.md) accepted Docling as the default loader, and [ADR-006](../adr/006-standardize-on-docling.md) (2026-05-05) removed the `unstructured` fallback path entirely so Docling is now the sole loader. References to `nli_classifier.py`, `--loader docling`, and the Llama 3.2 baseline below describe the spike scaffolding as it existed during evaluation, not Drover's current behavior. The current classifier is the local LLM path described in [ADR-004](../adr/004-local-llm-as-primary-local-path.md), and there is no NLI classifier.
 
 ## Context
 

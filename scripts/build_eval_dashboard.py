@@ -80,7 +80,12 @@ def _rfc3339_now() -> str:
 
 
 def _infer_loader_from_filename(fname: str) -> str:
-    """Infer loader name from JSON filename convention (e.g. gemma4_docling.json)."""
+    """Infer loader name from JSON filename convention (e.g. gemma4_docling.json).
+
+    Historical runs may carry an `_unstructured` suffix; surface that as-is so
+    older dashboard rows continue to render. Current runs are docling-only
+    (ADR-006).
+    """
     stem = Path(fname).stem
     parts = stem.split("_")
     if parts and parts[-1] in ("docling", "unstructured"):

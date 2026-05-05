@@ -21,12 +21,9 @@ from drover.classifier import (
 from drover.config import (
     DroverConfig,
     ErrorMode,
-    LoaderType,
 )
 from drover.loader import (
     DoclingLoader,
-    DocumentLoader,
-    DocumentLoaderProtocol,
     DocumentLoadError,
 )
 from drover.logging import get_logger
@@ -54,22 +51,13 @@ class ClassificationService:
         self._taxonomy = get_taxonomy(config.taxonomy)
         self._naming_policy = get_naming_policy(config.naming_style)
 
-        self._loader: DocumentLoaderProtocol
-        if config.loader == LoaderType.DOCLING:
-            debug_dir = (
-                Path(config.debug_dir).expanduser() if config.debug_dir else None
-            )
-            self._loader = DoclingLoader(
-                strategy=config.sample_strategy,
-                max_pages=config.max_pages,
-                debug_dir=debug_dir,
-                debug_structure=config.debug_structure,
-            )
-        else:
-            self._loader = DocumentLoader(
-                strategy=config.sample_strategy,
-                max_pages=config.max_pages,
-            )
+        debug_dir = Path(config.debug_dir).expanduser() if config.debug_dir else None
+        self._loader = DoclingLoader(
+            strategy=config.sample_strategy,
+            max_pages=config.max_pages,
+            debug_dir=debug_dir,
+            debug_structure=config.debug_structure,
+        )
         self._classifier = self._create_classifier()
         self._path_builder = PathBuilder(
             naming_policy=self._naming_policy,

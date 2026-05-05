@@ -1,4 +1,4 @@
-"""Tests for DocumentLoader and document sampling."""
+"""Tests for DoclingLoader and document sampling."""
 
 import json
 from pathlib import Path
@@ -10,149 +10,50 @@ import pytest
 from drover.loader import (
     _SUPPORTED_EXTENSIONS,
     DoclingLoader,
-    DocumentLoader,
     DocumentLoadError,
 )
 from drover.sampling import SampleStrategy
 
 
-async def test_document_loader_loads_text_file(tmp_path: Path) -> None:
-    """DocumentLoader should load a simple text file without errors."""
-    file_path = tmp_path / "example.txt"
-    file_path.write_text("hello world")
+def test_supported_extensions_match_docling_audit() -> None:
+    """`_SUPPORTED_EXTENSIONS` matches Docling's officially-supported set.
 
-    loader = DocumentLoader(strategy=SampleStrategy.FULL, max_pages=10)
-    loaded = await loader.load(file_path)
+    Source: https://docling-project.github.io/docling/usage/supported_formats/
+    Locked here so accidental additions surface as test failures and get
+    a deliberate review against the upstream support table.
+    """
+    expected = {
+        ".pdf",
+        ".txt",
+        ".md",
+        ".html",
+        ".htm",
+        ".csv",
+        ".docx",
+        ".xlsx",
+        ".pptx",
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".tiff",
+        ".tif",
+        ".bmp",
+    }
+    assert expected == _SUPPORTED_EXTENSIONS
 
-    assert loaded.path == file_path
-    assert "hello world" in loaded.content
-    assert loaded.page_count == 1
-    assert loaded.pages_sampled == 1
-    assert loaded.loader_backend == "unstructured"
-    assert loaded.loader_latency_ms is not None
-    assert loaded.loader_latency_ms >= 0.0
-
-
-async def test_document_loader_loads_markdown_file(tmp_path: Path) -> None:
-    """DocumentLoader should load markdown files."""
-    file_path = tmp_path / "readme.md"
-    file_path.write_text("# Header\n\nSome content here.")
-
-    loader = DocumentLoader(strategy=SampleStrategy.FULL, max_pages=10)
-    loaded = await loader.load(file_path)
-
-    assert loaded.path == file_path
-    assert "Header" in loaded.content
-    assert "Some content" in loaded.content
-
-
-async def test_document_loader_raises_for_missing_file(tmp_path: Path) -> None:
-    """DocumentLoader should raise DocumentLoadError for missing files."""
-    file_path = tmp_path / "nonexistent.txt"
-
-    loader = DocumentLoader()
-    with pytest.raises(DocumentLoadError, match="File not found"):
-        await loader.load(file_path)
-
-
-async def test_document_loader_raises_for_unsupported_type(tmp_path: Path) -> None:
-    """DocumentLoader should raise DocumentLoadError for unsupported file types."""
-    file_path = tmp_path / "data.xyz"
-    file_path.write_text("some data")
-
-    loader = DocumentLoader()
-    with pytest.raises(DocumentLoadError, match="Unsupported file type"):
-        await loader.load(file_path)
-
-
-async def test_document_loader_raises_for_empty_file(tmp_path: Path) -> None:
-    """DocumentLoader should raise DocumentLoadError for empty files."""
-    file_path = tmp_path / "empty.txt"
-    file_path.write_text("")
-
-    loader = DocumentLoader()
-    with pytest.raises(DocumentLoadError):
-        await loader.load(file_path)
-
-
-def test_supported_extensions_include_common_types() -> None:
-    """Supported extensions should include common document types."""
-    assert ".pdf" in _SUPPORTED_EXTENSIONS
-    assert ".txt" in _SUPPORTED_EXTENSIONS
-    assert ".md" in _SUPPORTED_EXTENSIONS
-    assert ".docx" in _SUPPORTED_EXTENSIONS
-    assert ".xlsx" in _SUPPORTED_EXTENSIONS
-    assert ".pptx" in _SUPPORTED_EXTENSIONS
-    assert ".png" in _SUPPORTED_EXTENSIONS
-    assert ".jpg" in _SUPPORTED_EXTENSIONS
-
-
-def test_sampling_strategy_first_n() -> None:
-    """FIRST_N strategy should return first N pages."""
-    loader = DocumentLoader(strategy=SampleStrategy.FIRST_N, max_pages=3)
-
-    # Create mock pages (list of lists)
-    pages = [[f"page{i}"] for i in range(10)]
-    sampled = loader._apply_sampling(pages, total_pages=10)
-
-    assert len(sampled) == 3
-    assert sampled == [["page0"], ["page1"], ["page2"]]
-
-
-def test_sampling_strategy_bookends() -> None:
-    """BOOKENDS strategy should return first and last pages."""
-    loader = DocumentLoader(strategy=SampleStrategy.BOOKENDS, max_pages=4)
-
-    pages = [[f"page{i}"] for i in range(10)]
-    sampled = loader._apply_sampling(pages, total_pages=10)
-
-    assert len(sampled) == 4
-    # First 2 and last 2
-    assert sampled == [["page0"], ["page1"], ["page8"], ["page9"]]
-
-
-def test_sampling_strategy_full() -> None:
-    """FULL strategy should return all pages regardless of max_pages."""
-    loader = DocumentLoader(strategy=SampleStrategy.FULL, max_pages=3)
-
-    pages = [[f"page{i}"] for i in range(5)]
-    sampled = loader._apply_sampling(pages, total_pages=5)
-
-    assert len(sampled) == 5
-
-
-def test_sampling_returns_all_when_under_max() -> None:
-    """Should return all pages when document is smaller than max_pages."""
-    loader = DocumentLoader(strategy=SampleStrategy.FIRST_N, max_pages=10)
-
-    pages = [[f"page{i}"] for i in range(3)]
-    sampled = loader._apply_sampling(pages, total_pages=3)
-
-    assert len(sampled) == 3
-
-
-def test_adaptive_strategy_selects_full_for_small_docs() -> None:
-    """ADAPTIVE should use FULL for documents <= 5 pages."""
-    loader = DocumentLoader(strategy=SampleStrategy.ADAPTIVE, max_pages=10)
-
-    selected = loader._select_strategy(total_pages=5)
-    assert selected == SampleStrategy.FULL
-
-
-def test_adaptive_strategy_selects_first_n_for_medium_docs() -> None:
-    """ADAPTIVE should use FIRST_N for documents 6-20 pages."""
-    loader = DocumentLoader(strategy=SampleStrategy.ADAPTIVE, max_pages=10)
-
-    selected = loader._select_strategy(total_pages=15)
-    assert selected == SampleStrategy.FIRST_N
-
-
-def test_adaptive_strategy_selects_bookends_for_large_docs() -> None:
-    """ADAPTIVE should use BOOKENDS for documents > 20 pages."""
-    loader = DocumentLoader(strategy=SampleStrategy.ADAPTIVE, max_pages=10)
-
-    selected = loader._select_strategy(total_pages=50)
-    assert selected == SampleStrategy.BOOKENDS
+    # Formats removed per ADR-006 (not in Docling's supported set):
+    for unsupported in {
+        ".doc",
+        ".xls",
+        ".ppt",  # legacy MS Office (Open XML only)
+        ".gif",  # not in Docling's image set
+        ".tsv",  # Docling lists CSV only
+        ".eml",
+        ".epub",
+        ".odt",
+        ".rtf",  # never reliably handled
+    }:
+        assert unsupported not in _SUPPORTED_EXTENSIONS
 
 
 # ---------------------------------------------------------------------------
@@ -215,7 +116,7 @@ async def test_docling_loader_raises_when_package_missing(tmp_path: Path) -> Non
 
 
 async def test_docling_loader_rejects_unsupported_extension(tmp_path: Path) -> None:
-    """DoclingLoader honors the same extension allowlist as DocumentLoader."""
+    """DoclingLoader rejects unsupported extensions before invoking Docling."""
     file_path = tmp_path / "data.xyz"
     file_path.write_text("noop")
 
@@ -336,30 +237,6 @@ def test_docling_loader_bookends_even_max_pages_4() -> None:
     page_nos = loader._select_page_numbers(10)
     assert len(page_nos) == 4
     assert page_nos == [1, 2, 9, 10]
-
-
-# ---------------------------------------------------------------------------
-# P1-5: BOOKENDS odd max_pages — DocumentLoader._apply_sampling
-# ---------------------------------------------------------------------------
-
-
-def test_document_loader_bookends_odd_max_pages_5() -> None:
-    """DocumentLoader BOOKENDS with max_pages=5 should return 5 pages (3+2)."""
-    loader = DocumentLoader(strategy=SampleStrategy.BOOKENDS, max_pages=5)
-    pages = [[f"page{i}"] for i in range(20)]
-    sampled = loader._apply_sampling(pages, total_pages=20)
-    assert len(sampled) == 5
-    assert sampled[:3] == [["page0"], ["page1"], ["page2"]]
-    assert sampled[3:] == [["page18"], ["page19"]]
-
-
-def test_document_loader_bookends_odd_max_pages_3() -> None:
-    """DocumentLoader BOOKENDS with max_pages=3 should return 3 pages (2+1)."""
-    loader = DocumentLoader(strategy=SampleStrategy.BOOKENDS, max_pages=3)
-    pages = [[f"page{i}"] for i in range(10)]
-    sampled = loader._apply_sampling(pages, total_pages=10)
-    assert len(sampled) == 3
-    assert sampled == [["page0"], ["page1"], ["page9"]]
 
 
 # ---------------------------------------------------------------------------

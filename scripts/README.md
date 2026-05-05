@@ -29,15 +29,6 @@ Synthetic eval-corpus generator. Picks `(domain, category, doctype)` triples fro
 uv run python scripts/generate_eval_samples.py --count 30 --concurrency 5
 ```
 
-### `build_format_matrix.py`
-
-Builds one fixture per supported file extension, runs both Drover loaders against each, and writes a markdown table reporting `PASS` / `FAIL` / `REGRESS` / `GAIN` / `SKIP` per extension. Used during the Docling spike to gate the loader switch on no-regression coverage.
-
-```bash
-uv run python scripts/build_format_matrix.py
-uv run python scripts/build_format_matrix.py --write   # writes eval/format_matrix.md
-```
-
 ### `build_eval_dashboard.py`
 
 Regenerator for `eval/dashboard_data.json` and the inline data block in `eval/dashboard.html`. Idempotent: existing entries are preserved, new runs in `eval/runs/` are appended, runs are sorted chronologically. Strips per-document records before writing so the committed summary is PII-safe.

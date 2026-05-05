@@ -39,7 +39,7 @@ def configure_logging(
         force=True,
     )
 
-    # Suppress noisy third-party loggers (pdfminer, unstructured, etc.)
+    # Suppress noisy third-party loggers
     # pdfminer.six outputs verbose debug info (nexttoken, do_keyword, etc.)
     noisy_loggers = [
         "pdfminer",
@@ -50,7 +50,6 @@ def configure_logging(
         "pdfminer.psparser",
         "pdfminer.pdfdocument",
         "pdfminer.pdfparser",
-        "unstructured",
         "PIL",
     ]
     for logger_name in noisy_loggers:

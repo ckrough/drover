@@ -12,7 +12,6 @@ from unittest.mock import patch
 
 import pytest
 
-from drover.config import DroverConfig, LoaderType
 from drover.loader import DoclingLoader, LoadedDocument
 
 
@@ -137,33 +136,3 @@ async def test_debug_structure_not_written_when_flag_off(
         await loader.load(source_path)
 
     assert not list(debug_dir.glob("*.docling.json"))
-
-
-async def test_debug_structure_no_op_for_unstructured_loader(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """The unstructured loader never writes a structure dump."""
-    from drover.models import ClassificationResult
-    from drover.service import ClassificationService
-
-    debug_dir = tmp_path / "debug"
-    cfg = DroverConfig(
-        loader=LoaderType.UNSTRUCTURED,
-        debug_structure=True,
-        debug_dir=debug_dir,
-    )
-    service = ClassificationService(cfg)
-    _patch_classifier(service, monkeypatch)
-
-    file_path = tmp_path / "sample.txt"
-    file_path.write_text("payload")
-
-    async def fake_load(path: Path) -> LoadedDocument:
-        return _make_fake_loaded(path)
-
-    monkeypatch.setattr(service._loader, "load", fake_load)
-
-    result = await service.classify_file(file_path)
-
-    assert isinstance(result, ClassificationResult)
-    assert not debug_dir.exists() or not list(debug_dir.glob("*.docling.json"))

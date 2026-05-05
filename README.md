@@ -47,9 +47,6 @@ git clone https://github.com/ckrough/drover.git
 cd drover
 uv sync --extra docling
 
-# Download required NLTK data (one-time, used by the `unstructured` fallback loader)
-uv run python -c "import nltk; nltk.download('averaged_perceptron_tagger_eng'); nltk.download('punkt_tab')"
-
 # Download Docling models (one-time, ~500 MB to ~/.cache/docling/models)
 uv run docling-tools models download
 ```
@@ -58,15 +55,7 @@ Run the CLI through `uv run drover ...`, or activate the environment with `sourc
 
 #### About the Docling loader
 
-Drover uses [Docling](https://docling-project.github.io/docling/) as the default PDF loader, with full-page OCR enabled so vendor names carried in logos and embedded images reach the classifier. The `[docling]` install extra and the one-time model download above are required. If you skip the download, Docling's first run fetches models from Hugging Face on demand (a few hundred MB, internet required); subsequent runs are fully offline. Rationale and trade-offs are in [ADR-005](docs/adr/005-docling-evaluation.md).
-
-To fall back to the lighter-weight `unstructured` loader:
-
-```bash
-uv sync   # without --extra docling
-drover classify document.pdf --loader unstructured
-# or set DROVER_LOADER=unstructured in your environment
-```
+Drover uses [Docling](https://docling-project.github.io/docling/) as the sole document loader, with full-page OCR enabled on PDFs so vendor names carried in logos and embedded images reach the classifier. The `[docling]` install extra and the one-time model download above are required. If you skip the download, Docling's first run fetches models from Hugging Face on demand (a few hundred MB, internet required); subsequent runs are fully offline. Rationale and the format-coverage policy live in [ADR-005](docs/adr/005-docling-evaluation.md) and [ADR-006](docs/adr/006-standardize-on-docling.md).
 
 ### Classify Your First Document
 
@@ -137,7 +126,6 @@ drover evaluate eval/ground_truth/synthetic.jsonl --output-format json
 | `DROVER_TAXONOMY` | Classification taxonomy | `household` |
 | `DROVER_NAMING_STYLE` | Filename policy | `nara` |
 | `DROVER_SAMPLE_STRATEGY` | Page sampling (full, first_n, bookends, adaptive) | `adaptive` |
-| `DROVER_LOADER` | Document loader backend (docling, unstructured) | `docling` |
 | `DROVER_LOG_LEVEL` | Logging verbosity (quiet, verbose, debug) | `quiet` |
 
 ### Config File
@@ -168,13 +156,15 @@ concurrency: 4
 
 ## Supported File Formats
 
+The loader is Docling, so the supported set matches Docling's officially-supported formats per [`docs/usage/supported_formats`](https://docling-project.github.io/docling/usage/supported_formats/). See [ADR-006](docs/adr/006-standardize-on-docling.md) for the audit.
+
 | Category | Extensions |
 |----------|------------|
 | PDF | `.pdf` |
-| Images | `.png`, `.jpg`, `.jpeg`, `.gif`, `.bmp`, `.tiff`, `.tif` |
-| Office | `.docx`, `.doc`, `.xlsx`, `.xls`, `.pptx`, `.ppt` |
-| Text | `.txt`, `.md`, `.html`, `.htm`, `.csv`, `.tsv` |
-| Other | `.eml`, `.epub`, `.odt`, `.rtf` |
+| Office (Open XML) | `.docx`, `.xlsx`, `.pptx` |
+| Markup | `.txt`, `.md`, `.html`, `.htm` |
+| Data | `.csv` |
+| Images | `.png`, `.jpg`, `.jpeg`, `.tiff`, `.tif`, `.bmp` |
 
 ## Architecture
 

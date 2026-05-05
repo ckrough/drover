@@ -215,27 +215,24 @@ def _extract_largest_json_object(text: str) -> str | None:
 
 def expand_paths(paths: list[Path]) -> list[Path]:
     """Expand directories to document files and filter to supported types."""
+    # Mirror Docling's officially-supported set (ADR-006). Keep this in sync
+    # with `src/drover/loader.py:_SUPPORTED_EXTENSIONS`.
     supported_extensions = {
         ".pdf",
-        ".doc",
         ".docx",
-        ".xls",
         ".xlsx",
-        ".ppt",
         ".pptx",
         ".txt",
         ".md",
-        ".rtf",
-        ".odt",
-        ".ods",
-        ".odp",
+        ".html",
+        ".htm",
+        ".csv",
         ".png",
         ".jpg",
         ".jpeg",
-        ".gif",
         ".tiff",
+        ".tif",
         ".bmp",
-        ".webp",
     }
 
     result = []
