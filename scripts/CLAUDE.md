@@ -10,6 +10,7 @@ For human-readable descriptions of each script and example invocations, see `REA
 
 ## When editing scripts
 
+- Eval-metric scripts (currently `run_eval_experiments.py`, plus the `drover evaluate` CLI when it writes into `eval/runs/`) feed the dashboard. After a new accuracy-keyed run lands in `eval/runs/`, run `scripts/build_eval_dashboard.py` to keep `eval/dashboard.html` and `eval/dashboard_data.json` in sync.
 - Keep `README.md` in sync. New script: add a section under the appropriate group (Eval/benchmarking, Taxonomy analysis, Operational). Removed script: remove its section. Renamed script: rename the section heading.
 - `check_version_consistency.py` is wired into the CI version-consistency check. If you bump `src/drover/__init__.py.__version__`, also bump `pyproject.toml [project] version` in the same commit.
 - `build_eval_dashboard.py` regenerates two managed files (`eval/dashboard.html`, `eval/dashboard_data.json`). Never hand-edit either file (`CLAUDE.md` note 14). Editing the regenerator's output schema requires updating `SCHEMA_VERSION`.
