@@ -29,6 +29,7 @@ dev = [
     "bandit>=1.7.5",
     "mypy>=1.8.0",
     "reportlab>=4.0,<5.0",
+    "matplotlib>=3.8",
 ]
 docling = [
     "docling>=2.0,<3.0",
