@@ -196,6 +196,14 @@ def test_parse_response_direct_json() -> None:
 
 12. **Docling first-run failure signature:** If every doc errors with `Docling models not found at ~/.cache/docling/models`, run `uv run docling-tools models download` once. The error is actionable but easy to miss in batch eval logs.
 
+    **OCR backend on macOS:** Docling auto-selects an OCR engine from what is installed. With only the `docling` extra it falls back to `rapidocr` on the torch CPU backend, which is slow. On macOS install the `ocr-mac` extra so Docling picks `ocrmac` (Apple Vision):
+
+    - **Dev / eval (.venv):** the project's standard `uv sync --all-extras` already includes `ocr-mac`. No flag change needed; just resync after pulling this branch.
+    - **Targeted install:** `uv sync --extra docling --extra ocr-mac`.
+    - **OS-level tool:** `uv tool install --reinstall "drover[docling,ocr-mac] @ git+https://github.com/ckrough/drover"` (or with `--editable <path>` for a local checkout).
+
+    The verbose log line shifts from `Auto OCR model selected rapidocr with torch` to `Auto OCR model selected ocrmac.`; the three "cannot be used because X is not installed" warnings disappear. The extra is gated on `sys_platform == 'darwin'`, so Linux/CI installs are unaffected (CI's `uv sync --all-extras` skips it via the marker).
+
 13. **Sandbox + Ollama:** The Bash sandbox blocks localhost (`127.0.0.1:11434`). Run any command that calls the Ollama provider with `dangerouslyDisableSandbox: true` (drover classify/evaluate, ollama list, etc.).
 
 14. **Eval dashboard:** `eval/dashboard.html` and `eval/dashboard_data.json` are both regenerator-managed by `scripts/build_eval_dashboard.py`. After adding a run to `eval/runs/`, run the script; never edit either file by hand.
