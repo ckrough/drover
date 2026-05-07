@@ -33,6 +33,9 @@ dev = [
 docling = [
     "docling>=2.0,<3.0",
 ]
+ocr-mac = [
+    "ocrmac>=1.0; sys_platform == 'darwin'",
+]
 
 [project.scripts]
 drover = "drover.cli:main"

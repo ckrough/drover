@@ -41,6 +41,8 @@ Drover uses LLMs to analyze documents and suggest consistent, policy-compliant f
 
 ### Installation
 
+To install drover as a global CLI on your system, see [INSTALL.md](INSTALL.md). The steps below set up a development checkout for working on drover itself.
+
 ```bash
 # Clone and sync the project (creates .venv and installs dependencies)
 git clone https://github.com/ckrough/drover.git
