@@ -53,6 +53,18 @@ uv run pytest tests/test_taxonomy.py::TestHouseholdTaxonomy::test_canonical_doma
 uv run pytest --cov=src/drover --cov-report=term-missing
 ```
 
+### Smoke Suite
+
+End-to-end functional-health checks against the drover CLI. Custom harness (not pytest) emitting JSON reports for downstream LLM-agent self-assessment. Test catalog and schema: [smoke/README.md](smoke/README.md).
+
+```bash
+# Full suite (LLM tests need local Ollama with gemma4:latest, ~2 min)
+uv run python smoke/run.py
+
+# CLI + error-path tests only (no LLM, ~10s; useful as a fast pre-commit gate)
+uv run python smoke/run.py --skip-llm
+```
+
 ### Code Quality
 
 ```bash
@@ -85,7 +97,7 @@ uv lock --upgrade
 src/drover/
 ├── __init__.py         # Package init, version definition
 ├── __main__.py         # Entry point for python -m drover
-├── cli.py              # Click CLI commands (classify, tag, evaluate)
+├── cli.py              # Click CLI commands (classify, tag, organize, evaluate)
 ├── config.py           # Configuration management (Pydantic models)
 ├── loader.py           # DoclingLoader (sole loader; structure-aware with full-page OCR)
 ├── classifier.py       # LLM-based DocumentClassifier

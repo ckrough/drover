@@ -242,6 +242,11 @@ uv sync --all-extras
 # Run tests
 uv run pytest
 
+# Run end-to-end smoke suite (LLM tests need Ollama; emits JSON report under smoke/reports/)
+uv run python smoke/run.py             # full suite (~2 min)
+uv run python smoke/run.py --skip-llm  # CLI + error-path tests only (~10s)
+# See smoke/README.md for the test catalog and report schema.
+
 # Lint and format
 uv run ruff check src/ --fix && uv run ruff format src/
 

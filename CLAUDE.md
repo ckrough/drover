@@ -70,6 +70,15 @@ src/drover/
 - `eval/runs/<timestamp>/*.json` — per-doc dumps (gitignored)
 - `eval/dashboard.html` and `eval/dashboard_data.json` — regenerator-managed via `scripts/build_eval_dashboard.py`; aggregates only, no per-doc PII
 
+## Smoke Layout
+
+- `smoke/run.py` — end-to-end functional-health harness (custom, not pytest); emits JSON for LLM-agent self-assessment
+- `smoke/README.md` — test catalog, report schema, environment requirements
+- `smoke/fixtures/` — three synthetic PDFs (committed; chosen for taxonomy diversity)
+- `smoke/reports/` — generated per-run JSON + per-test stdout/stderr captures (gitignored)
+
+Smoke is for *functional health* (does the CLI run, does the LLM path return well-formed results, did regressions stay fixed). Eval is for *classification accuracy*. They are intentionally separate runners with separate report formats.
+
 ## Commands
 
 ```bash
@@ -92,6 +101,10 @@ uv run drover evaluate --ground-truth eval/ground_truth/synthetic.jsonl --ai-mod
 
 # Run all tests
 uv run pytest
+
+# Run end-to-end smoke suite (10 tests; LLM tests need Ollama; emits JSON report)
+uv run python smoke/run.py
+uv run python smoke/run.py --skip-llm   # CLI + error-path tests only, ~10s
 
 # Run a single test file
 uv run pytest tests/test_taxonomy.py
