@@ -32,7 +32,7 @@ uv sync --all-extras
 src/drover/
 ├── __init__.py         # Package init, version definition
 ├── __main__.py         # Entry point for python -m drover
-├── cli.py              # Click CLI commands (classify, tag, evaluate)
+├── cli.py              # Click CLI commands (classify, tag, organize, evaluate)
 ├── config.py           # Configuration management (Pydantic models)
 ├── loader.py           # DocumentLoader - text extraction from documents
 ├── classifier.py       # LLM-based DocumentClassifier (uses structured output)
@@ -55,7 +55,8 @@ src/drover/
 │   └── loader.py       # Naming policy registry
 └── actions/            # File action implementations
     ├── base.py         # ActionPlan and ActionResult dataclasses
-    ├── runner.py       # ActionRunner orchestration
+    ├── runner.py       # ActionRunner orchestration (chained list of actions)
+    ├── move.py         # MoveAction (classify → relocate, used by drover organize)
     └── tag.py          # macOS filesystem tagging (TagAction, TagMode)
 ```
 
@@ -81,6 +82,10 @@ uv run drover classify document.pdf --ai-provider ollama --ai-model gemma4:lates
 # Run CLI - tag command (macOS only)
 uv run drover tag document.pdf --dry-run
 uv run drover tag document.pdf --tag-fields domain,category --tag-mode replace
+
+# Run CLI - organize command (classify, optionally tag, and move into a tree)
+uv run drover organize ~/Inbox --dest ~/Documents/filed --dry-run --report -
+uv run drover organize ~/Inbox/scan.pdf --dest ~/Documents/filed --tag-fields category,doctype
 
 # Run CLI - evaluate command
 uv run drover evaluate --ground-truth eval/ground_truth/synthetic.jsonl --ai-model gpt-4o
@@ -115,7 +120,7 @@ uv run bandit -r src/ -f json --severity-level medium --confidence-level medium 
 ### Plugin Systems
 - **Taxonomies** (`taxonomy/`): Controlled vocabularies. Register new ones in `taxonomy/loader.py`
 - **Naming Policies** (`naming/`): Filename conventions. Register new ones in `naming/loader.py`
-- **Actions** (`actions/`): Post-classification operations like tagging
+- **Actions** (`actions/`): Post-classification operations (`MoveAction`, `TagAction`). `ActionRunner` chains them in order, passing each action's `final_path` to the next; `halt_chain` stops the chain (set by `MoveAction` on `skipped_exists`)
 
 ### Key Models (`models.py`)
 - `RawClassification` → LLM output: domain, category, doctype, vendor, date, subject

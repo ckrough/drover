@@ -152,7 +152,7 @@ class TestActionRunner:
         """Empty file list returns exit code 0."""
         config = DroverConfig()
         action = MockAction()
-        runner = ActionRunner(config, action)
+        runner = ActionRunner(config, [action])
 
         exit_code = await runner.run([])
 
@@ -169,7 +169,7 @@ class TestActionRunner:
 
         config = DroverConfig()
         action = MockAction()
-        runner = ActionRunner(config, action)
+        runner = ActionRunner(config, [action])
         _stub_runner_loader(runner, monkeypatch)
 
         monkeypatch.setattr(
@@ -198,7 +198,7 @@ class TestActionRunner:
 
         config = DroverConfig()
         action = MockAction()
-        runner = ActionRunner(config, action)
+        runner = ActionRunner(config, [action])
         _stub_runner_loader(runner, monkeypatch)
 
         monkeypatch.setattr(
@@ -228,7 +228,7 @@ class TestActionRunner:
 
         config = DroverConfig()
         action = MockAction(should_fail=True)
-        runner = ActionRunner(config, action)
+        runner = ActionRunner(config, [action])
         _stub_runner_loader(runner, monkeypatch)
 
         monkeypatch.setattr(
@@ -246,10 +246,97 @@ class TestActionRunner:
 
         config = DroverConfig(on_error=ErrorMode.CONTINUE)
         action = MockAction()
-        runner = ActionRunner(config, action)
+        runner = ActionRunner(config, [action])
 
         exit_code = await runner.run([missing_file], dry_run=False)
 
         assert exit_code == 2  # All files failed classification
         assert len(action.planned) == 0
         assert len(action.executed) == 0
+
+    async def test_chain_of_actions_passes_final_path(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Each action in the chain receives the previous action's final_path."""
+        doc_path = tmp_path / "test.txt"
+        doc_path.write_text("test content")
+        relocated = tmp_path / "moved.txt"
+
+        class PathHandoffAction:
+            """First action: pretends to move the file to ``relocated``."""
+
+            def __init__(self, target: Path) -> None:
+                self.target = target
+                self.planned_with: list[Path] = []
+
+            def plan(self, file: Path, result: ClassificationResult) -> ActionPlan:
+                self.planned_with.append(file)
+                return ActionPlan(
+                    file=file,
+                    description="handoff",
+                    changes={"final_path": self.target},
+                )
+
+            def execute(self, plan: ActionPlan) -> ActionResult:
+                return ActionResult(
+                    file=plan.file,
+                    success=True,
+                    description="handed off",
+                    changes={"final_path": self.target},
+                )
+
+        first = PathHandoffAction(relocated)
+        second = MockAction()
+
+        config = DroverConfig()
+        runner = ActionRunner(config, [first, second])
+        _stub_runner_loader(runner, monkeypatch)
+        monkeypatch.setattr(
+            runner._service._classifier, "classify", _make_fake_classify(tmp_path)
+        )
+
+        exit_code = await runner.run([doc_path], dry_run=False)
+
+        assert exit_code == 0
+        assert first.planned_with == [doc_path]
+        assert len(second.planned) == 1
+        assert second.planned[0][0] == relocated
+
+    async def test_halt_chain_stops_subsequent_actions(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """An action signaling halt_chain prevents subsequent actions from running."""
+        doc_path = tmp_path / "test.txt"
+        doc_path.write_text("test content")
+
+        class HaltingAction:
+            def plan(self, file: Path, result: ClassificationResult) -> ActionPlan:
+                return ActionPlan(
+                    file=file,
+                    description="halt",
+                    changes={"halt_chain": True, "final_path": file},
+                )
+
+            def execute(self, plan: ActionPlan) -> ActionResult:
+                return ActionResult(
+                    file=plan.file,
+                    success=True,
+                    description="halted",
+                    changes={"halt_chain": True, "final_path": plan.file},
+                )
+
+        first = HaltingAction()
+        second = MockAction()
+
+        config = DroverConfig()
+        runner = ActionRunner(config, [first, second])
+        _stub_runner_loader(runner, monkeypatch)
+        monkeypatch.setattr(
+            runner._service._classifier, "classify", _make_fake_classify(tmp_path)
+        )
+
+        exit_code = await runner.run([doc_path], dry_run=False)
+
+        assert exit_code == 0
+        assert len(second.planned) == 0
+        assert len(second.executed) == 0

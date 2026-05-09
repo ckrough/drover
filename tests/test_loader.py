@@ -8,7 +8,7 @@ from unittest.mock import patch
 import pytest
 
 from drover.loader import (
-    _SUPPORTED_EXTENSIONS,
+    SUPPORTED_EXTENSIONS,
     DoclingLoader,
     DocumentLoadError,
 )
@@ -16,7 +16,7 @@ from drover.sampling import SampleStrategy
 
 
 def test_supported_extensions_match_docling_audit() -> None:
-    """`_SUPPORTED_EXTENSIONS` matches Docling's officially-supported set.
+    """`SUPPORTED_EXTENSIONS` matches Docling's officially-supported set.
 
     Source: https://docling-project.github.io/docling/usage/supported_formats/
     Locked here so accidental additions surface as test failures and get
@@ -39,7 +39,7 @@ def test_supported_extensions_match_docling_audit() -> None:
         ".tif",
         ".bmp",
     }
-    assert expected == _SUPPORTED_EXTENSIONS
+    assert expected == SUPPORTED_EXTENSIONS
 
     # Formats removed per ADR-006 (not in Docling's supported set):
     for unsupported in {
@@ -53,7 +53,7 @@ def test_supported_extensions_match_docling_audit() -> None:
         ".odt",
         ".rtf",  # never reliably handled
     }:
-        assert unsupported not in _SUPPORTED_EXTENSIONS
+        assert unsupported not in SUPPORTED_EXTENSIONS
 
 
 # ---------------------------------------------------------------------------

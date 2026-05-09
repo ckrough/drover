@@ -63,13 +63,14 @@ uv run python scripts/collect_classification_tuples.py \
 
 ## Operational
 
-### `organize_directory_tree.py`
-
-Recursive classify, rename, and tag for an existing directory tree. Uses `drover` batch mode, renames each file to its suggested filename in place, and applies domain, category, and doctype filesystem tags (macOS only). Supports `--dry-run` and a config file argument.
+The recursive classify-rename-tag flow is now part of the main CLI as `drover organize`. Use that subcommand instead of a script wrapper:
 
 ```bash
-uv run python scripts/organize_directory_tree.py ~/Documents --config drover.yaml --dry-run
+drover organize ~/Documents --dest ~/Documents/filed --dry-run --report -
+drover organize ~/Inbox/scan.pdf --dest ~/Documents/filed --tag-fields category,doctype
 ```
+
+See the top-level `README.md` and `CLAUDE.md` for the full flag matrix.
 
 ### `check_version_consistency.py`
 

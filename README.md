@@ -93,6 +93,55 @@ drover tag document.pdf --tag-fields domain,vendor
 drover tag --tag-mode replace document.pdf       # Replace existing tags
 ```
 
+### Organize Command
+
+Classify, optionally tag, and move files into a destination tree. `SRC` may be a single file or a directory; `--dest` is required.
+
+```bash
+# Move every supported file under ~/Inbox into ~/Documents/filed.
+drover organize ~/Inbox --dest ~/Documents/filed
+
+# Dry-run preview to stdout (one JSONL record per file).
+drover organize ~/Inbox --dest ~/Documents/filed --dry-run --report -
+
+# Single-file invocation suitable for Hazel rules or macOS Folder Actions.
+drover organize ~/Inbox/scan.pdf --dest ~/Documents/filed \
+  --tag-fields category,doctype \
+  --report ~/Library/Logs/drover/run-$(date +%Y%m%d-%H%M%S).jsonl
+
+# Copy instead of move; source preserved.
+drover organize ~/Inbox --dest ~/Documents/filed --copy
+```
+
+Behavior:
+
+- Default conflict policy is **skip**: if `{DEST}/{suggested_path}` already exists, the source is left in place and the record is `skipped_exists`. Re-running on the same source is idempotent.
+- `--tag-fields` is validated against `domain, category, doctype, vendor, date, subject` at parse time. Tags are written only to the destination Drover produces; the source file is never tagged.
+- The JSONL report is identical in `--dry-run` and live mode (status values are prefixed `would_` in dry-run). Records carry `original_path`, `suggested_path`, `final_destination`, `status`, `tags_applied`, and `error`.
+- Stream discipline: log chatter goes to stderr (gated by `DROVER_LOG_LEVEL`); the JSONL report goes to the file you pass, or to stdout when `--report -`. Unsupported extensions surface as `skipped_unsupported` records and do not raise the exit code.
+
+#### Hazel / Folder Action recipe
+
+A Hazel rule that watches `~/Inbox/`, runs `drover organize` on every newly added file, and appends to a daily JSONL log:
+
+```bash
+drover organize "$1" \
+  --dest ~/Documents/filed \
+  --tag-fields category,doctype \
+  --report ~/Library/Logs/drover/$(date +%Y-%m-%d).jsonl
+```
+
+Equivalent macOS Folder Action shell:
+
+```bash
+for f in "$@"; do
+  /usr/local/bin/drover organize "$f" \
+    --dest ~/Documents/filed \
+    --tag-fields category,doctype \
+    --report ~/Library/Logs/drover/$(date +%Y-%m-%d).jsonl
+done
+```
+
 ### Evaluate Command
 
 Measure classification accuracy against ground truth:

@@ -6,13 +6,22 @@ import asyncio
 import json
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import IO, TYPE_CHECKING, Any
 
 import click
 from rich.console import Console
 
 from drover import __version__
-from drover.actions import ActionPlan, ActionResult, ActionRunner, TagAction, TagMode
+from drover.actions import (
+    ActionPlan,
+    ActionResult,
+    ActionRunner,
+    MoveAction,
+    MoveStatus,
+    TagAction,
+    TagMode,
+    extract_tag_value,
+)
 from drover.config import (
     AIProvider,
     DroverConfig,
@@ -20,15 +29,16 @@ from drover.config import (
     LogLevel,
     TaxonomyMode,
 )
-from drover.logging import configure_logging
+from drover.loader import SUPPORTED_EXTENSIONS
+from drover.logging import configure_logging, get_logger
+from drover.models import ClassificationErrorResult, ClassificationResult
 from drover.sampling import SampleStrategy
-from drover.service import ClassificationService
+from drover.service import ClassificationService, make_filename_matcher, walk_directory
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from drover.models import ClassificationErrorResult as ClassificationErrorModel
-    from drover.models import ClassificationResult
+logger = get_logger(__name__)
 
 console = Console(stderr=True)
 
@@ -298,7 +308,7 @@ async def _classify_files(
             console.print(f"[red]Configuration error: {e}[/red]")
         return 2
 
-    def handle_result(result: ClassificationResult | ClassificationErrorModel) -> None:
+    def handle_result(result: ClassificationResult | ClassificationErrorResult) -> None:
         _output_result(result, batch)
         if log == LogLevel.VERBOSE and not result.error:
             console.print(f"[green]✓[/green] Processed {result.original}")
@@ -308,7 +318,7 @@ async def _classify_files(
 
 
 def _output_result(
-    result: ClassificationResult | ClassificationErrorModel,
+    result: ClassificationResult | ClassificationErrorResult,
     batch: bool,
 ) -> None:
     """Output classification result to stdout.
@@ -465,7 +475,7 @@ async def _tag_files(
 
     try:
         action = TagAction(fields=fields, mode=mode)
-        runner = ActionRunner(config, action)
+        runner = ActionRunner(config, [action])
     except ValueError as e:
         if log != LogLevel.QUIET:
             console.print(f"[red]Configuration error: {e}[/red]")
@@ -643,6 +653,472 @@ async def _evaluate_async(
     if results.domain_accuracy < 0.5:
         return 1
     return 0
+
+
+@main.command()
+@click.argument(
+    "src",
+    type=click.Path(exists=True, path_type=Path, resolve_path=True),
+)
+@click.option(
+    "--dest",
+    "dest_root",
+    required=True,
+    type=click.Path(file_okay=False, path_type=Path),
+    help="Destination root for the organized tree (required).",
+)
+@click.option(
+    "--copy",
+    "copy_mode",
+    is_flag=True,
+    default=False,
+    help="Copy instead of move; source is preserved.",
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    help="Plan without performing filesystem mutations.",
+)
+@click.option(
+    "--tag-fields",
+    "tag_fields_str",
+    default=None,
+    help=(
+        "Comma-separated classification fields to apply as macOS Finder tags. "
+        "Omit to skip tagging. Allowed: domain, category, doctype, vendor, date, subject."
+    ),
+)
+@click.option(
+    "--tag-mode",
+    type=click.Choice([m.value for m in TagMode]),
+    default=TagMode.ADD.value,
+    help="How to apply tags relative to existing tags (only honored with --tag-fields).",
+)
+@click.option(
+    "--report",
+    "report_path",
+    default=None,
+    help="Path for JSONL report. Use '-' to stream to stdout.",
+)
+@click.option(
+    "--follow-symlinks",
+    is_flag=True,
+    default=False,
+    help="Descend into symlinked directories when SRC is a directory.",
+)
+@classification_options
+def organize(
+    src: Path,
+    dest_root: Path,
+    copy_mode: bool,
+    dry_run: bool,
+    tag_fields_str: str | None,
+    tag_mode: str,
+    report_path: str | None,
+    follow_symlinks: bool,
+    config_path: Path | None,
+    ai_provider: str | None,
+    ai_model: str | None,
+    ai_max_tokens: int | None,
+    taxonomy_name: str | None,
+    taxonomy_mode: str | None,
+    naming_style: str | None,
+    sample_strategy: str | None,
+    max_pages: int | None,
+    on_error: str | None,
+    concurrency: int | None,
+    log_level: str | None,
+) -> None:
+    """Classify, optionally tag, and move files into a destination tree.
+
+    SRC may be a single file or a directory. Each supported file is
+    classified, optionally tagged, and moved (or copied with --copy) to
+    {DEST}/{domain}/{category}/{doctype}/{filename}. Destination
+    collisions are skipped (source untouched). Unsupported extensions
+    are reported as soft notices and do not raise the exit code.
+
+    Examples:
+
+        # Move every file in ~/Downloads into the filed tree.
+        drover organize ~/Downloads --dest ~/Documents/filed
+
+        # Single-file flow for a Hazel rule or Folder Action.
+        drover organize ~/Inbox/scan.pdf --dest ~/Documents/filed \\
+            --tag-fields category,doctype --report ~/Library/Logs/drover/run.jsonl
+
+        # Dry-run preview to stdout.
+        drover organize ./inbox --dest /tmp/filed --dry-run --report -
+    """
+    tag_fields: list[str] | None = None
+    if tag_fields_str is not None:
+        tag_fields = [f.strip() for f in tag_fields_str.split(",") if f.strip()]
+        invalid = set(tag_fields) - VALID_TAG_FIELDS
+        if invalid:
+            raise click.UsageError(
+                f"Invalid tag fields: {sorted(invalid)}. "
+                f"Valid fields: {', '.join(sorted(VALID_TAG_FIELDS))}"
+            )
+        if not tag_fields:
+            raise click.UsageError("--tag-fields requires at least one field.")
+        if sys.platform != "darwin":
+            raise click.UsageError(
+                "--tag-fields requires macOS (filesystem tags use macOS xattrs)."
+            )
+
+    dest_root = dest_root.expanduser().resolve()
+    if dest_root.exists() and not dest_root.is_dir():
+        raise click.UsageError(f"--dest must be a directory: {dest_root}")
+    try:
+        dest_root.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        raise click.UsageError(f"--dest is not writable: {dest_root} ({exc})") from exc
+
+    config = DroverConfig.load(config_path)
+    config = config.with_overrides(
+        ai_provider=ai_provider,
+        ai_model=ai_model,
+        ai_max_tokens=ai_max_tokens,
+        taxonomy=taxonomy_name,
+        taxonomy_mode=taxonomy_mode,
+        naming_style=naming_style,
+        sample_strategy=sample_strategy,
+        max_pages=max_pages,
+        on_error=on_error,
+        concurrency=concurrency,
+        log_level=log_level,
+    )
+
+    if on_error is None:
+        default_mode = ErrorMode.CONTINUE if src.is_dir() else ErrorMode.FAIL
+        config = config.with_overrides(on_error=default_mode)
+
+    configure_logging(level=config.log_level, json_output=True)
+
+    exit_code = asyncio.run(
+        _organize(
+            src=src,
+            dest_root=dest_root,
+            copy_mode=copy_mode,
+            dry_run=dry_run,
+            tag_fields=tag_fields,
+            tag_mode_value=TagMode(tag_mode),
+            report_path=report_path,
+            follow_symlinks=follow_symlinks,
+            config=config,
+        )
+    )
+    sys.exit(exit_code)
+
+
+async def _organize(
+    src: Path,
+    dest_root: Path,
+    copy_mode: bool,
+    dry_run: bool,
+    tag_fields: list[str] | None,
+    tag_mode_value: TagMode,
+    report_path: str | None,
+    follow_symlinks: bool,
+    config: DroverConfig,
+) -> int:
+    """Run the organize pipeline for SRC."""
+    if src.is_file():
+        all_files: list[tuple[Path, bool]] = [
+            (src, src.suffix.lower() in SUPPORTED_EXTENSIONS)
+        ]
+    elif src.is_dir():
+        all_files = list(walk_directory(src, SUPPORTED_EXTENSIONS, follow_symlinks))
+    else:
+        click.echo(f"SRC is not a file or directory: {src}", err=True)
+        return 2
+
+    supported = [p for p, ok in all_files if ok]
+    unsupported = [p for p, ok in all_files if not ok]
+
+    counts = {"moved": 0, "skipped_exists": 0, "error": 0, "skipped_unsupported": 0}
+    report_writer = _ReportWriter(report_path)
+
+    with report_writer:
+        for unsup in unsupported:
+            counts["skipped_unsupported"] += 1
+            logger.info("organize_unsupported", file=str(unsup))
+            report_writer.write(
+                _build_organize_record(
+                    original_path=unsup,
+                    suggested_path=None,
+                    final_destination=None,
+                    status=(
+                        "would_skip_unsupported" if dry_run else "skipped_unsupported"
+                    ),
+                    tags_applied=[],
+                    error=None,
+                )
+            )
+
+        if not supported:
+            return _organize_exit_code(counts)
+
+        try:
+            service = ClassificationService(config)
+        except ValueError as e:
+            click.echo(f"Configuration error: {e}", err=True)
+            return 2
+
+        results_by_path = await _classify_for_organize(service, supported)
+
+        move_action = MoveAction(dest_root=dest_root, copy=copy_mode)
+        tag_action: TagAction | None = None
+        if tag_fields:
+            tag_action = TagAction(fields=tag_fields, mode=tag_mode_value)
+
+        for file_path in supported:
+            result = results_by_path.get(file_path)
+            if result is None:
+                counts["error"] += 1
+                report_writer.write(
+                    _build_organize_record(
+                        original_path=file_path,
+                        suggested_path=None,
+                        final_destination=None,
+                        status=MoveStatus.ERROR.value,
+                        tags_applied=[],
+                        error="Classification produced no result",
+                    )
+                )
+                continue
+
+            if isinstance(result, ClassificationErrorResult) or result.error:
+                err_msg = (
+                    getattr(result, "error_message", None) or "Classification failed"
+                )
+                counts["error"] += 1
+                report_writer.write(
+                    _build_organize_record(
+                        original_path=file_path,
+                        suggested_path=None,
+                        final_destination=None,
+                        status=MoveStatus.ERROR.value,
+                        tags_applied=[],
+                        error=str(err_msg),
+                    )
+                )
+                continue
+
+            record = _organize_one(
+                file_path=file_path,
+                result=result,
+                move_action=move_action,
+                tag_action=tag_action,
+                tag_fields=tag_fields,
+                dry_run=dry_run,
+                counts=counts,
+            )
+            report_writer.write(record)
+
+    return _organize_exit_code(counts)
+
+
+async def _classify_for_organize(
+    service: ClassificationService, files: list[Path]
+) -> dict[Path, ClassificationResult | ClassificationErrorResult]:
+    """Classify files and map results back to source paths.
+
+    Files with duplicate basenames are matched in encounter order.
+    """
+    match_path = make_filename_matcher(files)
+    results: dict[Path, ClassificationResult | ClassificationErrorResult] = {}
+
+    def handle(
+        result: ClassificationResult | ClassificationErrorResult,
+    ) -> None:
+        path = match_path(result.original)
+        if path is not None:
+            results[path] = result
+
+    await service.classify_files(files, on_result=handle)
+    return results
+
+
+def _organize_one(
+    file_path: Path,
+    result: ClassificationResult,
+    move_action: MoveAction,
+    tag_action: TagAction | None,
+    tag_fields: list[str] | None,
+    dry_run: bool,
+    counts: dict[str, int],
+) -> dict[str, Any]:
+    """Run move (and optional tag) for one classified file. Returns a report record."""
+    move_plan = move_action.plan(file_path, result)
+
+    if dry_run:
+        status = move_plan.changes["status"]
+        destination = move_plan.changes["destination"]
+        if status == MoveStatus.WOULD_SKIP_EXISTS.value:
+            counts["skipped_exists"] += 1
+            return _build_organize_record(
+                original_path=file_path,
+                suggested_path=result.suggested_path,
+                final_destination=None,
+                status=status,
+                tags_applied=[],
+                error=None,
+            )
+        counts["moved"] += 1
+        tags_applied = _tag_field_records(result, tag_fields) if tag_fields else []
+        return _build_organize_record(
+            original_path=file_path,
+            suggested_path=result.suggested_path,
+            final_destination=destination,
+            status=status,
+            tags_applied=tags_applied,
+            error=None,
+        )
+
+    move_result = move_action.execute(move_plan)
+    if not move_result.success:
+        counts["error"] += 1
+        return _build_organize_record(
+            original_path=file_path,
+            suggested_path=result.suggested_path,
+            final_destination=None,
+            status=MoveStatus.ERROR.value,
+            tags_applied=[],
+            error=move_result.error or "Move failed",
+        )
+
+    status = str(move_result.changes.get("status", ""))
+    if status == MoveStatus.SKIPPED_EXISTS.value:
+        counts["skipped_exists"] += 1
+        return _build_organize_record(
+            original_path=file_path,
+            suggested_path=result.suggested_path,
+            final_destination=None,
+            status=status,
+            tags_applied=[],
+            error=None,
+        )
+
+    counts["moved"] += 1
+    final_dest = Path(str(move_result.changes["destination"]))
+    tags_applied = []
+    if tag_action is not None and tag_fields:
+        try:
+            tag_plan = tag_action.plan(final_dest, result)
+            tag_result = tag_action.execute(tag_plan)
+            if tag_result.success:
+                added = tag_result.changes.get("tags_added", []) or []
+                tags_applied = _tag_field_records(
+                    result, tag_fields, only_values=set(added)
+                )
+        except Exception as exc:
+            logger.warning(
+                "organize_tag_failed",
+                file=str(final_dest),
+                error=str(exc),
+            )
+    return _build_organize_record(
+        original_path=file_path,
+        suggested_path=result.suggested_path,
+        final_destination=str(final_dest),
+        status=status,
+        tags_applied=tags_applied,
+        error=None,
+    )
+
+
+def _tag_field_records(
+    result: ClassificationResult,
+    fields: list[str] | None,
+    only_values: set[str] | None = None,
+) -> list[dict[str, str]]:
+    """Build the tags_applied record list from classification fields.
+
+    Args:
+        result: Classification result.
+        fields: Field names to include.
+        only_values: When provided, restrict to records whose value
+            appears in this set (used in live mode to mirror what was
+            actually written).
+    """
+    if not fields:
+        return []
+    records: list[dict[str, str]] = []
+    for field in fields:
+        value = extract_tag_value(result, field)
+        if not value:
+            continue
+        if only_values is not None and value not in only_values:
+            continue
+        records.append({"field": field, "value": value})
+    return records
+
+
+def _build_organize_record(
+    original_path: Path,
+    suggested_path: str | None,
+    final_destination: str | None,
+    status: str,
+    tags_applied: list[dict[str, str]],
+    error: str | None,
+) -> dict[str, Any]:
+    """Build the canonical organize JSONL record."""
+    return {
+        "original_path": str(original_path),
+        "suggested_path": suggested_path,
+        "final_destination": final_destination,
+        "status": status,
+        "tags_applied": tags_applied,
+        "error": error,
+    }
+
+
+def _organize_exit_code(counts: dict[str, int]) -> int:
+    """Compute the organize exit code from per-status counters.
+
+    skipped_unsupported is a soft notice and does not raise the exit
+    code. Any error or skipped_exists yields exit 1; otherwise exit 0.
+    """
+    if counts.get("error", 0) > 0 or counts.get("skipped_exists", 0) > 0:
+        return 1
+    return 0
+
+
+class _ReportWriter:
+    """Context-managed writer for the organize JSONL report.
+
+    None path → no-op. ``-`` → write to stdout. Anything else → open the
+    file for writing and close on exit.
+    """
+
+    def __init__(self, path: str | None) -> None:
+        self.path = path
+        self._fp: IO[str] | None = None
+        self._owns_fp = False
+
+    def __enter__(self) -> _ReportWriter:
+        if self.path is None:
+            return self
+        if self.path == "-":
+            self._fp = sys.stdout
+            return self
+        target = Path(self.path).expanduser()
+        target.parent.mkdir(parents=True, exist_ok=True)
+        self._fp = target.open("w", encoding="utf-8")
+        self._owns_fp = True
+        return self
+
+    def __exit__(self, *_exc: object) -> None:
+        if self._owns_fp and self._fp is not None:
+            self._fp.close()
+            self._fp = None
+
+    def write(self, record: dict[str, Any]) -> None:
+        if self._fp is None:
+            return
+        self._fp.write(json.dumps(record) + "\n")
+        self._fp.flush()
 
 
 if __name__ == "__main__":

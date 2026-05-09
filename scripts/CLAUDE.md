@@ -6,7 +6,7 @@ For human-readable descriptions of each script and example invocations, see `REA
 
 - Always use `uv run python scripts/<name>.py`. Never plain `python`, never `pip`. The repo's pinned environment lives in `.venv/` and is managed by `uv`.
 - Scripts add `src/` to `sys.path` at import time; do not refactor them into modules under `src/drover/` without a deliberate decision. They are intentionally outside the package surface.
-- The Bash sandbox blocks `127.0.0.1:11434`. Any script that reaches the local Ollama instance (`discover_taxonomy_terms.py`, `collect_classification_tuples.py`, `run_eval_experiments.py`, `organize_directory_tree.py` when configured for Ollama) needs `dangerouslyDisableSandbox: true` per `CLAUDE.md` note 13.
+- The Bash sandbox blocks `127.0.0.1:11434`. Any script that reaches the local Ollama instance (`discover_taxonomy_terms.py`, `collect_classification_tuples.py`, `run_eval_experiments.py`) needs `dangerouslyDisableSandbox: true` per `CLAUDE.md` note 13.
 
 ## When editing scripts
 
