@@ -1118,6 +1118,10 @@ class _ReportWriter:
         if self._fp is None:
             return
         self._fp.write(json.dumps(record) + "\n")
+        # Flush per record so a Hazel/Folder Action invocation that gets
+        # killed mid-batch still has a complete audit log up to the last
+        # processed file. The cost is one syscall per file, dominated by
+        # the LLM round-trip in any realistic run.
         self._fp.flush()
 
 

@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from unittest.mock import patch
+
+import pytest
 
 from drover.actions.move import MoveAction, MoveStatus
 from drover.models import ClassificationResult
@@ -220,3 +223,62 @@ def test_dry_run_idempotent(tmp_path: Path) -> None:
     assert plan1.changes == plan2.changes
     assert source.exists()
     assert not Path(plan1.changes["destination"]).exists()
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="symlink semantics differ")
+def test_plan_treats_broken_symlink_at_destination_as_collision(tmp_path: Path) -> None:
+    """A broken symlink at the destination must be reported as skipped_exists.
+
+    Without this guard, ``Path.exists()`` returns False for a broken
+    symlink and the planner would proceed to a copy/move that follows
+    the symlink to whatever it points at.
+    """
+    source = tmp_path / "incoming" / "receipt.pdf"
+    source.parent.mkdir(parents=True)
+    source.write_bytes(b"new")
+
+    dest_root = tmp_path / "filed"
+    dest_path = dest_root / "household/finance/receipts/receipt.pdf"
+    dest_path.parent.mkdir(parents=True)
+    nonexistent_target = tmp_path / "outside" / "victim.txt"
+    dest_path.symlink_to(nonexistent_target)
+
+    assert not dest_path.exists()  # broken symlink — exists() is False
+    assert dest_path.is_symlink()  # but is_symlink() is True
+
+    action = MoveAction(dest_root=dest_root, copy=True)
+    plan = action.plan(source, _classification())
+
+    assert plan.changes["status"] == MoveStatus.WOULD_SKIP_EXISTS.value
+    assert plan.changes["halt_chain"] is True
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="symlink semantics differ")
+def test_execute_refuses_symlink_appearing_after_plan(tmp_path: Path) -> None:
+    """Symlinks planted between plan and execute must trigger an error, not a write-through.
+
+    Even if ``MoveAction.plan`` saw a clear destination, an attacker (or
+    just another process) could plant a symlink before execute. The
+    execute path must refuse the write rather than letting shutil.copy2
+    follow it.
+    """
+    source = tmp_path / "incoming" / "receipt.pdf"
+    source.parent.mkdir(parents=True)
+    source.write_bytes(b"hello")
+
+    action = MoveAction(dest_root=tmp_path / "filed", copy=True)
+    plan = action.plan(source, _classification())
+    # Plan saw clear destination; now plant a broken symlink.
+    dest_path = Path(plan.changes["destination"])
+    dest_path.parent.mkdir(parents=True, exist_ok=True)
+    victim = tmp_path / "victim.txt"
+    dest_path.symlink_to(victim)
+
+    result = action.execute(plan)
+
+    assert result.success is False
+    assert result.changes["status"] == MoveStatus.ERROR.value
+    assert source.exists()
+    assert source.read_bytes() == b"hello"
+    # Crucially, the symlink target was not written.
+    assert not victim.exists()

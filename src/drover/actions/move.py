@@ -54,7 +54,11 @@ class MoveAction:
     def plan(self, file: Path, result: ClassificationResult) -> ActionPlan:
         """Compute the destination for the file and detect collisions."""
         destination = self.dest_root / result.suggested_path
-        exists = destination.exists()
+        # Treat any pre-existing path at the destination — including a
+        # broken symlink — as a collision. shutil.copy2 follows
+        # destination symlinks, so a planted broken link could otherwise
+        # redirect the write to an arbitrary path.
+        exists = destination.exists() or destination.is_symlink()
 
         if exists:
             description = f"would skip (destination exists): {destination}"
@@ -107,6 +111,13 @@ class MoveAction:
             return self._error_result(source, destination, copy_mode, str(exc))
 
         if copy_mode:
+            if destination.exists() or destination.is_symlink():
+                return self._error_result(
+                    source,
+                    destination,
+                    copy_mode,
+                    f"destination appeared during copy: {destination}",
+                )
             try:
                 shutil.copy2(str(source), str(destination))
             except Exception as exc:
@@ -153,6 +164,13 @@ class MoveAction:
         but source removal failed). Returns None on full success so the
         caller can build the standard MOVED result.
         """
+        if destination.exists() or destination.is_symlink():
+            return self._error_result(
+                source,
+                destination,
+                False,
+                f"destination appeared during cross-volume move: {destination}",
+            )
         try:
             shutil.copy2(str(source), str(destination))
         except Exception as exc:

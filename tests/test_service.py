@@ -1,6 +1,7 @@
 """Tests for the ClassificationService orchestration layer."""
 
 import asyncio
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -10,7 +11,7 @@ from drover.classifier import LLMParseError
 from drover.config import DroverConfig, ErrorMode
 from drover.loader import LoadedDocument
 from drover.models import ClassificationErrorResult, ClassificationResult
-from drover.service import ClassificationService
+from drover.service import ClassificationService, walk_directory
 
 # Type alias for union return type (keeps lines under 100 chars)
 Result = ClassificationResult | ClassificationErrorResult
@@ -513,3 +514,64 @@ class TestUnexpectedErrors:
         assert result.error is True
         assert result.error_code == ErrorCode.UNEXPECTED_ERROR
         assert "Simulated unexpected failure" in (result.error_message or "")
+
+
+class TestWalkDirectory:
+    """Tests for the walk_directory helper."""
+
+    @pytest.mark.skipif(
+        sys.platform == "win32", reason="Symlink behavior differs on Windows"
+    )
+    def test_skips_symlinks_by_default(self, tmp_path: Path) -> None:
+        real = tmp_path / "real.pdf"
+        real.write_bytes(b"x")
+        link = tmp_path / "link.pdf"
+        link.symlink_to(real)
+
+        files = list(walk_directory(tmp_path, {".pdf"}, follow_symlinks=False))
+        paths = {p for p, _ in files}
+
+        assert real in paths
+        assert link not in paths
+
+    @pytest.mark.skipif(
+        sys.platform == "win32", reason="Symlink behavior differs on Windows"
+    )
+    def test_includes_symlinks_when_follow_symlinks_true(self, tmp_path: Path) -> None:
+        real = tmp_path / "real.pdf"
+        real.write_bytes(b"x")
+        link = tmp_path / "link.pdf"
+        link.symlink_to(real)
+
+        files = list(walk_directory(tmp_path, {".pdf"}, follow_symlinks=True))
+        paths = {p for p, _ in files}
+
+        assert real in paths
+        assert link in paths
+
+    def test_skips_hidden_files_and_directories(self, tmp_path: Path) -> None:
+        visible = tmp_path / "visible.pdf"
+        visible.write_bytes(b"x")
+        hidden_file = tmp_path / ".hidden.pdf"
+        hidden_file.write_bytes(b"x")
+        hidden_dir = tmp_path / ".cache"
+        hidden_dir.mkdir()
+        (hidden_dir / "buried.pdf").write_bytes(b"x")
+
+        files = list(walk_directory(tmp_path, {".pdf"}))
+        paths = {p for p, _ in files}
+
+        assert visible in paths
+        assert hidden_file not in paths
+        assert all(".cache" not in p.parts for p in paths)
+
+    def test_marks_unsupported_extensions(self, tmp_path: Path) -> None:
+        pdf = tmp_path / "a.pdf"
+        pdf.write_bytes(b"x")
+        odd = tmp_path / "b.unsupported"
+        odd.write_bytes(b"x")
+
+        files = dict(walk_directory(tmp_path, {".pdf"}))
+
+        assert files[pdf] is True
+        assert files[odd] is False

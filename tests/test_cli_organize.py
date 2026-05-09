@@ -399,3 +399,55 @@ def test_tag_fields_dry_run_records_tags_applied(
     record = json.loads(next(ln for ln in result.stdout.splitlines() if ln.strip()))
     fields = {entry["field"]: entry["value"] for entry in record["tags_applied"]}
     assert fields == {"category": "finance", "doctype": "receipts"}
+
+
+@pytest.mark.skipif(
+    sys.platform != "darwin", reason="--tag-fields only supported on macOS"
+)
+def test_tag_failure_after_successful_move_does_not_roll_back(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Tag-step failure must leave the move intact and emit a moved record.
+
+    The tags_applied list is empty because tagging never succeeded; the
+    status is ``moved`` because the move did succeed.
+    """
+    src = tmp_path / "doc.pdf"
+    src.write_bytes(b"hello")
+    dest = tmp_path / "filed"
+
+    classification = _classification_for(src.name)
+    _patch_classify(monkeypatch, {src.resolve(): classification})
+
+    from drover.actions.tag import TagAction
+
+    def raise_on_plan(self: TagAction, file: Path, result: Any) -> None:
+        raise RuntimeError("simulated tag failure")
+
+    monkeypatch.setattr(TagAction, "plan", raise_on_plan)
+
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        [
+            "organize",
+            str(src),
+            "--dest",
+            str(dest),
+            "--tag-fields",
+            "category,doctype",
+            "--report",
+            "-",
+        ],
+    )
+
+    assert result.exit_code == 0, result.stderr
+    moved = dest / "household/finance/receipts/receipt.pdf"
+    assert moved.exists()
+    assert moved.read_bytes() == b"hello"
+    assert not src.exists()
+
+    record = json.loads(next(ln for ln in result.stdout.splitlines() if ln.strip()))
+    assert record["status"] == "moved"
+    assert record["tags_applied"] == []
+    assert record["error"] is None

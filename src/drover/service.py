@@ -74,12 +74,19 @@ def walk_directory(
     Hidden files and directories (whose name starts with a dot) are
     skipped. Symlinks are skipped unless ``follow_symlinks`` is True.
 
+    The implementation eagerly materializes the full tree via
+    ``sorted(root.rglob('*'))`` to provide deterministic ordering. For
+    typical inbox-sized directories this is fine; if you need to walk
+    very large trees and care about peak memory, sort outside.
+
     Args:
         root: Directory to walk.
         supported_extensions: Lowercase suffixes (including the leading
             dot) that count as processable.
-        follow_symlinks: If True, descend into symlinked directories and
-            include symlinked files.
+        follow_symlinks: When False, symlinked files are skipped. Note
+            that ``Path.rglob`` does not descend into symlinked
+            directories regardless of this flag — this controls only
+            whether individual symlinked files are included.
 
     Yields:
         Pairs of ``(file_path, is_supported)`` in sorted order.
