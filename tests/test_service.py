@@ -523,6 +523,7 @@ class TestWalkDirectory:
         sys.platform == "win32", reason="Symlink behavior differs on Windows"
     )
     def test_skips_symlinks_by_default(self, tmp_path: Path) -> None:
+        """With follow_symlinks=False, symlinked files are excluded from the walk."""
         real = tmp_path / "real.pdf"
         real.write_bytes(b"x")
         link = tmp_path / "link.pdf"
@@ -538,6 +539,7 @@ class TestWalkDirectory:
         sys.platform == "win32", reason="Symlink behavior differs on Windows"
     )
     def test_includes_symlinks_when_follow_symlinks_true(self, tmp_path: Path) -> None:
+        """With follow_symlinks=True, symlinked files are included in the walk."""
         real = tmp_path / "real.pdf"
         real.write_bytes(b"x")
         link = tmp_path / "link.pdf"
@@ -550,6 +552,7 @@ class TestWalkDirectory:
         assert link in paths
 
     def test_skips_hidden_files_and_directories(self, tmp_path: Path) -> None:
+        """Dot-prefixed files and any descendant of a dot-prefixed directory are skipped."""
         visible = tmp_path / "visible.pdf"
         visible.write_bytes(b"x")
         hidden_file = tmp_path / ".hidden.pdf"
@@ -566,6 +569,7 @@ class TestWalkDirectory:
         assert all(".cache" not in p.parts for p in paths)
 
     def test_marks_unsupported_extensions(self, tmp_path: Path) -> None:
+        """The supported flag in each yielded pair reflects the extension allowlist."""
         pdf = tmp_path / "a.pdf"
         pdf.write_bytes(b"x")
         odd = tmp_path / "b.unsupported"

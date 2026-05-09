@@ -54,6 +54,7 @@ def make_filename_matcher(files: Sequence[Path]) -> Callable[[str], Path | None]
     counters: dict[str, int] = {}
 
     def match(filename: str) -> Path | None:
+        """Return the next unconsumed Path for ``filename`` or None when exhausted."""
         paths = index.get(filename, [])
         idx = counters.get(filename, 0)
         if idx < len(paths):

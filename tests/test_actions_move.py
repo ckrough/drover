@@ -15,6 +15,7 @@ from drover.models import ClassificationResult
 def _classification(
     suggested_path: str = "household/finance/receipts/receipt.pdf",
 ) -> ClassificationResult:
+    """Return a stock ClassificationResult pinned to a fixed suggested_path."""
     return ClassificationResult(
         original="receipt.pdf",
         suggested_path=suggested_path,
@@ -29,6 +30,7 @@ def _classification(
 
 
 def test_plan_would_move_when_destination_missing(tmp_path: Path) -> None:
+    """plan() reports would_move and computes the absolute destination."""
     source = tmp_path / "incoming" / "receipt.pdf"
     source.parent.mkdir(parents=True)
     source.write_bytes(b"data")
@@ -44,6 +46,7 @@ def test_plan_would_move_when_destination_missing(tmp_path: Path) -> None:
 
 
 def test_plan_would_skip_exists_when_destination_present(tmp_path: Path) -> None:
+    """plan() reports would_skip_exists and halts the chain when destination is occupied."""
     source = tmp_path / "incoming" / "receipt.pdf"
     source.parent.mkdir(parents=True)
     source.write_bytes(b"data")
@@ -62,6 +65,7 @@ def test_plan_would_skip_exists_when_destination_present(tmp_path: Path) -> None
 
 
 def test_execute_move_same_volume(tmp_path: Path) -> None:
+    """Same-volume execute() removes the source and writes the destination."""
     source = tmp_path / "incoming" / "receipt.pdf"
     source.parent.mkdir(parents=True)
     source.write_bytes(b"hello")
@@ -79,6 +83,7 @@ def test_execute_move_same_volume(tmp_path: Path) -> None:
 
 
 def test_execute_copy_leaves_source_intact(tmp_path: Path) -> None:
+    """--copy mode preserves the source bytes and writes a copy at the destination."""
     source = tmp_path / "incoming" / "receipt.pdf"
     source.parent.mkdir(parents=True)
     source.write_bytes(b"hello")
@@ -97,6 +102,7 @@ def test_execute_copy_leaves_source_intact(tmp_path: Path) -> None:
 
 
 def test_execute_skip_when_destination_exists(tmp_path: Path) -> None:
+    """A pre-existing destination triggers skipped_exists and leaves both files untouched."""
     source = tmp_path / "incoming" / "receipt.pdf"
     source.parent.mkdir(parents=True)
     source.write_bytes(b"new")
@@ -119,6 +125,7 @@ def test_execute_skip_when_destination_exists(tmp_path: Path) -> None:
 
 
 def test_execute_creates_intermediate_directories(tmp_path: Path) -> None:
+    """execute() creates any missing destination subdirectories before writing."""
     source = tmp_path / "incoming" / "receipt.pdf"
     source.parent.mkdir(parents=True)
     source.write_bytes(b"hello")

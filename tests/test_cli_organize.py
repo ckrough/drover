@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 
 
 def _classification_for(name: str = "receipt.pdf") -> ClassificationResult:
+    """Return a stock ClassificationResult for organize-CLI tests."""
     return ClassificationResult(
         original=name,
         suggested_path="household/finance/receipts/receipt.pdf",
@@ -51,6 +52,7 @@ def _patch_classify(
 
 
 def test_help_lists_organize_command() -> None:
+    """`drover organize --help` lists the documented flags."""
     runner = CliRunner()
     result = runner.invoke(main, ["organize", "--help"])
 
@@ -63,6 +65,7 @@ def test_help_lists_organize_command() -> None:
 
 
 def test_missing_dest_exits_two(tmp_path: Path) -> None:
+    """Omitting --dest causes Click to fail at parse time with exit code 2."""
     src = tmp_path / "doc.pdf"
     src.write_bytes(b"x")
 
@@ -73,6 +76,7 @@ def test_missing_dest_exits_two(tmp_path: Path) -> None:
 
 
 def test_invalid_tag_field_rejected_at_parse_time(tmp_path: Path) -> None:
+    """A --tag-fields value outside the allowlist exits 2 before any file is touched."""
     src = tmp_path / "doc.pdf"
     src.write_bytes(b"x")
     dest = tmp_path / "filed"
@@ -99,6 +103,7 @@ def test_invalid_tag_field_rejected_at_parse_time(tmp_path: Path) -> None:
 def test_single_file_dry_run_writes_to_stdout_report(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    """`--dry-run --report -` emits exactly one would_move JSONL line on stdout."""
     src = tmp_path / "doc.pdf"
     src.write_bytes(b"x")
     dest = tmp_path / "filed"
@@ -137,6 +142,7 @@ def test_single_file_dry_run_writes_to_stdout_report(
 def test_single_file_live_moves_source(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    """Live single-file run removes the source and writes the destination + JSONL record."""
     src = tmp_path / "doc.pdf"
     src.write_bytes(b"hello")
     dest = tmp_path / "filed"
@@ -174,6 +180,7 @@ def test_single_file_live_moves_source(
 def test_copy_mode_leaves_source_intact(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    """`--copy` writes the destination while keeping the source byte-identical."""
     src = tmp_path / "doc.pdf"
     src.write_bytes(b"hello")
     dest = tmp_path / "filed"
@@ -202,6 +209,7 @@ def test_copy_mode_leaves_source_intact(
 def test_skipped_exists_keeps_source_and_reports(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    """A pre-existing destination keeps source intact, emits skipped_exists, exits 1."""
     src = tmp_path / "doc.pdf"
     src.write_bytes(b"new")
     dest = tmp_path / "filed"
@@ -255,6 +263,7 @@ def test_unsupported_extension_is_soft_notice(
 def test_directory_classify_error_records_error_and_exits_one(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    """A classification error is reported as an `error` record and exits 1."""
     src_dir = tmp_path / "in"
     src_dir.mkdir()
     bad = src_dir / "bad.pdf"
@@ -340,6 +349,7 @@ def test_dry_run_report_parity_with_live_run_modulo_status(
 def test_idempotent_rerun_produces_skipped_exists(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    """Re-running organize on the same input emits skipped_exists with no new mutations."""
     src = tmp_path / "doc.pdf"
     src.write_bytes(b"hello")
     dest = tmp_path / "filed"
@@ -372,6 +382,7 @@ def test_idempotent_rerun_produces_skipped_exists(
 def test_tag_fields_dry_run_records_tags_applied(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    """Dry-run with --tag-fields records the tags that would be applied per field."""
     src = tmp_path / "doc.pdf"
     src.write_bytes(b"x")
     dest = tmp_path / "filed"

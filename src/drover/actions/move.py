@@ -204,6 +204,7 @@ class MoveAction:
     def _error_result(
         source: Path, destination: Path, copy_mode: bool, error: str
     ) -> ActionResult:
+        """Build a failure ActionResult that halts the chain and leaves the source path intact."""
         verb = "copy" if copy_mode else "move"
         return ActionResult(
             file=source,

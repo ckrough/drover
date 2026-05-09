@@ -309,6 +309,7 @@ async def _classify_files(
         return 2
 
     def handle_result(result: ClassificationResult | ClassificationErrorResult) -> None:
+        """Emit one classification record to stdout, plus a verbose-mode confirmation."""
         _output_result(result, batch)
         if log == LogLevel.VERBOSE and not result.error:
             console.print(f"[green]✓[/green] Processed {result.original}")
@@ -932,6 +933,7 @@ async def _classify_for_organize(
     def handle(
         result: ClassificationResult | ClassificationErrorResult,
     ) -> None:
+        """Record the classification result against its source Path."""
         path = match_path(result.original)
         if path is not None:
             results[path] = result
@@ -1115,6 +1117,7 @@ class _ReportWriter:
             self._fp = None
 
     def write(self, record: dict[str, Any]) -> None:
+        """Append one JSONL record to the report sink, no-op when none configured."""
         if self._fp is None:
             return
         self._fp.write(json.dumps(record) + "\n")
