@@ -75,6 +75,33 @@ def _fake_docling_result(markdown: str, num_pages: int = 1) -> SimpleNamespace:
     return SimpleNamespace(document=document)
 
 
+async def test_docling_loader_caches_converter_across_loads(tmp_path: Path) -> None:
+    """`_build_docling_converter` runs once even when `load()` is called repeatedly."""
+    file_path = tmp_path / "sample.txt"
+    file_path.write_text("placeholder body for docling fake")
+
+    fake_result = _fake_docling_result("# Heading\n\nBody.", num_pages=1)
+
+    class FakeConverter:
+        def convert(self, source: str) -> SimpleNamespace:
+            return fake_result
+
+    with (
+        patch(
+            "drover.loader._build_docling_converter",
+            return_value=FakeConverter(),
+        ) as build_mock,
+        patch("drover.loader._check_docling_models_available") as check_mock,
+    ):
+        loader = DoclingLoader()
+        await loader.load(file_path)
+        await loader.load(file_path)
+        await loader.load(file_path)
+
+    assert build_mock.call_count == 1
+    assert check_mock.call_count == 1
+
+
 async def test_docling_loader_loads_document(tmp_path: Path) -> None:
     """DoclingLoader returns content from the markdown export."""
     file_path = tmp_path / "sample.txt"

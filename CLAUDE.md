@@ -207,7 +207,7 @@ def test_parse_response_direct_json() -> None:
     - **Targeted install:** `uv sync --extra docling --extra ocr-mac`.
     - **OS-level tool:** `uv tool install --reinstall "drover[docling,ocr-mac] @ git+https://github.com/ckrough/drover"` (or with `--editable <path>` for a local checkout).
 
-    The verbose log line shifts from `Auto OCR model selected rapidocr with torch` to `Auto OCR model selected ocrmac.`; the three "cannot be used because X is not installed" warnings disappear. The extra is gated on `sys_platform == 'darwin'`, so Linux/CI installs are unaffected (CI's `uv sync --all-extras` skips it via the marker).
+    To verify the active OCR backend, the historical signal was a Docling INFO line (`Auto OCR model selected ocrmac.` vs `Auto OCR model selected rapidocr with torch`). That line is now suppressed by `logging.py`'s `quieted_loggers` (which floors `docling`/`docling_core`/`docling_ibm_models` at WARNING to keep `--log-level debug` readable). To surface it again, comment out the `docling` entries in `quieted_loggers` for the duration of the diagnostic run, or invoke Docling directly via `python -c "from docling.models.factories.ocr_factory import OcrFactory; ..."`. The `ocr-mac` extra is gated on `sys_platform == 'darwin'`, so Linux/CI installs are unaffected (CI's `uv sync --all-extras` skips it via the marker).
 
 13. **Sandbox + Ollama:** The Bash sandbox blocks localhost (`127.0.0.1:11434`). Run any command that calls the Ollama provider with `dangerouslyDisableSandbox: true` (drover classify/evaluate, ollama list, etc.).
 
