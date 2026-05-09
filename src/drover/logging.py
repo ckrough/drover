@@ -39,9 +39,11 @@ def configure_logging(
         force=True,
     )
 
-    # Suppress noisy third-party loggers
-    # pdfminer.six outputs verbose debug info (nexttoken, do_keyword, etc.)
-    noisy_loggers = [
+    # Suppress noisy third-party loggers. Drover's --log-level=debug should
+    # surface drover's own debug events, not byte-level transport, model-cache
+    # chatter, or PDF-parser internals.
+    silent_loggers = [
+        # PDF parsing internals (nexttoken, do_keyword, etc.)
         "pdfminer",
         "pdfminer.pdfpage",
         "pdfminer.pdfinterp",
@@ -52,8 +54,28 @@ def configure_logging(
         "pdfminer.pdfparser",
         "PIL",
     ]
-    for logger_name in noisy_loggers:
+    for logger_name in silent_loggers:
         logging.getLogger(logger_name).setLevel(logging.ERROR)
+
+    quieted_loggers = [
+        # HTTP transport (Ollama/Anthropic/OpenAI/HF requests)
+        "httpcore",
+        "httpx",
+        "urllib3",
+        # HuggingFace model metadata fetches and downloads
+        "huggingface_hub",
+        "filelock",
+        # Docling pipeline initialization, plugin loading, and per-stage profiling
+        "docling",
+        "docling_core",
+        "docling_ibm_models",
+        # Plotting library imported transitively by Docling
+        "matplotlib",
+        # asyncio's "Using selector: KqueueSelector" startup line
+        "asyncio",
+    ]
+    for logger_name in quieted_loggers:
+        logging.getLogger(logger_name).setLevel(logging.WARNING)
 
     # Build processor chain
     processors: list[structlog.types.Processor] = [

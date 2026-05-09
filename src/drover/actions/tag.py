@@ -181,6 +181,20 @@ class TagManager:
         self.write_tags(path, [])
 
 
+def extract_tag_value(result: ClassificationResult, field: str) -> str:
+    """Return the tag value for a single classification field.
+
+    For ``date`` returns the leading 4 digits (year); for any other
+    field returns the field as-is. Empty/missing values yield "".
+    """
+    if field == "date":
+        if result.date and len(result.date) >= 4:
+            return result.date[:4]
+        return ""
+    value = getattr(result, field, None)
+    return value or ""
+
+
 def tags_from_result(result: ClassificationResult, fields: list[str]) -> list[str]:
     """Extract tag values from a classification result.
 
@@ -189,18 +203,13 @@ def tags_from_result(result: ClassificationResult, fields: list[str]) -> list[st
         fields: List of field names to extract (e.g., ["domain", "category"]).
 
     Returns:
-        List of tag values.
+        List of tag values (omits empty values).
     """
     tags = []
     for field in fields:
-        if field == "date":
-            # Extract year from YYYYMMDD format
-            if result.date and len(result.date) >= 4:
-                tags.append(result.date[:4])
-        else:
-            value = getattr(result, field, None)
-            if value:
-                tags.append(value)
+        value = extract_tag_value(result, field)
+        if value:
+            tags.append(value)
     return tags
 
 
@@ -261,20 +270,18 @@ class TagAction:
     def plan(self, file: Path, result: ClassificationResult) -> ActionPlan:
         """Plan tag changes for a file.
 
+        Tolerates a missing file: when called against a path that does
+        not exist yet (e.g. an organize dry-run pointing at a destination
+        that has not been written), existing tags are treated as empty.
+
         Args:
             file: The file to tag.
             result: Classification result.
 
         Returns:
             ActionPlan with planned tag changes.
-
-        Raises:
-            FileNotFoundError: If the file does not exist.
         """
-        if not file.exists():
-            raise FileNotFoundError(f"File not found: {file}")
-
-        existing = self.manager.read_tags(file)
+        existing = self.manager.read_tags(file) if file.exists() else []
         new_tags = tags_from_result(result, self.fields)
         final = compute_final_tags(existing, new_tags, self.mode)
 

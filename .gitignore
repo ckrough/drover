@@ -67,3 +67,6 @@ tests/integration/config.yaml
 
 # Local-only tools and scratch (kept out of repo by convention)
 .local/
+
+# Smoke-suite generated reports (harness-managed)
+smoke/reports/

@@ -32,7 +32,7 @@ uv sync --all-extras
 src/drover/
 ├── __init__.py         # Package init, version definition
 ├── __main__.py         # Entry point for python -m drover
-├── cli.py              # Click CLI commands (classify, tag, evaluate)
+├── cli.py              # Click CLI commands (classify, tag, organize, evaluate)
 ├── config.py           # Configuration management (Pydantic models)
 ├── loader.py           # DocumentLoader - text extraction from documents
 ├── classifier.py       # LLM-based DocumentClassifier (uses structured output)
@@ -55,7 +55,8 @@ src/drover/
 │   └── loader.py       # Naming policy registry
 └── actions/            # File action implementations
     ├── base.py         # ActionPlan and ActionResult dataclasses
-    ├── runner.py       # ActionRunner orchestration
+    ├── runner.py       # ActionRunner orchestration (chained list of actions)
+    ├── move.py         # MoveAction (classify → relocate, used by drover organize)
     └── tag.py          # macOS filesystem tagging (TagAction, TagMode)
 ```
 
@@ -68,6 +69,15 @@ src/drover/
 - `eval/runs/<timestamp>/results.md` — committed when free of PII
 - `eval/runs/<timestamp>/*.json` — per-doc dumps (gitignored)
 - `eval/dashboard.html` and `eval/dashboard_data.json` — regenerator-managed via `scripts/build_eval_dashboard.py`; aggregates only, no per-doc PII
+
+## Smoke Layout
+
+- `smoke/run.py` — end-to-end functional-health harness (custom, not pytest); emits JSON for LLM-agent self-assessment
+- `smoke/README.md` — test catalog, report schema, environment requirements
+- `smoke/fixtures/` — three synthetic PDFs (committed; chosen for taxonomy diversity)
+- `smoke/reports/` — generated per-run JSON + per-test stdout/stderr captures (gitignored)
+
+Smoke is for *functional health* (does the CLI run, does the LLM path return well-formed results, did regressions stay fixed). Eval is for *classification accuracy*. They are intentionally separate runners with separate report formats.
 
 ## Commands
 
@@ -82,11 +92,19 @@ uv run drover classify document.pdf --ai-provider ollama --ai-model gemma4:lates
 uv run drover tag document.pdf --dry-run
 uv run drover tag document.pdf --tag-fields domain,category --tag-mode replace
 
+# Run CLI - organize command (classify, optionally tag, and move into a tree)
+uv run drover organize ~/Inbox --dest ~/Documents/filed --dry-run --report -
+uv run drover organize ~/Inbox/scan.pdf --dest ~/Documents/filed --tag-fields category,doctype
+
 # Run CLI - evaluate command
 uv run drover evaluate --ground-truth eval/ground_truth/synthetic.jsonl --ai-model gpt-4o
 
 # Run all tests
 uv run pytest
+
+# Run end-to-end smoke suite (10 tests; LLM tests need Ollama; emits JSON report)
+uv run python smoke/run.py
+uv run python smoke/run.py --skip-llm   # CLI + error-path tests only, ~10s
 
 # Run a single test file
 uv run pytest tests/test_taxonomy.py
@@ -115,7 +133,7 @@ uv run bandit -r src/ -f json --severity-level medium --confidence-level medium 
 ### Plugin Systems
 - **Taxonomies** (`taxonomy/`): Controlled vocabularies. Register new ones in `taxonomy/loader.py`
 - **Naming Policies** (`naming/`): Filename conventions. Register new ones in `naming/loader.py`
-- **Actions** (`actions/`): Post-classification operations like tagging
+- **Actions** (`actions/`): Post-classification operations (`MoveAction`, `TagAction`). `ActionRunner` chains them in order, passing each action's `final_path` to the next; `halt_chain` stops the chain (set by `MoveAction` on `skipped_exists`)
 
 ### Key Models (`models.py`)
 - `RawClassification` → LLM output: domain, category, doctype, vendor, date, subject
@@ -202,7 +220,7 @@ def test_parse_response_direct_json() -> None:
     - **Targeted install:** `uv sync --extra docling --extra ocr-mac`.
     - **OS-level tool:** `uv tool install --reinstall "drover[docling,ocr-mac] @ git+https://github.com/ckrough/drover"` (or with `--editable <path>` for a local checkout).
 
-    The verbose log line shifts from `Auto OCR model selected rapidocr with torch` to `Auto OCR model selected ocrmac.`; the three "cannot be used because X is not installed" warnings disappear. The extra is gated on `sys_platform == 'darwin'`, so Linux/CI installs are unaffected (CI's `uv sync --all-extras` skips it via the marker).
+    To verify the active OCR backend, the historical signal was a Docling INFO line (`Auto OCR model selected ocrmac.` vs `Auto OCR model selected rapidocr with torch`). That line is now suppressed by `logging.py`'s `quieted_loggers` (which floors `docling`/`docling_core`/`docling_ibm_models` at WARNING to keep `--log-level debug` readable). To surface it again, comment out the `docling` entries in `quieted_loggers` for the duration of the diagnostic run, or invoke Docling directly via `python -c "from docling.models.factories.ocr_factory import OcrFactory; ..."`. The `ocr-mac` extra is gated on `sys_platform == 'darwin'`, so Linux/CI installs are unaffected (CI's `uv sync --all-extras` skips it via the marker).
 
 13. **Sandbox + Ollama:** The Bash sandbox blocks localhost (`127.0.0.1:11434`). Run any command that calls the Ollama provider with `dangerouslyDisableSandbox: true` (drover classify/evaluate, ollama list, etc.).
 

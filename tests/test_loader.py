@@ -8,7 +8,7 @@ from unittest.mock import patch
 import pytest
 
 from drover.loader import (
-    _SUPPORTED_EXTENSIONS,
+    SUPPORTED_EXTENSIONS,
     DoclingLoader,
     DocumentLoadError,
 )
@@ -16,7 +16,7 @@ from drover.sampling import SampleStrategy
 
 
 def test_supported_extensions_match_docling_audit() -> None:
-    """`_SUPPORTED_EXTENSIONS` matches Docling's officially-supported set.
+    """`SUPPORTED_EXTENSIONS` matches Docling's officially-supported set.
 
     Source: https://docling-project.github.io/docling/usage/supported_formats/
     Locked here so accidental additions surface as test failures and get
@@ -39,7 +39,7 @@ def test_supported_extensions_match_docling_audit() -> None:
         ".tif",
         ".bmp",
     }
-    assert expected == _SUPPORTED_EXTENSIONS
+    assert expected == SUPPORTED_EXTENSIONS
 
     # Formats removed per ADR-006 (not in Docling's supported set):
     for unsupported in {
@@ -53,7 +53,7 @@ def test_supported_extensions_match_docling_audit() -> None:
         ".odt",
         ".rtf",  # never reliably handled
     }:
-        assert unsupported not in _SUPPORTED_EXTENSIONS
+        assert unsupported not in SUPPORTED_EXTENSIONS
 
 
 # ---------------------------------------------------------------------------
@@ -73,6 +73,33 @@ def _fake_docling_result(markdown: str, num_pages: int = 1) -> SimpleNamespace:
         pages={i: SimpleNamespace() for i in range(1, num_pages + 1)},
     )
     return SimpleNamespace(document=document)
+
+
+async def test_docling_loader_caches_converter_across_loads(tmp_path: Path) -> None:
+    """`_build_docling_converter` runs once even when `load()` is called repeatedly."""
+    file_path = tmp_path / "sample.txt"
+    file_path.write_text("placeholder body for docling fake")
+
+    fake_result = _fake_docling_result("# Heading\n\nBody.", num_pages=1)
+
+    class FakeConverter:
+        def convert(self, source: str) -> SimpleNamespace:
+            return fake_result
+
+    with (
+        patch(
+            "drover.loader._build_docling_converter",
+            return_value=FakeConverter(),
+        ) as build_mock,
+        patch("drover.loader._check_docling_models_available") as check_mock,
+    ):
+        loader = DoclingLoader()
+        await loader.load(file_path)
+        await loader.load(file_path)
+        await loader.load(file_path)
+
+    assert build_mock.call_count == 1
+    assert check_mock.call_count == 1
 
 
 async def test_docling_loader_loads_document(tmp_path: Path) -> None:

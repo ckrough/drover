@@ -8,7 +8,7 @@ adapter over this service.
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from pathlib import Path
 
 from drover.classifier import (
@@ -36,6 +36,71 @@ logger = get_logger(__name__)
 
 Result = ClassificationResult | ClassificationErrorResult
 ResultCallback = Callable[[Result], None]
+
+
+def make_filename_matcher(files: Sequence[Path]) -> Callable[[str], Path | None]:
+    """Return a stateful function mapping filename to its next unmatched Path.
+
+    Classification results carry only the basename of the source file
+    (``ClassificationResult.original``). Callers reconciling those
+    results with their original Path objects need to handle duplicate
+    basenames in encounter order. This helper centralizes that logic:
+    each call returns the next unconsumed Path for the given filename,
+    or ``None`` once every path with that name has been matched.
+    """
+    index: dict[str, list[Path]] = {}
+    for f in files:
+        index.setdefault(f.name, []).append(f)
+    counters: dict[str, int] = {}
+
+    def match(filename: str) -> Path | None:
+        """Return the next unconsumed Path for ``filename`` or None when exhausted."""
+        paths = index.get(filename, [])
+        idx = counters.get(filename, 0)
+        if idx < len(paths):
+            counters[filename] = idx + 1
+            return paths[idx]
+        return None
+
+    return match
+
+
+def walk_directory(
+    root: Path,
+    supported_extensions: Iterable[str],
+    follow_symlinks: bool = False,
+) -> Iterator[tuple[Path, bool]]:
+    """Yield files under root paired with whether their extension is supported.
+
+    Hidden files and directories (whose name starts with a dot) are
+    skipped. Symlinks are skipped unless ``follow_symlinks`` is True.
+
+    The implementation eagerly materializes the full tree via
+    ``sorted(root.rglob('*'))`` to provide deterministic ordering. For
+    typical inbox-sized directories this is fine; if you need to walk
+    very large trees and care about peak memory, sort outside.
+
+    Args:
+        root: Directory to walk.
+        supported_extensions: Lowercase suffixes (including the leading
+            dot) that count as processable.
+        follow_symlinks: When False, symlinked files are skipped. Note
+            that ``Path.rglob`` does not descend into symlinked
+            directories regardless of this flag — this controls only
+            whether individual symlinked files are included.
+
+    Yields:
+        Pairs of ``(file_path, is_supported)`` in sorted order.
+    """
+    extensions = {ext.lower() for ext in supported_extensions}
+    for path in sorted(root.rglob("*")):
+        if any(part.startswith(".") for part in path.relative_to(root).parts):
+            continue
+        if path.is_symlink() and not follow_symlinks:
+            continue
+        if not path.is_file():
+            continue
+        yield path, path.suffix.lower() in extensions
 
 
 class ClassificationService:

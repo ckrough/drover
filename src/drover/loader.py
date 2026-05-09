@@ -50,7 +50,7 @@ class DocumentLoadError(Exception):
 
 # Supported file extensions, restricted to formats Docling officially handles.
 # Source: https://docling-project.github.io/docling/usage/supported_formats/
-_SUPPORTED_EXTENSIONS: set[str] = {
+SUPPORTED_EXTENSIONS: set[str] = {
     # PDF
     ".pdf",
     # Plain text and markup
@@ -146,6 +146,13 @@ class DoclingLoader:
         self.max_pages = max_pages
         self.debug_dir = debug_dir
         self.debug_structure = debug_structure
+        self._converter: Any | None = None
+
+    def _get_converter(self) -> Any:
+        if self._converter is None:
+            _check_docling_models_available()
+            self._converter = _build_docling_converter()
+        return self._converter
 
     async def load(self, path: Path) -> LoadedDocument:
         """Load a document via Docling with page sampling.
@@ -170,12 +177,11 @@ class DoclingLoader:
         suffix = path.suffix.lower()
         mime_type, _ = mimetypes.guess_type(str(path))
 
-        if suffix not in _SUPPORTED_EXTENSIONS:
+        if suffix not in SUPPORTED_EXTENSIONS:
             raise DocumentLoadError(f"Unsupported file type: {suffix}")
 
         try:
-            _check_docling_models_available()
-            converter = _build_docling_converter()
+            converter = self._get_converter()
         except DocumentLoadError:
             raise
         except ImportError as e:
