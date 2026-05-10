@@ -308,6 +308,65 @@ class TestRound4LCGFTAlignment:
             assert taxonomy.singular_form(plural)
 
 
+class TestLifestyleEntertainmentCategory:
+    """Lifestyle entertainment category for event reservations.
+
+    Concert tickets, sporting events, theater, and other event reservations
+    (schema.org EventReservation) should land in lifestyle/entertainment, not
+    lifestyle/travel. Travel is for transit and tourism artifacts.
+    """
+
+    @pytest.fixture
+    def taxonomy(self) -> HouseholdTaxonomy:
+        return HouseholdTaxonomy()
+
+    def test_entertainment_is_canonical_in_lifestyle(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        assert "entertainment" in taxonomy.CANONICAL_CATEGORIES["lifestyle"]
+        assert taxonomy.canonical_category("lifestyle", "entertainment") == "entertainment"
+
+    def test_entertainment_not_in_personal(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        """Entertainment lives only in lifestyle. personal/entertainment surfaces as drift."""
+        assert "entertainment" not in taxonomy.CANONICAL_CATEGORIES["personal"]
+        assert taxonomy.canonical_category("personal", "entertainment") is None
+
+    @pytest.mark.parametrize(
+        "raw",
+        [
+            "concert",
+            "concerts",
+            "event",
+            "events",
+            "show",
+            "shows",
+            "performance",
+            "performances",
+            "sporting_event",
+            "sporting_events",
+            "sports_event",
+            "theater",
+            "theatre",
+            "movie",
+            "movies",
+            "sport",
+            "sports",
+        ],
+    )
+    def test_lifestyle_event_aliases_route_to_entertainment(
+        self, taxonomy: HouseholdTaxonomy, raw: str
+    ) -> None:
+        assert taxonomy.canonical_category("lifestyle", raw) == "entertainment"
+
+    def test_lifestyle_travel_still_canonical(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        """Adding entertainment must not disturb the travel category."""
+        assert taxonomy.canonical_category("lifestyle", "travel") == "travel"
+
+
 class TestTaxonomyLoader:
     """Tests for TaxonomyLoader plugin infrastructure."""
 

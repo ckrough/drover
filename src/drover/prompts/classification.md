@@ -106,6 +106,7 @@ Use functional domains when the document is fundamentally about a specific life 
 - Health records, visits, medical billing -> **medical**
 - Insurance policies and claims -> **insurance**
 - Vehicle-related policies -> **insurance** with auto category
+- Event reservations (concert tickets, sporting events, theater, movies) -> **lifestyle** with **entertainment** category. Do NOT use `travel`; travel is for transit and tourism artifacts (flights, lodging, itineraries). A Ticketmaster concert ticket is `lifestyle/entertainment/reservations`, not `lifestyle/travel/reservations` and not `personal/travel/reservations`.
 
 ### Rule 5: Category and Document Type Selection
 
