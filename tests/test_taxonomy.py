@@ -324,11 +324,11 @@ class TestLifestyleEntertainmentCategory:
         self, taxonomy: HouseholdTaxonomy
     ) -> None:
         assert "entertainment" in taxonomy.CANONICAL_CATEGORIES["lifestyle"]
-        assert taxonomy.canonical_category("lifestyle", "entertainment") == "entertainment"
+        assert (
+            taxonomy.canonical_category("lifestyle", "entertainment") == "entertainment"
+        )
 
-    def test_entertainment_only_in_lifestyle(
-        self, taxonomy: HouseholdTaxonomy
-    ) -> None:
+    def test_entertainment_only_in_lifestyle(self, taxonomy: HouseholdTaxonomy) -> None:
         """Entertainment is a lifestyle-only category."""
         for domain, categories in taxonomy.CANONICAL_CATEGORIES.items():
             if domain == "lifestyle":
@@ -383,9 +383,7 @@ class TestPersonalDomainRemoval:
     def taxonomy(self) -> HouseholdTaxonomy:
         return HouseholdTaxonomy()
 
-    def test_personal_not_canonical_domain(
-        self, taxonomy: HouseholdTaxonomy
-    ) -> None:
+    def test_personal_not_canonical_domain(self, taxonomy: HouseholdTaxonomy) -> None:
         assert "personal" not in taxonomy.CANONICAL_DOMAINS
         assert "personal" not in taxonomy.CANONICAL_CATEGORIES
 
@@ -395,15 +393,11 @@ class TestPersonalDomainRemoval:
         """Backward-compat: LLM-emitted `personal` resolves to lifestyle."""
         assert taxonomy.canonical_domain("personal") == "lifestyle"
 
-    def test_nonprofit_aliases_to_lifestyle(
-        self, taxonomy: HouseholdTaxonomy
-    ) -> None:
+    def test_nonprofit_aliases_to_lifestyle(self, taxonomy: HouseholdTaxonomy) -> None:
         assert taxonomy.canonical_domain("nonprofit") == "lifestyle"
         assert taxonomy.canonical_domain("non_profit") == "lifestyle"
 
-    def test_lifestyle_membership_canonical(
-        self, taxonomy: HouseholdTaxonomy
-    ) -> None:
+    def test_lifestyle_membership_canonical(self, taxonomy: HouseholdTaxonomy) -> None:
         assert "membership" in taxonomy.CANONICAL_CATEGORIES["lifestyle"]
         assert taxonomy.canonical_category("lifestyle", "membership") == "membership"
 
