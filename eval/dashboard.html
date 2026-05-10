@@ -77,7 +77,7 @@
       color: #343a40;
     }
     .chart-wrap { position: relative; height: 220px; }
-    .table-section { margin-top: 8px; }
+    .table-section { margin-top: 8px; overflow-x: auto; }
     .table-section h2 { font-size: 1rem; font-weight: 600; margin-bottom: 10px; }
     table {
       width: 100%;
@@ -86,18 +86,27 @@
       background: #fff;
       border: 1px solid #dee2e6;
       border-radius: 6px;
-      overflow: hidden;
     }
     thead { background: #f1f3f5; }
     th, td {
       padding: 7px 10px;
       text-align: left;
       border-bottom: 1px solid #dee2e6;
+      white-space: nowrap;
     }
-    th { font-weight: 600; white-space: nowrap; }
+    th { font-weight: 600; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #f8f9fa; }
     .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .delta {
+      display: inline-block;
+      margin-left: 0.25rem;
+      font-size: 0.65rem;
+      vertical-align: 1px;
+    }
+    .delta-good { color: #16a34a; }
+    .delta-bad { color: #dc2626; }
+    .delta-eq { color: #2563eb; }
     .badge {
       display: inline-block;
       padding: 1px 6px;
@@ -173,7 +182,7 @@
 <script id="data" type="application/json">
 {
   "schema_version": 2,
-  "generated_at": "2026-05-10T10:23:47-04:00",
+  "generated_at": "2026-05-10T13:28:04-04:00",
   "runs": [
     {
       "run_id": "personal-removal-20260510-093641-results",
@@ -193,6 +202,25 @@
       "notes": "prof-un5 + prof-b7h: lifestyle/entertainment + remove personal domain",
       "runtime_seconds": 1139,
       "commit_hash": "d96dd78-dirty"
+    },
+    {
+      "run_id": "entity-field-rebased-20260510-165705-results",
+      "date": "2026-05-10",
+      "corpus": "synthetic",
+      "corpus_size": 80,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "docling",
+      "domain_accuracy": 0.8625,
+      "category_accuracy": 0.6125,
+      "doctype_accuracy": 0.9125,
+      "vendor_accuracy": 0.9125,
+      "date_accuracy": 0.9,
+      "errors": 0,
+      "source": "eval/runs/entity-field-rebased-20260510-165705/results.json",
+      "notes": "",
+      "commit_hash": "b7512b4",
+      "runtime_seconds": 1339
     },
     {
       "run_id": "ocr-mac-20260507-110208-gemma4_docling",
@@ -357,7 +385,7 @@
 
   function fmtPct(v) {
     const p = pct(v);
-    return p != null ? p + "%" : "";
+    return p != null ? p.toFixed(1) + "%" : "";
   }
 
   function runXLabel(run) {
@@ -371,25 +399,9 @@
     return run.date;
   }
 
-  function buildLabels(runs) {
-    const seen = new Set();
-    const labels = [];
-    for (const r of runs) {
-      const d = runXLabel(r);
-      if (d && !seen.has(d)) { seen.add(d); labels.push(d); }
-    }
-    labels.sort();
-    return labels;
-  }
-
   function fmtRuntimePerDoc(r) {
-    if (r.runtime_seconds == null || !r.corpus_size) return "";
+    if (r == null || r.runtime_seconds == null || !r.corpus_size) return "";
     const perDoc = r.runtime_seconds / r.corpus_size;
-    if (perDoc >= 60) {
-      const m = Math.floor(perDoc / 60);
-      const s = Math.round(perDoc - m * 60);
-      return m + "m " + s + "s";
-    }
     return perDoc.toFixed(1) + "s";
   }
 
@@ -397,14 +409,88 @@
     return r.commit_hash ? r.commit_hash.slice(0, 7) : "";
   }
 
+  // Full timestamp for the table's Date column. Falls back to the
+  // run-id-derived "YYYY-MM-DD HH:MM" form so multiple runs on the same
+  // day are distinguishable; if the run-id has no parseable timestamp,
+  // fall back to the bare date.
+  function fmtTimestamp(r) {
+    return runXLabel(r) || r.date || "";
+  }
+
+  // Append a delta indicator span to *td*.
+  //
+  // The triangle character reflects the literal direction of change
+  // (▲ when the value went up, ▼ when it went down). The color reflects
+  // whether the change is good or bad: pass `lowerIsBetter` for metrics
+  // like runtime where a decrease is the win. Equal values render a
+  // neutral blue "=".
+  function appendDeltaIndicator(td, direction, tooltip, lowerIsBetter = false) {
+    const span = document.createElement("span");
+    if (direction === 0) {
+      span.className = "delta delta-eq";
+      span.textContent = "=";
+    } else {
+      const goingUp = direction > 0;
+      span.textContent = goingUp ? "▲" : "▼";
+      const isGood = lowerIsBetter ? !goingUp : goingUp;
+      span.className = "delta " + (isGood ? "delta-good" : "delta-bad");
+    }
+    if (tooltip) span.title = tooltip;
+    td.appendChild(span);
+  }
+
+  // Build a percentage cell with an up/down/equal indicator vs the prior
+  // run. Inputs are raw decimal accuracies (0..1), matching the JSON
+  // shape; the cell formats once via fmtPct. Comparison is on the
+  // displayed (rounded) percent so two values that render identically
+  // get an "=" rather than a noisy ▲/▼.
+  function metricCellWithDelta(curr, prior) {
+    const td = document.createElement("td");
+    td.className = "num";
+    const text = fmtPct(curr);
+    td.appendChild(document.createTextNode(text));
+    const currPct = pct(curr);
+    const priorPctVal = pct(prior);
+    if (currPct == null || priorPctVal == null) return td;
+    const dir = currPct === priorPctVal ? 0 : (currPct > priorPctVal ? 1 : -1);
+    appendDeltaIndicator(td, dir, `${fmtPct(prior)} → ${text}`);
+    return td;
+  }
+
+  // Per-doc runtime in seconds, or null when the run lacks the data.
+  function perDocSeconds(r) {
+    if (!r || r.runtime_seconds == null || !r.corpus_size) return null;
+    return r.runtime_seconds / r.corpus_size;
+  }
+
+  // Build a runtime/doc cell. The triangle direction follows the
+  // numeric change (▲ when runtime increased, ▼ when it decreased),
+  // but the color is inverted vs the percentage cells: faster runtime
+  // (▼) is the win and renders green, slower runtime (▲) renders red.
+  function runtimeCellWithDelta(r, prior) {
+    const td = document.createElement("td");
+    td.className = "num";
+    const text = fmtRuntimePerDoc(r);
+    td.appendChild(document.createTextNode(text));
+    const curr = perDocSeconds(r);
+    const prev = perDocSeconds(prior);
+    if (curr == null || prev == null) return td;
+    const priorTxt = fmtRuntimePerDoc(prior);
+    const dir = text === priorTxt ? 0 : (curr > prev ? 1 : -1);
+    appendDeltaIndicator(td, dir, `${priorTxt} → ${text}`, /* lowerIsBetter */ true);
+    return td;
+  }
+
   // ---------------------------------------------------------------------------
   // Run set
   // ---------------------------------------------------------------------------
   // Corpus is filtered upstream by build_eval_dashboard.py (synthetic only,
-  // runs with runtime_seconds + corpus_size). The dashboard renders all runs
-  // present in dashboard_data.json.
+  // runs with runtime_seconds + corpus_size). The dashboard caps the
+  // visible set at the 10 most-recent runs to keep the table and charts
+  // readable; older runs are kept in dashboard_data.json for archival.
+  const MAX_RUNS = 10;
   function filteredRuns() {
-    return allRuns;
+    return allRuns.slice(0, MAX_RUNS);
   }
 
   // ---------------------------------------------------------------------------
@@ -413,30 +499,35 @@
   const chartInstances = {};
 
   function buildChartConfig(metricKey, runs) {
-    const labels = buildLabels(runs);
+    // `runs` is newest-first; charts read left-to-right oldest-to-newest.
+    // Labels are short commit hashes; repeated hashes (re-runs of the
+    // same commit) become repeated x-positions rather than collapsing,
+    // so every run gets its own point on the line.
+    const ordered = runs.slice().reverse();
+    const labels = ordered.map((r) => fmtCommit(r) || r.run_id);
 
     const seriesMap = {};
-    for (const r of runs) {
+    ordered.forEach((r, i) => {
       const k = seriesKey(r);
-      if (!seriesMap[k]) seriesMap[k] = { key: k, points: {}, hasReal: false, hasSynthetic: false };
-      const x = runXLabel(r);
-      seriesMap[k].points[x] = r;
+      if (!seriesMap[k]) {
+        seriesMap[k] = {
+          key: k,
+          data: new Array(ordered.length).fill(null),
+          hasReal: false,
+          hasSynthetic: false,
+        };
+      }
+      seriesMap[k].data[i] = pct(r[metricKey]);
       if (r.corpus === "real-world") seriesMap[k].hasReal = true;
       else seriesMap[k].hasSynthetic = true;
-    }
+    });
 
-    const datasets = Object.values(seriesMap).map(s => {
+    const datasets = Object.values(seriesMap).map((s) => {
       const color = seriesColor(s.key);
       const borderDash = (s.hasReal && s.hasSynthetic) ? [4, 4] : s.hasReal ? [6, 3] : [];
-
-      const data = labels.map(lbl => {
-        const r = s.points[lbl];
-        return r != null ? pct(r[metricKey]) : null;
-      });
-
       return {
         label: s.key,
-        data,
+        data: s.data,
         borderColor: color,
         backgroundColor: color + "22",
         borderDash,
@@ -462,10 +553,17 @@
           },
           tooltip: {
             callbacks: {
+              title(items) {
+                if (!items.length) return "";
+                const r = ordered[items[0].dataIndex];
+                if (!r) return items[0].label;
+                const stamp = runXLabel(r);
+                return stamp ? `${fmtCommit(r) || r.run_id} · ${stamp}` : (fmtCommit(r) || r.run_id);
+              },
               label(ctx) {
                 const v = ctx.raw;
                 return v != null
-                  ? ctx.dataset.label + ": " + v + "%"
+                  ? ctx.dataset.label + ": " + v.toFixed(1) + "%"
                   : ctx.dataset.label + ": no data";
               },
             },
@@ -505,7 +603,8 @@
     const tbody = document.getElementById("runs-tbody");
     while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
 
-    for (const r of filteredRuns()) {
+    const runs = filteredRuns();
+    runs.forEach((r, i) => {
       const tr = document.createElement("tr");
 
       function td(text, cls) {
@@ -515,7 +614,7 @@
         return el;
       }
 
-      tr.appendChild(td(r.date));
+      tr.appendChild(td(fmtTimestamp(r)));
 
       // Corpus badge
       const tdCorpus = document.createElement("td");
@@ -532,13 +631,19 @@
       if (r.commit_hash) commitTd.title = r.commit_hash;
       tr.appendChild(commitTd);
 
-      tr.appendChild(td(fmtRuntimePerDoc(r), "num"));
+      // Runs are newest-first; the prior chronological run is the
+      // next index in `runs`. Rows beyond MAX_RUNS still compare
+      // against allRuns[i+1] when available, so the bottom row is
+      // not silently dropped from delta tracking.
+      const prior = runs[i + 1] || allRuns[i + 1] || null;
+      tr.appendChild(runtimeCellWithDelta(r, prior));
 
-      tr.appendChild(td(fmtPct(r.domain_accuracy), "num"));
-      tr.appendChild(td(fmtPct(r.category_accuracy), "num"));
-      tr.appendChild(td(fmtPct(r.doctype_accuracy), "num"));
-      tr.appendChild(td(fmtPct(r.vendor_accuracy), "num"));
-      tr.appendChild(td(fmtPct(r.date_accuracy), "num"));
+      const priorVal = (k) => (prior ? prior[k] : null);
+      tr.appendChild(metricCellWithDelta(r.domain_accuracy, priorVal("domain_accuracy")));
+      tr.appendChild(metricCellWithDelta(r.category_accuracy, priorVal("category_accuracy")));
+      tr.appendChild(metricCellWithDelta(r.doctype_accuracy, priorVal("doctype_accuracy")));
+      tr.appendChild(metricCellWithDelta(r.vendor_accuracy, priorVal("vendor_accuracy")));
+      tr.appendChild(metricCellWithDelta(r.date_accuracy, priorVal("date_accuracy")));
 
       // Notes cell with title tooltip for truncated text
       const tdNotes = document.createElement("td");
@@ -550,7 +655,7 @@
       tr.appendChild(tdNotes);
 
       tbody.appendChild(tr);
-    }
+    });
   }
 
   function render() {

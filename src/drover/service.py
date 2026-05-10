@@ -127,6 +127,8 @@ class ClassificationService:
         self._path_builder = PathBuilder(
             naming_policy=self._naming_policy,
             taxonomy=self._taxonomy,
+            emit_entity=config.naming_emit_entity,
+            redact_entity_in_domains=config.naming_redact_entity_in_domains,
         )
 
     def _create_classifier(self) -> DocumentClassifier:

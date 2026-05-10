@@ -53,6 +53,7 @@ class BaseNamingPolicy(ABC):
         subject: str,
         date: str,
         extension: str,
+        entity: str = "",
     ) -> str:
         """Format a filename from classification components.
 
@@ -62,6 +63,9 @@ class BaseNamingPolicy(ABC):
             subject: Brief subject description.
             date: Date in YYYYMMDD format.
             extension: File extension including dot (e.g., ".pdf").
+            entity: Optional principal named entity (pet, patient, performer,
+                brand). When empty or matching the normalized vendor, the slot
+                is suppressed and a 4-component filename is produced.
 
         Returns:
             Formatted filename.

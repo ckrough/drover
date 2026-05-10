@@ -138,6 +138,49 @@ class TestNARAPolicyNaming:
         assert not is_valid
         assert "exceeds" in error.lower()
 
+    def test_format_filename_with_entity_inserts_slot(
+        self, policy: NARAPolicyNaming
+    ) -> None:
+        """Entity is inserted between subject and date when present."""
+        filename = policy.format_filename(
+            doctype="invoice",
+            vendor="VCA Hospital",
+            subject="annual checkup",
+            date="20250416",
+            extension=".pdf",
+            entity="Sally",
+        )
+        assert filename == "invoice-vca_hospital-annual_checkup-sally-20250416.pdf"
+
+    def test_format_filename_without_entity_keeps_legacy_shape(
+        self, policy: NARAPolicyNaming
+    ) -> None:
+        """Empty entity reproduces the 4-component pattern."""
+        filename = policy.format_filename(
+            doctype="statement",
+            vendor="Chase",
+            subject="checking",
+            date="20240115",
+            extension=".pdf",
+            entity="",
+        )
+        assert filename == "statement-chase-checking-20240115.pdf"
+
+    def test_format_filename_entity_dedups_with_vendor(
+        self, policy: NARAPolicyNaming
+    ) -> None:
+        """When normalized entity equals normalized vendor, slot is suppressed."""
+        filename = policy.format_filename(
+            doctype="invoice",
+            vendor="Trails Offroad",
+            subject="subscription billing",
+            date="20250416",
+            extension=".pdf",
+            entity="Trails Offroad",
+        )
+        assert filename == "invoice-trails_offroad-subscription_billing-20250416.pdf"
+        assert filename.count("trails_offroad") == 1
+
 
 class TestNamingPolicyLoader:
     """Tests for NamingPolicyLoader."""

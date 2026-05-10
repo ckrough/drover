@@ -177,6 +177,210 @@ class TestPathBuilder:
             builder.build(classification, original)
 
 
+class TestPathBuilderEntity:
+    """Tests for the optional entity slot in generated filenames."""
+
+    @pytest.fixture
+    def policy(self) -> NARAPolicyNaming:
+        return NARAPolicyNaming()
+
+    @pytest.fixture
+    def taxonomy(self) -> HouseholdTaxonomy:
+        return HouseholdTaxonomy()
+
+    @pytest.fixture
+    def builder(
+        self, policy: NARAPolicyNaming, taxonomy: HouseholdTaxonomy
+    ) -> PathBuilder:
+        return PathBuilder(naming_policy=policy, taxonomy=taxonomy)
+
+    def test_entity_present_appears_in_filename(self, builder: PathBuilder) -> None:
+        classification = RawClassification(
+            domain="pets",
+            category="medical",
+            doctype="invoices",
+            vendor="VCA Hospital",
+            date="20250416",
+            subject="annual checkup",
+            entity="Sally",
+        )
+        result = builder.build(classification, Path("/inbox/scan.pdf"))
+        assert result.suggested_filename.endswith(".pdf")
+        assert "-sally-" in result.suggested_filename
+        assert result.entity == "Sally"
+
+    def test_entity_absent_keeps_four_component_filename(
+        self, builder: PathBuilder
+    ) -> None:
+        classification = RawClassification(
+            domain="financial",
+            category="banking",
+            doctype="statements",
+            vendor="Chase Bank",
+            date="20240115",
+            subject="checking account",
+            entity="",
+        )
+        result = builder.build(classification, Path("/inbox/scan.pdf"))
+        # Four components plus extension = three component separators
+        stem = result.suggested_filename.rsplit(".", 1)[0]
+        assert stem.count("-") == 3
+
+    def test_entity_matching_vendor_is_suppressed(self, builder: PathBuilder) -> None:
+        classification = RawClassification(
+            domain="lifestyle",
+            category="membership",
+            doctype="invoices",
+            vendor="Trails Offroad",
+            date="20250416",
+            subject="subscription billing",
+            entity="Trails Offroad",
+        )
+        result = builder.build(classification, Path("/inbox/scan.pdf"))
+        assert result.suggested_filename.count("trails_offroad") == 1
+
+    def test_emit_entity_false_suppresses_for_all_documents(
+        self, policy: NARAPolicyNaming, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        builder = PathBuilder(
+            naming_policy=policy,
+            taxonomy=taxonomy,
+            emit_entity=False,
+        )
+        classification = RawClassification(
+            domain="pets",
+            category="medical",
+            doctype="invoices",
+            vendor="VCA Hospital",
+            date="20250416",
+            subject="annual checkup",
+            entity="Sally",
+        )
+        result = builder.build(classification, Path("/inbox/scan.pdf"))
+        assert "sally" not in result.suggested_filename
+        # Entity is preserved in the result for downstream consumers (e.g. tags)
+        assert result.entity == "Sally"
+
+    def test_redact_entity_for_medical_domain_by_default(
+        self, builder: PathBuilder
+    ) -> None:
+        classification = RawClassification(
+            domain="medical",
+            category="expense",
+            doctype="invoices",
+            vendor="Fairfax Medical",
+            date="20250416",
+            subject="lab work",
+            entity="Chris Krough",
+        )
+        result = builder.build(classification, Path("/inbox/scan.pdf"))
+        assert "chris" not in result.suggested_filename.lower()
+        assert "krough" not in result.suggested_filename.lower()
+        assert result.entity == "Chris Krough"
+
+    def test_redact_list_is_configurable(
+        self, policy: NARAPolicyNaming, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        builder = PathBuilder(
+            naming_policy=policy,
+            taxonomy=taxonomy,
+            redact_entity_in_domains=["pets"],
+        )
+        classification = RawClassification(
+            domain="pets",
+            category="medical",
+            doctype="invoices",
+            vendor="VCA Hospital",
+            date="20250416",
+            subject="annual checkup",
+            entity="Sally",
+        )
+        result = builder.build(classification, Path("/inbox/scan.pdf"))
+        assert "sally" not in result.suggested_filename
+
+
+class TestEntityMotivatingCases:
+    """End-to-end checks for the three motivating cases from prof-fes."""
+
+    @pytest.fixture
+    def builder(self) -> PathBuilder:
+        return PathBuilder(
+            naming_policy=NARAPolicyNaming(),
+            taxonomy=HouseholdTaxonomy(),
+            # Override the medical-redact default so we can inspect the
+            # would-be filename for the medical motivating case below.
+            redact_entity_in_domains=[],
+        )
+
+    def test_vet_invoice_for_pet(self, builder: PathBuilder) -> None:
+        """Pet invoice carries the pet's name in the filename."""
+        classification = RawClassification(
+            domain="pets",
+            category="medical",
+            doctype="invoices",
+            vendor="VCA Hospital",
+            date="20250416",
+            subject="annual checkup",
+            entity="Sally",
+        )
+        result = builder.build(classification, Path("/inbox/vet.pdf"))
+        assert (
+            result.suggested_filename
+            == "invoice-vca_hospital-annual_checkup-sally-20250416.pdf"
+        )
+
+    def test_medical_bill_with_patient(self, builder: PathBuilder) -> None:
+        """Medical bill carries the patient when redaction is disabled."""
+        classification = RawClassification(
+            domain="medical",
+            category="expense",
+            doctype="invoices",
+            vendor="Fairfax Medical",
+            date="20250416",
+            subject="lab work",
+            entity="C Krough",
+        )
+        result = builder.build(classification, Path("/inbox/lab.pdf"))
+        assert (
+            result.suggested_filename
+            == "invoice-fairfax_medical-lab_work-c_krough-20250416.pdf"
+        )
+
+    def test_concert_reservation_for_performer(self, builder: PathBuilder) -> None:
+        """Concert reservation carries the performer's name."""
+        classification = RawClassification(
+            domain="lifestyle",
+            category="entertainment",
+            doctype="reservations",
+            vendor="Ticketmaster",
+            date="20250416",
+            subject="concert ticket",
+            entity="Taylor Swift",
+        )
+        result = builder.build(classification, Path("/inbox/ticket.pdf"))
+        assert "taylor_swift" in result.suggested_filename
+        assert "ticketmaster" in result.suggested_filename
+        assert result.suggested_filename.endswith("-20250416.pdf")
+
+    def test_subscription_dedups_with_vendor(self, builder: PathBuilder) -> None:
+        """Trails Offroad subscription invoice does not repeat the brand."""
+        classification = RawClassification(
+            domain="lifestyle",
+            category="membership",
+            doctype="invoices",
+            vendor="Trails Offroad",
+            date="20250416",
+            subject="subscription billing",
+            entity="Trails Offroad",
+        )
+        result = builder.build(classification, Path("/inbox/sub.pdf"))
+        # Vendor and entity match → entity slot is suppressed.
+        assert (
+            result.suggested_filename
+            == "invoice-trails_offroad-subscription_billing-20250416.pdf"
+        )
+
+
 class TestBuildSuggestedPath:
     """Tests for build_suggested_path convenience function."""
 

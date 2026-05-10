@@ -32,6 +32,13 @@ class ClassificationResult(BaseModel):
     vendor: str = Field(description="Vendor/provider name, normalized")
     date: str = Field(description="Document date in YYYYMMDD format")
     subject: str = Field(description="Brief subject description")
+    entity: str = Field(
+        default="",
+        description=(
+            "Principal named entity the document is about (pet, patient, performer,"
+            " account-holder, brand). Empty string when no clear entity exists."
+        ),
+    )
     error: bool = Field(default=False, description="Whether classification failed")
     error_code: ErrorCode | None = Field(
         default=None, description="Error code if failed"
@@ -76,6 +83,13 @@ class RawClassification(BaseModel):
     vendor: str = Field(description="Vendor name as identified")
     date: str = Field(description="Date in YYYYMMDD format")
     subject: str = Field(description="Subject description")
+    entity: str = Field(
+        default="",
+        description=(
+            "Principal named entity the document is about (pet, patient, performer,"
+            " account-holder, brand). Empty string when no clear entity exists."
+        ),
+    )
 
 
 class PathConstraints(BaseModel):

@@ -35,6 +35,7 @@ class GroundTruthEntry(BaseModel):
     vendor: str | None = Field(default=None, description="Expected vendor (optional)")
     date: str | None = Field(default=None, description="Expected date (optional)")
     subject: str | None = Field(default=None, description="Expected subject (optional)")
+    entity: str | None = Field(default=None, description="Expected entity (optional)")
     notes: str | None = Field(default=None, description="Notes about this entry")
 
 
@@ -50,6 +51,7 @@ class ClassificationComparison:
     doctype_correct: bool
     vendor_correct: bool | None  # None if vendor not in ground truth
     date_correct: bool | None  # None if date not in ground truth
+    entity_correct: bool | None = None  # None if entity not in ground truth
     loader_latency_ms: float | None = None
     loader_backend: str | None = None
 
@@ -64,6 +66,7 @@ class EvaluationResult:
     doctype_accuracy: float
     vendor_accuracy: float | None  # None if no vendor data
     date_accuracy: float | None  # None if no date data
+    entity_accuracy: float | None = None  # None if no entity data
 
     # Detailed results per file
     comparisons: list[ClassificationComparison] = field(default_factory=list)
@@ -91,6 +94,7 @@ class EvaluationResult:
             "doctype_accuracy": self.doctype_accuracy,
             "vendor_accuracy": self.vendor_accuracy,
             "date_accuracy": self.date_accuracy,
+            "entity_accuracy": self.entity_accuracy,
             "model": self.model,
             "provider": self.provider,
             "loader": loader,
@@ -105,6 +109,7 @@ class EvaluationResult:
                     "doctype_correct": c.doctype_correct,
                     "vendor_correct": c.vendor_correct,
                     "date_correct": c.date_correct,
+                    "entity_correct": c.entity_correct,
                     "loader_latency_ms": c.loader_latency_ms,
                     "loader_backend": c.loader_backend,
                 }
@@ -129,6 +134,8 @@ class EvaluationResult:
             lines.append(f"Vendor accuracy:   {self.vendor_accuracy:6.1%}")
         if self.date_accuracy is not None:
             lines.append(f"Date accuracy:     {self.date_accuracy:6.1%}")
+        if self.entity_accuracy is not None:
+            lines.append(f"Entity accuracy:   {self.entity_accuracy:6.1%}")
 
         # Show misclassifications
         mistakes = [c for c in self.comparisons if not c.domain_correct]
@@ -247,6 +254,8 @@ class ClassificationEvaluator:
         vendor_total = 0
         date_correct = 0
         date_total = 0
+        entity_correct = 0
+        entity_total = 0
 
         # Confusion matrices
         domain_confusion: dict[str, dict[str, int]] = {}
@@ -299,6 +308,16 @@ class ClassificationEvaluator:
                 if dt_correct:
                     date_correct += 1
 
+            # Entity comparison (optional)
+            e_correct: bool | None = None
+            if actual.entity is not None:
+                e_correct = (
+                    predicted.entity.strip().lower() == actual.entity.strip().lower()
+                )
+                entity_total += 1
+                if e_correct:
+                    entity_correct += 1
+
             comparison = ClassificationComparison(
                 filename=filename,
                 predicted=predicted,
@@ -308,6 +327,7 @@ class ClassificationEvaluator:
                 doctype_correct=t_correct,
                 vendor_correct=v_correct,
                 date_correct=dt_correct,
+                entity_correct=e_correct,
                 loader_latency_ms=loaded_doc.loader_latency_ms,
                 loader_backend=loaded_doc.loader_backend,
             )
@@ -346,6 +366,7 @@ class ClassificationEvaluator:
                 doctype_accuracy=0.0,
                 vendor_accuracy=None,
                 date_accuracy=None,
+                entity_accuracy=None,
                 model=classifier.model,
                 provider=classifier.provider.value,
             )
@@ -357,6 +378,9 @@ class ClassificationEvaluator:
             doctype_accuracy=doctype_correct / total,
             vendor_accuracy=vendor_correct / vendor_total if vendor_total > 0 else None,
             date_accuracy=date_correct / date_total if date_total > 0 else None,
+            entity_accuracy=(
+                entity_correct / entity_total if entity_total > 0 else None
+            ),
             comparisons=comparisons,
             domain_confusion=domain_confusion,
             category_confusion=category_confusion,

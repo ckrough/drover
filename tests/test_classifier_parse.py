@@ -89,6 +89,43 @@ def test_parse_response_double_brace_wrapper() -> None:
     assert result["category"] == "banking"
 
 
+def test_parse_response_entity_present_passes_through() -> None:
+    classifier = _make_classifier()
+    payload = (
+        '{"domain": "pets", "category": "medical", "doctype": "invoices", '
+        '"vendor": "VCA Hospital", "date": "20250416", "subject": "annual checkup", '
+        '"entity": "Sally"}'
+    )
+
+    result = classifier._parse_response(payload)
+
+    assert result["entity"] == "Sally"
+
+
+def test_parse_response_entity_missing_defaults_to_empty() -> None:
+    classifier = _make_classifier()
+    payload = (
+        '{"domain": "financial", "category": "banking", "doctype": "statement", '
+        '"vendor": "Bank", "date": "20250101", "subject": "checking"}'
+    )
+
+    result = classifier._parse_response(payload)
+
+    assert result["entity"] == ""
+
+
+def test_parse_response_entity_null_normalized_to_empty() -> None:
+    classifier = _make_classifier()
+    payload = (
+        '{"domain": "financial", "category": "banking", "doctype": "statement", '
+        '"vendor": "Bank", "date": "20250101", "subject": "checking", "entity": null}'
+    )
+
+    result = classifier._parse_response(payload)
+
+    assert result["entity"] == ""
+
+
 def test_parse_response_classification_analysis_tags() -> None:
     """LLM produces chain-of-thought inside <classification_analysis> tags."""
     classifier = _make_classifier()
