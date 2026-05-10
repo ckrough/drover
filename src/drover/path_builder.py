@@ -30,6 +30,8 @@ class PathBuilder:
         naming_policy: BaseNamingPolicy,
         constraints: PathConstraints | None = None,
         taxonomy: BaseTaxonomy | None = None,
+        emit_entity: bool = True,
+        redact_entity_in_domains: list[str] | None = None,
     ) -> None:
         """Initialize path builder.
 
@@ -39,10 +41,23 @@ class PathBuilder:
             taxonomy: Optional taxonomy used to map plural canonical doctypes
                 to their singular instance form for filename generation.
                 Folders always use the plural form; filenames use the singular.
+            emit_entity: When False, the entity slot is suppressed for every
+                document, reproducing the legacy 4-component filename. When
+                True (default), the entity slot is included subject to
+                per-domain redaction and vendor/entity dedup.
+            redact_entity_in_domains: Domains whose entity slot is suppressed
+                to avoid leaking personally-identifying values into filenames.
+                Defaults to ``["medical"]``.
         """
         self.naming_policy = naming_policy
         self.constraints = constraints or PathConstraints()
         self.taxonomy = taxonomy
+        self.emit_entity = emit_entity
+        self.redact_entity_in_domains = (
+            ["medical"]
+            if redact_entity_in_domains is None
+            else list(redact_entity_in_domains)
+        )
 
     def build(
         self,
@@ -69,12 +84,18 @@ class PathBuilder:
             if self.taxonomy is not None
             else classification.doctype
         )
+
+        entity_for_filename = self._resolve_entity(
+            classification.entity, classification.domain
+        )
+
         filename = self.naming_policy.format_filename(
             doctype=filename_doctype,
             vendor=classification.vendor,
             subject=classification.subject,
             date=classification.date,
             extension=original_path.suffix,
+            entity=entity_for_filename,
         )
 
         is_valid, error_message = self.naming_policy.validate_filename(filename)
@@ -96,7 +117,25 @@ class PathBuilder:
             vendor=classification.vendor,
             date=classification.date,
             subject=classification.subject,
+            entity=classification.entity,
         )
+
+    def _resolve_entity(self, entity: str, domain: str) -> str:
+        """Apply emit-entity and per-domain redaction policy.
+
+        Returns the entity value to pass to the naming policy. The
+        result is empty when entity emission is disabled globally or
+        when ``domain`` is in the redact list. The naming policy is
+        responsible for the vendor/entity dedup; this method only
+        enforces config-level suppression.
+        """
+        if not self.emit_entity:
+            return ""
+        if domain and domain.lower() in {
+            d.lower() for d in self.redact_entity_in_domains
+        }:
+            return ""
+        return entity or ""
 
     def _build_folder_path(
         self,
@@ -163,6 +202,8 @@ def build_suggested_path(
     naming_policy: BaseNamingPolicy,
     constraints: PathConstraints | None = None,
     taxonomy: BaseTaxonomy | None = None,
+    emit_entity: bool = True,
+    redact_entity_in_domains: list[str] | None = None,
 ) -> ClassificationResult:
     """Convenience function to build a suggested path.
 
@@ -172,6 +213,9 @@ def build_suggested_path(
         naming_policy: Naming policy for filename generation.
         constraints: Path constraints, or None for defaults.
         taxonomy: Optional taxonomy for singular-form filename generation.
+        emit_entity: When False, suppress the entity slot for every document.
+        redact_entity_in_domains: Domains whose entity slot is suppressed
+            for privacy. Defaults to ``["medical"]``.
 
     Returns:
         ClassificationResult with suggested path.
@@ -180,5 +224,7 @@ def build_suggested_path(
         naming_policy=naming_policy,
         constraints=constraints,
         taxonomy=taxonomy,
+        emit_entity=emit_entity,
+        redact_entity_in_domains=redact_entity_in_domains,
     )
     return builder.build(classification, original_path)

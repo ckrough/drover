@@ -870,12 +870,23 @@ class DocumentClassifier:
         if missing:
             raise LLMParseError(f"LLM response missing required fields: {missing}")
 
-        # Validate field types
+        # Validate field types for required fields
         for field in required_fields:
             if not isinstance(parsed[field], str):
                 raise LLMParseError(
                     f"Field '{field}' must be string, got {type(parsed[field]).__name__}"
                 )
+
+        # Entity is optional; coerce null/missing to empty string and reject
+        # non-string values. Older prompts and existing fixtures may not emit
+        # the field at all.
+        entity = parsed.get("entity")
+        if entity is None:
+            parsed["entity"] = ""
+        elif not isinstance(entity, str):
+            raise LLMParseError(
+                f"Field 'entity' must be string or null, got {type(entity).__name__}"
+            )
 
         return cast("dict[str, Any]", parsed)
 
@@ -937,4 +948,5 @@ class DocumentClassifier:
             vendor=classification.vendor,
             date=classification.date,
             subject=classification.subject,
+            entity=classification.entity,
         )

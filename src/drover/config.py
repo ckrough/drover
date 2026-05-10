@@ -80,6 +80,20 @@ class DroverConfig(BaseModel):
     taxonomy: str = Field(default="household")
     taxonomy_mode: TaxonomyMode = Field(default=TaxonomyMode.FALLBACK)
     naming_style: str = Field(default="nara")
+    naming_emit_entity: bool = Field(
+        default=True,
+        description=(
+            "When True, include the entity slot in generated filenames. Set to"
+            " False to reproduce legacy 4-component filenames."
+        ),
+    )
+    naming_redact_entity_in_domains: list[str] = Field(
+        default_factory=lambda: ["medical"],
+        description=(
+            "Domains for which the entity slot is suppressed to avoid leaking"
+            " personally-identifying values into filenames."
+        ),
+    )
     sample_strategy: SampleStrategy = Field(default=SampleStrategy.ADAPTIVE)
     max_pages: int = Field(default=10)
     log_level: LogLevel = Field(default=LogLevel.QUIET)

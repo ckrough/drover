@@ -367,7 +367,15 @@ def _output_result(
 
 
 # Valid tag fields that can be extracted from classification results
-VALID_TAG_FIELDS = {"domain", "category", "doctype", "vendor", "date", "subject"}
+VALID_TAG_FIELDS = {
+    "domain",
+    "category",
+    "doctype",
+    "vendor",
+    "date",
+    "subject",
+    "entity",
+}
 
 
 @main.command()
@@ -739,6 +747,16 @@ async def _evaluate_async(
     default=False,
     help="Descend into symlinked directories when SRC is a directory.",
 )
+@click.option(
+    "--no-entity",
+    "no_entity",
+    is_flag=True,
+    default=False,
+    help=(
+        "Suppress the entity slot in generated filenames. Reproduces the legacy"
+        " 4-component pattern doctype-vendor-subject-YYYYMMDD."
+    ),
+)
 @classification_options
 def organize(
     src: Path,
@@ -749,6 +767,7 @@ def organize(
     tag_mode: str,
     report_path: str | None,
     follow_symlinks: bool,
+    no_entity: bool,
     config_path: Path | None,
     ai_provider: str | None,
     ai_model: str | None,
@@ -820,6 +839,9 @@ def organize(
         concurrency=concurrency,
         log_level=log_level,
     )
+
+    if no_entity:
+        config = config.with_overrides(naming_emit_entity=False)
 
     if on_error is None:
         default_mode = ErrorMode.CONTINUE if src.is_dir() else ErrorMode.FAIL

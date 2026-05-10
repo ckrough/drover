@@ -54,3 +54,44 @@ def test_raw_classification():
         subject="checking account",
     )
     assert raw.vendor == "Chase Bank"  # Not normalized yet
+
+
+def test_raw_classification_entity_defaults_to_empty():
+    """Entity is optional and defaults to empty string."""
+    raw = RawClassification(
+        domain="financial",
+        category="banking",
+        doctype="statement",
+        vendor="Chase Bank",
+        date="20250115",
+        subject="checking account",
+    )
+    assert raw.entity == ""
+
+
+def test_raw_classification_entity_can_be_set():
+    raw = RawClassification(
+        domain="pets",
+        category="medical",
+        doctype="invoices",
+        vendor="VCA Hospital",
+        date="20250416",
+        subject="annual checkup",
+        entity="Sally",
+    )
+    assert raw.entity == "Sally"
+
+
+def test_classification_result_entity_defaults_to_empty():
+    result = ClassificationResult(
+        original="scan.pdf",
+        suggested_path="financial/banking/statements/x.pdf",
+        suggested_filename="x.pdf",
+        domain="financial",
+        category="banking",
+        doctype="statements",
+        vendor="chase",
+        date="20240115",
+        subject="checking",
+    )
+    assert result.entity == ""
