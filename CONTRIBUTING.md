@@ -396,7 +396,7 @@ class RenameAction:
 ### Conventions
 
 - Use pytest with pytest-asyncio (`asyncio_mode = "auto"`)
-- **Never call real LLMs in unit tests** — mock at the classifier level
+- **Never call real LLMs in unit tests**: mock at the classifier level
 - Test names: `test_<function>_<scenario>_<expected>`
 
 ### Mocking Pattern
@@ -543,4 +543,4 @@ You retain copyright on your contributions. The project does not require a Contr
 
 ### About the Commercial License
 
-Backchain LLC offers this project under a commercial license in addition to AGPL-3.0 for use cases that AGPL does not accommodate (proprietary integration, SaaS deployment without source disclosure). The commercial license covers code authored by Backchain LLC. Outside contributions remain under AGPL-3.0 only — Backchain LLC does not, by virtue of your contribution, acquire the right to relicense your contribution under its commercial license.
+Backchain LLC offers this project under a commercial license in addition to AGPL-3.0 for use cases that AGPL does not accommodate (proprietary integration, SaaS deployment without source disclosure). The commercial license covers code authored by Backchain LLC. Outside contributions remain under AGPL-3.0 only. Backchain LLC does not, by virtue of your contribution, acquire the right to relicense your contribution under its commercial license.
