@@ -76,9 +76,14 @@ class EvaluationResult:
     # Metadata
     model: str = ""
     provider: str = ""
+    loader: str = ""
+    commit_hash: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
+        loader = self.loader
+        if not loader and self.comparisons and self.comparisons[0].loader_backend:
+            loader = self.comparisons[0].loader_backend
         return {
             "total": self.total,
             "domain_accuracy": self.domain_accuracy,
@@ -88,6 +93,8 @@ class EvaluationResult:
             "date_accuracy": self.date_accuracy,
             "model": self.model,
             "provider": self.provider,
+            "loader": loader,
+            "commit_hash": self.commit_hash,
             "comparisons": [
                 {
                     "filename": c.filename,

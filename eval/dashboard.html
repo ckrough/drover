@@ -126,25 +126,12 @@
 <body>
 <div class="container">
   <h1>Drover Classification Accuracy</h1>
-  <p class="subtitle">Historical progression by model, loader, and corpus. Data survives run-directory deletion.</p>
+  <p class="subtitle">Historical progression by model and loader on the synthetic corpus. Data survives run-directory deletion.</p>
 
   <div class="info-bar" id="info-bar"></div>
 
-  <div class="controls">
-    <div class="filter-group">
-      <label>Corpus:</label>
-      <label class="pill" style="background:#dbeafe; border-color:#93c5fd;">
-        <input type="checkbox" id="filter-synthetic" checked> Synthetic
-      </label>
-      <label class="pill" style="background:#fce7f3; border-color:#f9a8d4;">
-        <input type="checkbox" id="filter-real" checked> Real-world
-      </label>
-    </div>
-  </div>
-
   <p class="series-note">
     Lines are grouped by <strong>model + loader + variant</strong>.
-    Solid line = synthetic corpus; dashed = real-world.
     Click legend items to hide/show individual series.
   </p>
 
@@ -186,201 +173,26 @@
 <script id="data" type="application/json">
 {
   "schema_version": 2,
-  "generated_at": "2026-05-07T11:24:59-04:00",
+  "generated_at": "2026-05-10T10:23:47-04:00",
   "runs": [
     {
-      "run_id": "2026-04-30T165717-gemma4_docling",
-      "date": "2026-04-30",
+      "run_id": "personal-removal-20260510-093641-results",
+      "date": "2026-05-10",
       "corpus": "synthetic",
       "corpus_size": 80,
       "model": "gemma4:latest",
       "provider": "ollama",
       "loader": "docling",
-      "domain_accuracy": 0.8625,
-      "category_accuracy": 0.375,
-      "doctype_accuracy": 0.8375,
-      "vendor_accuracy": 0.7,
-      "date_accuracy": 0.8125,
-      "errors": 0,
-      "source": "eval/runs/2026-04-30T165717/gemma4_docling.json",
-      "notes": "ADR-005 eval run: Docling full-page OCR on synthetic corpus. Wallclock ~35 min."
-    },
-    {
-      "run_id": "2026-04-30T165717-gemma4_unstructured",
-      "date": "2026-04-30",
-      "corpus": "synthetic",
-      "corpus_size": 80,
-      "model": "gemma4:latest",
-      "provider": "ollama",
-      "loader": "unstructured",
       "domain_accuracy": 0.875,
-      "category_accuracy": 0.4,
-      "doctype_accuracy": 0.8625,
-      "vendor_accuracy": 0.7875,
-      "date_accuracy": 0.8875,
+      "category_accuracy": 0.6125,
+      "doctype_accuracy": 0.9375,
+      "vendor_accuracy": 0.9,
+      "date_accuracy": 0.9,
       "errors": 0,
-      "source": "eval/runs/2026-04-30T165717/gemma4_unstructured.json",
-      "notes": "ADR-005 eval run: unstructured loader on synthetic corpus."
-    },
-    {
-      "run_id": "real-world-2026-04-30T184932-gemma4_docling",
-      "date": "2026-04-30",
-      "corpus": "real-world",
-      "corpus_size": 11,
-      "model": "gemma4:latest",
-      "provider": "ollama",
-      "loader": "docling",
-      "domain_accuracy": 0.5454545454545454,
-      "category_accuracy": 0.45454545454545453,
-      "doctype_accuracy": 0.7272727272727273,
-      "vendor_accuracy": 0.18181818181818182,
-      "date_accuracy": 0.36363636363636365,
-      "errors": 0,
-      "source": "eval/runs/real-world-2026-04-30T184932/gemma4_docling.json",
-      "notes": "First real-world run, full-page OCR. n=11 of 14 (3 LLM_PARSE_ERROR on long docs). Path-joint (domain+category+doctype) accuracy: 0.455 vs 0.182 for unstructured."
-    },
-    {
-      "run_id": "real-world-2026-04-30T184932-gemma4_unstructured",
-      "date": "2026-04-30",
-      "corpus": "real-world",
-      "corpus_size": 13,
-      "model": "gemma4:latest",
-      "provider": "ollama",
-      "loader": "unstructured",
-      "domain_accuracy": 0.6923076923076923,
-      "category_accuracy": 0.23076923076923078,
-      "doctype_accuracy": 0.5384615384615384,
-      "vendor_accuracy": 0.3076923076923077,
-      "date_accuracy": 0.6153846153846154,
-      "errors": 0,
-      "source": "eval/runs/real-world-2026-04-30T184932/gemma4_unstructured.json",
-      "notes": "First real-world run, unstructured loader. n=13 of 14 (1 failure). Path-joint accuracy: 0.182."
-    },
-    {
-      "run_id": "real-world-2026-04-30T191002-picture-ocr-gemma4_docling",
-      "date": "2026-04-30",
-      "corpus": "real-world",
-      "corpus_size": 11,
-      "model": "gemma4:latest",
-      "provider": "ollama",
-      "loader": "docling",
-      "domain_accuracy": 0.5454545454545454,
-      "category_accuracy": 0.36363636363636365,
-      "doctype_accuracy": 0.6363636363636364,
-      "vendor_accuracy": 0.2727272727272727,
-      "date_accuracy": 0.45454545454545453,
-      "errors": 0,
-      "source": "eval/runs/real-world-2026-04-30T191002-picture-ocr/gemma4_docling.json",
-      "notes": "Picture-region-only OCR (force_full_page_ocr=False). ~50% faster. Vendor/date improve vs full-page; category/doctype regress. n=11 aligned.",
-      "loader_variant": "picture-region-ocr"
-    },
-    {
-      "run_id": "real-world-2026-04-30T191002-picture-ocr-gemma4_unstructured",
-      "date": "2026-04-30",
-      "corpus": "real-world",
-      "corpus_size": 13,
-      "model": "gemma4:latest",
-      "provider": "ollama",
-      "loader": "unstructured",
-      "domain_accuracy": 0.6923076923076923,
-      "category_accuracy": 0.23076923076923078,
-      "doctype_accuracy": 0.5384615384615384,
-      "vendor_accuracy": 0.3076923076923077,
-      "date_accuracy": 0.6153846153846154,
-      "errors": 0,
-      "source": "eval/runs/real-world-2026-04-30T191002-picture-ocr/gemma4_unstructured.json",
-      "notes": "Companion unstructured run for picture-region-OCR comparison. n=13 of 14.",
-      "loader_variant": "picture-region-ocr"
-    },
-    {
-      "run_id": "post-audit-2026-05-01T095432-gemma4_docling",
-      "date": "2026-05-01",
-      "corpus": "real-world",
-      "corpus_size": 14,
-      "model": "gemma4:latest",
-      "provider": "ollama",
-      "loader": "docling",
-      "domain_accuracy": 0.7142857142857143,
-      "category_accuracy": 0.2857142857142857,
-      "doctype_accuracy": 0.6428571428571429,
-      "vendor_accuracy": 0.21428571428571427,
-      "date_accuracy": 0.42857142857142855,
-      "errors": 0,
-      "source": "eval/runs/post-audit-2026-05-01T095432/gemma4_docling.json",
-      "notes": "Post-audit run after phase 3 refactor. n=14 full corpus, 0 errors (long-doc fix verified). Full-page OCR. This is the current production baseline.",
-      "loader_variant": "full-page-ocr"
-    },
-    {
-      "run_id": "real-world-2026-05-01T070630-structured-gemma4_docling",
-      "date": "2026-05-01",
-      "corpus": "real-world",
-      "corpus_size": 11,
-      "model": "gemma4:latest",
-      "provider": "ollama",
-      "loader": "docling",
-      "domain_accuracy": 0.6363636363636364,
-      "category_accuracy": 0.2727272727272727,
-      "doctype_accuracy": 0.6363636363636364,
-      "vendor_accuracy": 0.18181818181818182,
-      "date_accuracy": 0.36363636363636365,
-      "errors": 0,
-      "source": "eval/runs/real-world-2026-05-01T070630-structured/gemma4_docling.json",
-      "notes": "Structured-regions ([TAG] prefix) input experiment. Worse than markdown on category/vendor/date. Production reverted to markdown export.",
-      "loader_variant": "structured-regions"
-    },
-    {
-      "run_id": "round4-parity-20260504-132642-eval",
-      "date": "2026-05-04",
-      "corpus": "synthetic",
-      "corpus_size": 80,
-      "model": "gemma4:latest",
-      "provider": "ollama",
-      "loader": "unknown",
-      "domain_accuracy": 0.7625,
-      "category_accuracy": 0.4625,
-      "doctype_accuracy": 0.95,
-      "vendor_accuracy": 0.825,
-      "date_accuracy": 0.85,
-      "errors": 0,
-      "source": "eval/runs/round4-parity-20260504-132642/eval.json",
-      "notes": "",
-      "runtime_seconds": 1643
-    },
-    {
-      "run_id": "round4-parity-20260504-141532-eval",
-      "date": "2026-05-04",
-      "corpus": "synthetic",
-      "corpus_size": 80,
-      "model": "gemma4:latest",
-      "provider": "ollama",
-      "loader": "unknown",
-      "domain_accuracy": 0.7625,
-      "category_accuracy": 0.5625,
-      "doctype_accuracy": 0.95,
-      "vendor_accuracy": 0.825,
-      "date_accuracy": 0.85,
-      "errors": 0,
-      "source": "eval/runs/round4-parity-20260504-141532/eval.json",
-      "notes": "",
-      "runtime_seconds": 1172
-    },
-    {
-      "run_id": "ocr-baseline-rapidocr-20260507-100620-gemma4_docling",
-      "date": "2026-05-07",
-      "corpus": "synthetic",
-      "corpus_size": 80,
-      "model": "gemma4:latest",
-      "provider": "ollama",
-      "loader": "docling",
-      "domain_accuracy": 0.8,
-      "category_accuracy": 0.575,
-      "doctype_accuracy": 0.938,
-      "vendor_accuracy": 0.85,
-      "date_accuracy": 0.85,
-      "errors": 0,
-      "source": "eval/runs/ocr-baseline-rapidocr-20260507-100620/gemma4_docling.json",
-      "notes": "",
-      "runtime_seconds": 3309
+      "source": "eval/runs/personal-removal-20260510-093641/results.json",
+      "notes": "prof-un5 + prof-b7h: lifestyle/entertainment + remove personal domain",
+      "runtime_seconds": 1139,
+      "commit_hash": "d96dd78-dirty"
     },
     {
       "run_id": "ocr-mac-20260507-110208-gemma4_docling",
@@ -397,8 +209,66 @@
       "date_accuracy": 0.9,
       "errors": 0,
       "source": "eval/runs/ocr-mac-20260507-110208/gemma4_docling.json",
-      "notes": "",
-      "runtime_seconds": 1223
+      "notes": "OCR backend: ocrmac (Apple Vision via ocr-mac extra)",
+      "runtime_seconds": 1223,
+      "commit_hash": "0ac26b2~"
+    },
+    {
+      "run_id": "ocr-baseline-rapidocr-20260507-100620-gemma4_docling",
+      "date": "2026-05-07",
+      "corpus": "synthetic",
+      "corpus_size": 80,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "docling",
+      "domain_accuracy": 0.8,
+      "category_accuracy": 0.575,
+      "doctype_accuracy": 0.938,
+      "vendor_accuracy": 0.85,
+      "date_accuracy": 0.85,
+      "errors": 0,
+      "source": "eval/runs/ocr-baseline-rapidocr-20260507-100620/gemma4_docling.json",
+      "notes": "OCR backend: rapidocr on torch CPU (default w/o ocr-mac extra)",
+      "runtime_seconds": 3309,
+      "commit_hash": "0ac26b2~"
+    },
+    {
+      "run_id": "round4-parity-20260504-141532-eval",
+      "date": "2026-05-04",
+      "corpus": "synthetic",
+      "corpus_size": 80,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "docling",
+      "domain_accuracy": 0.7625,
+      "category_accuracy": 0.5625,
+      "doctype_accuracy": 0.95,
+      "vendor_accuracy": 0.825,
+      "date_accuracy": 0.85,
+      "errors": 0,
+      "source": "eval/runs/round4-parity-20260504-141532/eval.json",
+      "notes": "Round 4 parity: LCGFT plural doctypes + schema.org reservation aliases (post-refactor)",
+      "runtime_seconds": 1172,
+      "commit_hash": "603d276~"
+    },
+    {
+      "run_id": "round4-parity-20260504-132642-eval",
+      "date": "2026-05-04",
+      "corpus": "synthetic",
+      "corpus_size": 80,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "docling",
+      "domain_accuracy": 0.7625,
+      "category_accuracy": 0.4625,
+      "doctype_accuracy": 0.95,
+      "vendor_accuracy": 0.825,
+      "date_accuracy": 0.85,
+      "errors": 0,
+      "source": "eval/runs/round4-parity-20260504-132642/eval.json",
+      "notes": "Round 4 parity: pre-refactor baseline",
+      "runtime_seconds": 1643,
+      "commit_hash": "603d276~"
     }
   ]
 }
@@ -491,6 +361,13 @@
   }
 
   function runXLabel(run) {
+    // Run ids commonly carry a YYYYMMDD-HHMMSS or YYYY-MM-DDTHHMMSS stamp.
+    // Extract it so multiple runs on the same date get distinct x-positions
+    // instead of collapsing to a single point.
+    const m = (run.run_id || "").match(/(\d{4})-?(\d{2})-?(\d{2})[-T](\d{2})(\d{2})/);
+    if (m) {
+      return `${m[1]}-${m[2]}-${m[3]} ${m[4]}:${m[5]}`;
+    }
     return run.date;
   }
 
@@ -521,17 +398,13 @@
   }
 
   // ---------------------------------------------------------------------------
-  // Filter state
+  // Run set
   // ---------------------------------------------------------------------------
-  let showSynthetic = true;
-  let showReal = true;
-
+  // Corpus is filtered upstream by build_eval_dashboard.py (synthetic only,
+  // runs with runtime_seconds + corpus_size). The dashboard renders all runs
+  // present in dashboard_data.json.
   function filteredRuns() {
-    return allRuns.filter(r => {
-      if (r.corpus === "synthetic" && !showSynthetic) return false;
-      if (r.corpus === "real-world" && !showReal) return false;
-      return true;
-    });
+    return allRuns;
   }
 
   // ---------------------------------------------------------------------------
@@ -687,14 +560,6 @@
     }
   }
 
-  document.getElementById("filter-synthetic").addEventListener("change", function (e) {
-    showSynthetic = e.target.checked;
-    render();
-  });
-  document.getElementById("filter-real").addEventListener("change", function (e) {
-    showReal = e.target.checked;
-    render();
-  });
 
   render();
 })();

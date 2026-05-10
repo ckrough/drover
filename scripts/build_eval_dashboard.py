@@ -2,7 +2,7 @@
 
 Idempotent: existing entries with the same run_id are preserved. New runs
 found in eval/runs/ that are not already recorded are appended. Runs are
-sorted chronologically by date then run_id.
+sorted in descending order by date (newest first), then by run_id.
 
 Usage:
     uv run python scripts/build_eval_dashboard.py
@@ -13,8 +13,17 @@ committed to the summary file.
 
 Runs whose directory name does not encode a parseable date are excluded
 from the dashboard. Per-run runtime is computed from the first and last
-timestamp in the run's `.stderr` file when present; commit hashes are
-included only when the run JSON records one.
+timestamp in the run's `.stderr` file when present, with a fallback to
+the stderr/json file mtimes when the stderr has no parseable timestamps
+(e.g. eval ran with `--log quiet`). Commit hashes are read from the run
+JSON when present; otherwise backfilled best-effort from the parent of
+the commit that first added a tracked artifact in the run directory
+(`~` suffix marks the value as derived rather than captured at run time).
+
+Dashboard inclusion policy (enforced at write time):
+- Only synthetic-corpus runs are kept; real-world runs are dropped.
+- Only runs with both `runtime_seconds` and `corpus_size` are kept, so
+  the per-doc runtime cell renders for every row.
 
 After updating dashboard_data.json, the script also rewrites the inline
 <script id="data" type="application/json"> block in dashboard.html so both
@@ -50,6 +59,7 @@ _AGGREGATE_KEYS: set[str] = {
     *_METRIC_KEYS,
     "model",
     "provider",
+    "loader",
     "total",
     "errors",
     "commit_hash",
@@ -91,6 +101,44 @@ def _infer_loader_from_filename(fname: str) -> str:
     if parts and parts[-1] in ("docling", "unstructured"):
         return parts[-1]
     return "unknown"
+
+
+def _loader_from_comparisons(json_path: Path) -> str | None:
+    """Read the first comparison's `loader_backend` for runs without a top-level
+    `loader` field. Returns None if the file can't be read or has no signal.
+    """
+    if not json_path.exists():
+        return None
+    try:
+        with json_path.open() as f:
+            raw = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return None
+    comparisons = raw.get("comparisons")
+    if not isinstance(comparisons, list) or not comparisons:
+        return None
+    backend = comparisons[0].get("loader_backend") if isinstance(
+        comparisons[0], dict
+    ) else None
+    return backend if isinstance(backend, str) and backend else None
+
+
+def _resolve_loader(agg: dict[str, Any], json_path: Path) -> str:
+    """Determine the loader for a run.
+
+    Priority:
+    1. Top-level `loader` field in the JSON (current `drover evaluate` output).
+    2. First comparison's `loader_backend` (older drover JSON shape).
+    3. Filename suffix convention (e.g. `gemma4_docling.json`).
+    4. "unknown" if none of the above resolve.
+    """
+    top = agg.get("loader")
+    if isinstance(top, str) and top.strip():
+        return top.strip()
+    from_comparisons = _loader_from_comparisons(json_path)
+    if from_comparisons:
+        return from_comparisons
+    return _infer_loader_from_filename(json_path.name)
 
 
 def _infer_corpus_from_dir(dir_name: str) -> str:
@@ -153,10 +201,106 @@ def _runtime_from_stderr(json_path: Path) -> int | None:
     return _seconds_between(first, last)
 
 
+def _find_stderr_sibling(json_path: Path) -> Path | None:
+    """Locate a `.stderr` file in the run directory (any stem)."""
+    same_stem = json_path.with_suffix(".stderr")
+    if same_stem.exists():
+        return same_stem
+    siblings = sorted(json_path.parent.glob("*.stderr"))
+    return siblings[0] if siblings else None
+
+
+def _runtime_from_mtimes(json_path: Path) -> int | None:
+    """Fallback: estimate runtime from `.stderr` (start) and `.json` (end) mtimes.
+
+    Used when `--log` was quiet so the stderr file has no parseable timestamps.
+    The stderr file is created the moment the eval CLI's redirection opens, so
+    its mtime closely tracks process start; the JSON file's mtime tracks the
+    last write at process end. Falls back to any `.stderr` neighbour in the
+    same directory if no same-stem match is found.
+    """
+    stderr_path = _find_stderr_sibling(json_path)
+    if stderr_path is None or not json_path.exists():
+        return None
+    try:
+        start = stderr_path.stat().st_mtime
+        end = json_path.stat().st_mtime
+    except OSError:
+        return None
+    delta = int(end - start)
+    return delta if delta > 0 else None
+
+
 def _commit_hash(agg: dict[str, Any]) -> str | None:
     value = agg.get("commit_hash") or agg.get("commit")
     if isinstance(value, str) and value.strip():
         return value.strip()
+    return None
+
+
+def _git_artifact_introducing_commit(file_path: Path) -> str | None:
+    """Return the short hash of the commit that first added *file_path*."""
+    try:
+        result = subprocess.run(  # nosec B603 B607 - fixed argv, trusted PATH
+            [
+                "git",
+                "log",
+                "--diff-filter=A",
+                "-1",
+                "--format=%h",
+                "--",
+                str(file_path),
+            ],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except (FileNotFoundError, OSError):
+        return None
+    if result.returncode != 0:
+        return None
+    sha = result.stdout.strip()
+    return sha or None
+
+
+def _git_parent(short_hash: str) -> str | None:
+    """Return the short hash of *short_hash*'s parent commit, or None."""
+    try:
+        result = subprocess.run(  # nosec B603 B607 - fixed argv, trusted PATH
+            ["git", "rev-parse", "--short", f"{short_hash}^"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except (FileNotFoundError, OSError):
+        return None
+    if result.returncode != 0:
+        return None
+    sha = result.stdout.strip()
+    return sha or None
+
+
+def _commit_from_artifact_history(run_dir: Path) -> str | None:
+    """Best-effort commit_hash for a run, derived from its committed artifacts.
+
+    The eval workflow is "run eval -> commit artifacts", so the parent of the
+    commit that first added a tracked file in the run directory is the commit
+    that produced the eval. Returns a short hash with a `~` suffix to mark
+    the value as derived (not captured at run time, may not reflect dirty-tree
+    state).
+    """
+    for name in ("eval.stderr", "results.md"):
+        candidate = run_dir / name
+        if not candidate.exists():
+            continue
+        introducing = _git_artifact_introducing_commit(candidate)
+        if not introducing:
+            continue
+        parent = _git_parent(introducing)
+        if parent:
+            return f"{parent}~"
     return None
 
 
@@ -165,7 +309,10 @@ def _runtime_seconds(agg: dict[str, Any], json_path: Path) -> int | None:
         v = agg.get(key)
         if isinstance(v, int | float):
             return int(v)
-    return _runtime_from_stderr(json_path)
+    runtime = _runtime_from_stderr(json_path)
+    if runtime is not None:
+        return runtime
+    return _runtime_from_mtimes(json_path)
 
 
 def _load_existing() -> dict[str, Any]:
@@ -239,7 +386,7 @@ def scan_runs_dir(
             skipped.append(f"{run_id} (no metric keys)")
             continue
 
-        loader = _infer_loader_from_filename(jf.name)
+        loader = _resolve_loader(agg, jf)
         loader_variant = _loader_variant_from_dir(dir_label)
         corpus = _infer_corpus_from_dir(dir_label)
 
@@ -275,6 +422,23 @@ def scan_runs_dir(
 
 def _sort_key(run: dict[str, Any]) -> tuple[str, str]:
     return (run.get("date", "0000-00-00"), run.get("run_id", ""))
+
+
+def _qualifies_for_dashboard(run: dict[str, Any]) -> bool:
+    """Dashboard inclusion policy.
+
+    Runs are kept only if they are synthetic-corpus and have both a
+    runtime_seconds and a corpus_size, so the per-doc runtime cell can be
+    rendered. Real-world runs and runs predating runtime instrumentation
+    are excluded.
+    """
+    if run.get("corpus") != "synthetic":
+        return False
+    runtime = run.get("runtime_seconds")
+    size = run.get("corpus_size")
+    if not isinstance(runtime, int | float) or runtime <= 0:
+        return False
+    return isinstance(size, int) and size > 0
 
 
 _HTML_DATA_OPEN = '<script id="data" type="application/json">'
@@ -318,6 +482,48 @@ def main() -> None:
     existing_ids = _existing_run_ids(data)
     print(f"  Retained {len(existing_ids)} existing run(s).")
 
+    backfilled_runtime = 0
+    backfilled_loader = 0
+    backfilled_commit = 0
+    for run in data["runs"]:
+        source = run.get("source")
+        json_path = REPO_ROOT / source if isinstance(source, str) else None
+        json_available = json_path is not None and json_path.exists()
+        run_dir = json_path.parent if json_path is not None else None
+
+        if not isinstance(run.get("runtime_seconds"), int | float) and json_available:
+            assert json_path is not None
+            runtime = _runtime_seconds({}, json_path)
+            if runtime:
+                run["runtime_seconds"] = runtime
+                backfilled_runtime += 1
+
+        if run.get("loader", "unknown") in (None, "", "unknown") and json_available:
+            assert json_path is not None
+            better = _loader_from_comparisons(json_path)
+            if better:
+                run["loader"] = better
+                backfilled_loader += 1
+
+        existing_commit = run.get("commit_hash")
+        commit_missing = not isinstance(existing_commit, str) or not existing_commit
+        if commit_missing and run_dir is not None and run_dir.exists():
+            derived = _commit_from_artifact_history(run_dir)
+            if derived:
+                run["commit_hash"] = derived
+                backfilled_commit += 1
+    if backfilled_runtime:
+        print(
+            f"  Backfilled runtime_seconds for {backfilled_runtime} existing run(s)."
+        )
+    if backfilled_loader:
+        print(f"  Backfilled loader for {backfilled_loader} existing run(s).")
+    if backfilled_commit:
+        print(
+            f"  Backfilled commit_hash for {backfilled_commit} existing run(s) "
+            "(derived; `~` suffix marks artifact-history origin)."
+        )
+
     new_runs, added_ids, skipped = scan_runs_dir(existing_ids)
 
     if new_runs:
@@ -333,7 +539,26 @@ def main() -> None:
         for s in skipped:
             print(f"  - {s}")
 
-    data["runs"].sort(key=_sort_key)
+    pre_filter = len(data["runs"])
+    dropped = [r for r in data["runs"] if not _qualifies_for_dashboard(r)]
+    data["runs"] = [r for r in data["runs"] if _qualifies_for_dashboard(r)]
+    if dropped:
+        print(
+            f"\nDropped {len(dropped)} run(s) failing dashboard policy "
+            f"(must be synthetic with runtime_seconds and corpus_size):"
+        )
+        for r in dropped:
+            reason = []
+            if r.get("corpus") != "synthetic":
+                reason.append(f"corpus={r.get('corpus')}")
+            if not isinstance(r.get("runtime_seconds"), int | float):
+                reason.append("no runtime_seconds")
+            if not isinstance(r.get("corpus_size"), int):
+                reason.append("no corpus_size")
+            print(f"  - {r.get('run_id')} ({', '.join(reason) or 'unknown reason'})")
+    print(f"\n{pre_filter} -> {len(data['runs'])} run(s) after policy filter.")
+
+    data["runs"].sort(key=_sort_key, reverse=True)
     data["generated_at"] = _rfc3339_now()
     data["schema_version"] = SCHEMA_VERSION
 

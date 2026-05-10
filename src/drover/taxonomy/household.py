@@ -34,7 +34,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
         "legal",
         "lifestyle",
         "medical",
-        "personal",
         "pets",
         "property",
         "reference",
@@ -99,12 +98,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "payment",
             "umbrella",
         },
-        "personal": {
-            "expense",
-            "identity",
-            "membership",
-            "travel",
-        },
         "government": {
             "federal",
             "local",
@@ -160,6 +153,7 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "expense",
             "goal",
             "interest",
+            "membership",
             "planning",
             "travel",
             "volunteering",
@@ -324,8 +318,9 @@ class HouseholdTaxonomy(BaseTaxonomy):
         "vehicle": "household",
         "vehicles": "household",
         "work": "career",
-        "non_profit": "personal",
-        "nonprofit": "personal",
+        "non_profit": "lifestyle",
+        "nonprofit": "lifestyle",
+        "personal": "lifestyle",
     }
 
     CATEGORY_ALIASES: ClassVar[dict[tuple[str, str], str]] = {
@@ -340,7 +335,6 @@ class HouseholdTaxonomy(BaseTaxonomy):
         ("reference", "manual"): "documentation",
         ("property", "agreement"): "mortgage",
         ("housing", "agreement"): "rental",
-        ("personal", "goals"): "identity",
         ("financial", "bank"): "banking",
         ("financial", "checking"): "banking",
         ("financial", "savings"): "banking",
@@ -457,8 +451,15 @@ class HouseholdTaxonomy(BaseTaxonomy):
         ("lifestyle", "job_search"): "planning",
         ("lifestyle", "training"): "interest",
         ("lifestyle", "volunteer_programming"): "volunteering",
-        # personal domain - non-profit aliases (when non_profit maps to personal)
-        ("personal", "annual_report"): "membership",
+        # lifestyle/membership aliases (subsumed personal/membership in prof-b7h)
+        ("lifestyle", "annual_report"): "membership",
+        ("lifestyle", "club"): "membership",
+        ("lifestyle", "clubs"): "membership",
+        ("lifestyle", "donation"): "membership",
+        ("lifestyle", "donations"): "membership",
+        ("lifestyle", "gym"): "membership",
+        ("lifestyle", "subscription"): "membership",
+        ("lifestyle", "subscriptions"): "membership",
         # household domain - vehicles aliases (when vehicles maps to household)
         ("household", "vehicle_service_records"): "vehicle",
         # education domain
@@ -469,11 +470,9 @@ class HouseholdTaxonomy(BaseTaxonomy):
         # singular `purchase` (LLM emits singular alongside plural)
         ("food", "purchase"): "expense",
         ("property", "purchase"): "expense",
-        ("personal", "purchase"): "expense",
         ("lifestyle", "purchase"): "expense",
         ("career", "purchase"): "expense",
         # gerund variants of `travel`
-        ("personal", "traveling"): "travel",
         ("lifestyle", "traveling"): "travel",
         # `billing` is what the LLM calls a payment notice
         ("insurance", "billing"): "payment",
