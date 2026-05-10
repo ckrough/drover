@@ -267,4 +267,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full development workflow.
 
 ## License
 
-MIT
+AGPL-3.0-or-later. See [LICENSE](LICENSE) for the full text.
+
+Copyright (C) 2025 Chris Krough <dev@krough.org>
