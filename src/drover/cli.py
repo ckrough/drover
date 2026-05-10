@@ -840,6 +840,17 @@ async def _organize(
     counts = {"moved": 0, "skipped_exists": 0, "error": 0, "skipped_unsupported": 0}
     report_writer = _ReportWriter(report_path)
 
+    logger.info(
+        "organize_started",
+        src=str(src),
+        dest=str(dest_root),
+        total=len(all_files),
+        supported=len(supported),
+        unsupported=len(unsupported),
+        dry_run=dry_run,
+        copy=copy_mode,
+    )
+
     with report_writer:
         for unsup in unsupported:
             counts["skipped_unsupported"] += 1
@@ -858,6 +869,7 @@ async def _organize(
             )
 
         if not supported:
+            logger.info("organize_complete", **counts)
             return _organize_exit_code(counts)
 
         try:
@@ -877,6 +889,11 @@ async def _organize(
             result = results_by_path.get(file_path)
             if result is None:
                 counts["error"] += 1
+                logger.info(
+                    "organize_error",
+                    file=str(file_path),
+                    error="Classification produced no result",
+                )
                 report_writer.write(
                     _build_organize_record(
                         original_path=file_path,
@@ -894,6 +911,11 @@ async def _organize(
                     getattr(result, "error_message", None) or "Classification failed"
                 )
                 counts["error"] += 1
+                logger.info(
+                    "organize_error",
+                    file=str(file_path),
+                    error=str(err_msg),
+                )
                 report_writer.write(
                     _build_organize_record(
                         original_path=file_path,
@@ -917,6 +939,7 @@ async def _organize(
             )
             report_writer.write(record)
 
+    logger.info("organize_complete", **counts)
     return _organize_exit_code(counts)
 
 
@@ -959,6 +982,12 @@ def _organize_one(
         destination = move_plan.changes["destination"]
         if status == MoveStatus.WOULD_SKIP_EXISTS.value:
             counts["skipped_exists"] += 1
+            logger.info(
+                "organize_skipped_exists",
+                file=str(file_path),
+                destination=str(destination),
+                status=status,
+            )
             return _build_organize_record(
                 original_path=file_path,
                 suggested_path=result.suggested_path,
@@ -969,6 +998,12 @@ def _organize_one(
             )
         counts["moved"] += 1
         tags_applied = _tag_field_records(result, tag_fields) if tag_fields else []
+        logger.info(
+            "organize_moved",
+            file=str(file_path),
+            destination=str(destination),
+            status=status,
+        )
         return _build_organize_record(
             original_path=file_path,
             suggested_path=result.suggested_path,
@@ -981,6 +1016,11 @@ def _organize_one(
     move_result = move_action.execute(move_plan)
     if not move_result.success:
         counts["error"] += 1
+        logger.info(
+            "organize_error",
+            file=str(file_path),
+            error=move_result.error or "Move failed",
+        )
         return _build_organize_record(
             original_path=file_path,
             suggested_path=result.suggested_path,
@@ -993,6 +1033,12 @@ def _organize_one(
     status = str(move_result.changes.get("status", ""))
     if status == MoveStatus.SKIPPED_EXISTS.value:
         counts["skipped_exists"] += 1
+        logger.info(
+            "organize_skipped_exists",
+            file=str(file_path),
+            destination=str(move_result.changes.get("destination", "")),
+            status=status,
+        )
         return _build_organize_record(
             original_path=file_path,
             suggested_path=result.suggested_path,
@@ -1004,6 +1050,12 @@ def _organize_one(
 
     counts["moved"] += 1
     final_dest = Path(str(move_result.changes["destination"]))
+    logger.info(
+        "organize_moved",
+        file=str(file_path),
+        destination=str(final_dest),
+        status=status,
+    )
     tags_applied = []
     if tag_action is not None and tag_fields:
         try:

@@ -260,6 +260,196 @@ def test_unsupported_extension_is_soft_notice(
     assert "skipped_unsupported" in statuses
 
 
+def _verbose_log_events(stderr: str) -> list[dict[str, Any]]:
+    """Parse structlog JSON events from stderr.
+
+    Lines that don't start with `{` (e.g., a stray libomp warning) are
+    skipped, but a line that opens with `{` and fails to parse is
+    surfaced as an assertion error so test pollution doesn't silently
+    drop expected events.
+    """
+    events: list[dict[str, Any]] = []
+    for line_no, raw in enumerate(stderr.splitlines(), 1):
+        line = raw.strip()
+        if not line.startswith("{"):
+            continue
+        try:
+            events.append(json.loads(line))
+        except json.JSONDecodeError as e:
+            raise AssertionError(
+                f"stderr line {line_no} looks like JSON but failed to parse: "
+                f"{line[:120]!r} ({e})"
+            ) from e
+    return events
+
+
+def test_organize_emits_start_and_complete_summary_at_verbose(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """`--log-level verbose` emits `organize_started` and `organize_complete` summaries."""
+    src_dir = tmp_path / "in"
+    src_dir.mkdir()
+    good = src_dir / "doc.pdf"
+    good.write_bytes(b"hello")
+    skipped = src_dir / "image.unsupported"
+    skipped.write_bytes(b"x")
+    dest = tmp_path / "filed"
+
+    classification = _classification_for(good.name)
+    _patch_classify(monkeypatch, {good.resolve(): classification})
+
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        [
+            "organize",
+            str(src_dir),
+            "--dest",
+            str(dest),
+            "--report",
+            "-",
+            "--log-level",
+            "verbose",
+        ],
+    )
+    assert result.exit_code == 0, result.stderr
+
+    events = _verbose_log_events(result.stderr)
+    started = [e for e in events if e.get("event") == "organize_started"]
+    completed = [e for e in events if e.get("event") == "organize_complete"]
+    assert len(started) == 1
+    assert started[0]["total"] == 2
+    assert started[0]["supported"] == 1
+    assert started[0]["unsupported"] == 1
+    assert started[0]["dry_run"] is False
+    assert len(completed) == 1
+    assert completed[0]["moved"] == 1
+    assert completed[0]["skipped_unsupported"] == 1
+    assert completed[0]["error"] == 0
+
+
+def test_organize_emits_per_file_moved_event(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Each successful move emits an `organize_moved` INFO event with the destination."""
+    src = tmp_path / "doc.pdf"
+    src.write_bytes(b"hello")
+    dest = tmp_path / "filed"
+
+    classification = _classification_for(src.name)
+    _patch_classify(monkeypatch, {src.resolve(): classification})
+
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        [
+            "organize",
+            str(src),
+            "--dest",
+            str(dest),
+            "--report",
+            "-",
+            "--log-level",
+            "verbose",
+        ],
+    )
+    assert result.exit_code == 0, result.stderr
+
+    moved_events = [
+        e
+        for e in _verbose_log_events(result.stderr)
+        if e.get("event") == "organize_moved"
+    ]
+    assert len(moved_events) == 1
+    assert moved_events[0]["file"] == str(src.resolve())
+    assert moved_events[0]["destination"].endswith(
+        "household/finance/receipts/receipt.pdf"
+    )
+    assert moved_events[0]["status"] == "moved"
+
+
+def test_organize_emits_skipped_exists_event(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A pre-existing destination emits `organize_skipped_exists` at verbose level."""
+    src = tmp_path / "doc.pdf"
+    src.write_bytes(b"new")
+    dest = tmp_path / "filed"
+    existing = dest / "household/finance/receipts/receipt.pdf"
+    existing.parent.mkdir(parents=True)
+    existing.write_bytes(b"old")
+
+    classification = _classification_for(src.name)
+    _patch_classify(monkeypatch, {src.resolve(): classification})
+
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        [
+            "organize",
+            str(src),
+            "--dest",
+            str(dest),
+            "--report",
+            "-",
+            "--log-level",
+            "verbose",
+        ],
+    )
+    assert result.exit_code == 1
+
+    skip_events = [
+        e
+        for e in _verbose_log_events(result.stderr)
+        if e.get("event") == "organize_skipped_exists"
+    ]
+    assert len(skip_events) == 1
+    assert skip_events[0]["file"] == str(src.resolve())
+
+
+def test_organize_emits_error_event_on_classify_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Classification errors emit an `organize_error` INFO event."""
+    src_dir = tmp_path / "in"
+    src_dir.mkdir()
+    bad = src_dir / "bad.pdf"
+    bad.write_bytes(b"x")
+    dest = tmp_path / "filed"
+
+    err = ClassificationErrorResult(
+        original=bad.name,
+        error_code=ErrorCode.LLM_PARSE_ERROR,
+        error_message="parse failed",
+    )
+    _patch_classify(monkeypatch, {bad.resolve(): err})
+
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        [
+            "organize",
+            str(src_dir),
+            "--dest",
+            str(dest),
+            "--report",
+            "-",
+            "--log-level",
+            "verbose",
+        ],
+    )
+    assert result.exit_code == 1
+
+    error_events = [
+        e
+        for e in _verbose_log_events(result.stderr)
+        if e.get("event") == "organize_error"
+    ]
+    assert len(error_events) == 1
+    assert error_events[0]["file"] == str(bad.resolve())
+    assert "parse failed" in error_events[0]["error"]
+
+
 def test_directory_classify_error_records_error_and_exits_one(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
