@@ -9,6 +9,7 @@ page-sampling strategies. See ADR-005 (Docling adoption) and ADR-006
 import asyncio
 import mimetypes
 import time
+from io import BytesIO
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
@@ -73,6 +74,14 @@ SUPPORTED_EXTENSIONS: set[str] = {
     ".tif",
     ".bmp",
 }
+
+# Plain-text extensions that Docling routes through its Markdown backend.
+# That backend decodes strictly as UTF-8 and surfaces a logged traceback for
+# any byte that isn't valid UTF-8. We pre-decode these in `DoclingLoader.load`
+# with a Latin-1 fallback so files saved in legacy single-byte encodings load
+# without poisoning the run's stderr.
+_TEXTLIKE_EXTENSIONS: set[str] = {".txt", ".md", ".csv"}
+
 
 # Standard Docling model cache location
 _DOCLING_MODEL_CACHE = Path.home() / ".cache" / "docling" / "models"
@@ -189,9 +198,11 @@ class DoclingLoader:
                 "docling is not installed. Install with `uv sync --extra docling`."
             ) from e
 
+        convert_source = self._build_convert_source(path)
+
         start = time.perf_counter()
         try:
-            result = await asyncio.to_thread(converter.convert, str(path))
+            result = await asyncio.to_thread(converter.convert, convert_source)
         except Exception as e:
             raise DocumentLoadError(f"Failed to load {path.name}: {e}") from e
         loader_latency_ms = (time.perf_counter() - start) * 1000.0
@@ -239,6 +250,25 @@ class DoclingLoader:
             loader_latency_ms=loader_latency_ms,
             loader_backend="docling",
         )
+
+    def _build_convert_source(self, path: Path) -> Any:
+        """Return the value to pass to `DocumentConverter.convert` for `path`."""
+        if path.suffix.lower() not in _TEXTLIKE_EXTENSIONS:
+            return str(path)
+
+        from docling_core.types.io import DocumentStream
+
+        # Docling's MD backend decodes strictly as UTF-8. For legacy
+        # single-byte files (e.g., Latin-1) it raises and logs a misleading
+        # traceback. Try UTF-8 first; on failure decode as Latin-1 (a strict
+        # superset of ASCII that never raises) and re-encode for Docling.
+        raw = path.read_bytes()
+        try:
+            raw.decode("utf-8")
+            buf = BytesIO(raw)
+        except UnicodeDecodeError:
+            buf = BytesIO(raw.decode("latin-1").encode("utf-8"))
+        return DocumentStream(name=path.name, stream=buf)
 
     def _select_page_numbers(self, total_pages: int) -> list[int]:
         """Return the 1-based page numbers to export, applying the sampling strategy.

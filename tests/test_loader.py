@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -353,3 +354,64 @@ async def test_docling_loader_debug_write_oserror_does_not_abort_load(
 
     # Load should succeed despite the OSError
     assert "Content" in loaded.content
+
+
+async def test_docling_loader_redecodes_non_utf8_textfile(tmp_path: Path) -> None:
+    """Latin-1 bytes in a `.txt` file are re-decoded so Docling never sees a UTF-8 error.
+
+    Reproduces the `podsrefund.txt` failure where Docling's MD backend
+    raised `UnicodeDecodeError` on byte 0xe9 and logged a misleading
+    traceback. The loader pre-decodes text-like inputs and hands Docling
+    a UTF-8 `DocumentStream`.
+    """
+    from docling_core.types.io import DocumentStream
+
+    file_path = tmp_path / "podsrefund.txt"
+    # 0xe9 = latin-1 'é'; would crash a strict UTF-8 decode.
+    file_path.write_bytes(b"caf\xe9 receipt total $42")
+
+    captured_sources: list[Any] = []
+    fake_result = _fake_docling_result("# Content", num_pages=1)
+
+    class FakeConverter:
+        def convert(self, source: object) -> SimpleNamespace:
+            captured_sources.append(source)
+            return fake_result
+
+    with (
+        patch("drover.loader._build_docling_converter", return_value=FakeConverter()),
+        patch("drover.loader._check_docling_models_available"),
+    ):
+        loader = DoclingLoader()
+        loaded = await loader.load(file_path)
+
+    assert loaded.content == "# Content"
+    assert len(captured_sources) == 1
+    source = captured_sources[0]
+    assert isinstance(source, DocumentStream)
+    assert source.name == "podsrefund.txt"
+    # Re-encoded as UTF-8 so the MD backend's strict decode succeeds.
+    assert source.stream.getvalue().decode("utf-8") == "café receipt total $42"
+
+
+async def test_docling_loader_passes_path_for_non_textlike(tmp_path: Path) -> None:
+    """Non-text formats still flow as a string path; only `.txt`/`.md`/`.csv` are pre-decoded."""
+    file_path = tmp_path / "doc.pdf"
+    file_path.write_bytes(b"%PDF-1.4 stub")
+
+    captured_sources: list[Any] = []
+    fake_result = _fake_docling_result("# PDF body", num_pages=1)
+
+    class FakeConverter:
+        def convert(self, source: object) -> SimpleNamespace:
+            captured_sources.append(source)
+            return fake_result
+
+    with (
+        patch("drover.loader._build_docling_converter", return_value=FakeConverter()),
+        patch("drover.loader._check_docling_models_available"),
+    ):
+        loader = DoclingLoader()
+        await loader.load(file_path)
+
+    assert captured_sources == [str(file_path)]
