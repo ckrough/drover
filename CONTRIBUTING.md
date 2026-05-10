@@ -534,3 +534,13 @@ Design decisions are documented in `docs/adr/`:
 - [ADR-003](docs/adr/003-nli-classifier-roadmap.md): Zero-shot NLI classifier roadmap (superseded by ADR-004)
 - [ADR-004](docs/adr/004-local-llm-as-primary-local-path.md): Local LLM (Ollama gemma4) as the primary local classification path
 - [ADR-005](docs/adr/005-docling-evaluation.md): Docling with full-page OCR as the default PDF loader
+
+## License of Contributions
+
+This project is licensed under GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later). By submitting a contribution, you agree that your contribution is licensed under the same terms.
+
+You retain copyright on your contributions. The project does not require a Contributor License Agreement (CLA).
+
+### About the Commercial License
+
+Backchain LLC offers this project under a commercial license in addition to AGPL-3.0 for use cases that AGPL does not accommodate (proprietary integration, SaaS deployment without source disclosure). The commercial license covers code authored by Backchain LLC. Outside contributions remain under AGPL-3.0 only — Backchain LLC does not, by virtue of your contribution, acquire the right to relicense your contribution under its commercial license.
