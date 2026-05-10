@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import subprocess  # nosec B404 - fixed-argv invocations only
 import sys
 from pathlib import Path
 from typing import IO, TYPE_CHECKING, Any
@@ -41,6 +42,35 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 console = Console(stderr=True)
+
+
+def _git_head_marker() -> str:
+    """Return short HEAD with `-dirty` suffix when the working tree has changes.
+
+    Returns an empty string when not inside a git repository or when git is
+    unavailable, so callers can record a best-effort provenance stamp without
+    failing the eval run.
+    """
+    try:
+        head = subprocess.check_output(  # nosec B603 B607 - fixed argv, trusted PATH
+            ["git", "rev-parse", "--short", "HEAD"],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
+        return ""
+    try:
+        dirty = (
+            subprocess.run(  # nosec B603 B607
+                ["git", "diff", "--quiet"],
+                check=False,
+                stderr=subprocess.DEVNULL,
+            ).returncode
+            != 0
+        )
+    except (FileNotFoundError, OSError):
+        dirty = False
+    return f"{head}-dirty" if dirty else head
 
 
 def classification_options(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -644,6 +674,7 @@ async def _evaluate_async(
         return 1
 
     results = await evaluator.evaluate(service._classifier, service._loader)
+    results.commit_hash = _git_head_marker()
 
     if output_format == "json":
         click.echo(json.dumps(results.to_dict(), indent=2))

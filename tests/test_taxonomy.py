@@ -187,11 +187,11 @@ class TestHouseholdHierarchyRule:
         """No alias for career.agreement — surfaces as drift for ground-truth refinement."""
         assert taxonomy.canonical_category("career", "agreement") is None
 
-    def test_canonical_category_correspondence_demoted_in_personal(
+    def test_canonical_category_correspondence_demoted_in_lifestyle(
         self, taxonomy: HouseholdTaxonomy
     ) -> None:
-        """correspondence is form-only; surfaces as gap in personal domain."""
-        assert taxonomy.canonical_category("personal", "correspondence") is None
+        """correspondence is form-only; surfaces as gap in lifestyle domain."""
+        assert taxonomy.canonical_category("lifestyle", "correspondence") is None
 
     def test_canonical_category_correspondence_demoted_in_legal(
         self, taxonomy: HouseholdTaxonomy
@@ -306,6 +306,127 @@ class TestRound4LCGFTAlignment:
         for plural in ("floor_plans", "menus", "maps"):
             assert plural in taxonomy.CANONICAL_DOCTYPES
             assert taxonomy.singular_form(plural)
+
+
+class TestLifestyleEntertainmentCategory:
+    """Lifestyle entertainment category for event reservations.
+
+    Concert tickets, sporting events, theater, and other event reservations
+    (schema.org EventReservation) should land in lifestyle/entertainment, not
+    lifestyle/travel. Travel is for transit and tourism artifacts.
+    """
+
+    @pytest.fixture
+    def taxonomy(self) -> HouseholdTaxonomy:
+        return HouseholdTaxonomy()
+
+    def test_entertainment_is_canonical_in_lifestyle(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        assert "entertainment" in taxonomy.CANONICAL_CATEGORIES["lifestyle"]
+        assert (
+            taxonomy.canonical_category("lifestyle", "entertainment") == "entertainment"
+        )
+
+    def test_entertainment_only_in_lifestyle(self, taxonomy: HouseholdTaxonomy) -> None:
+        """Entertainment is a lifestyle-only category."""
+        for domain, categories in taxonomy.CANONICAL_CATEGORIES.items():
+            if domain == "lifestyle":
+                assert "entertainment" in categories
+            else:
+                assert "entertainment" not in categories
+
+    @pytest.mark.parametrize(
+        "raw",
+        [
+            "concert",
+            "concerts",
+            "event",
+            "events",
+            "show",
+            "shows",
+            "performance",
+            "performances",
+            "sporting_event",
+            "sporting_events",
+            "sports_event",
+            "theater",
+            "theatre",
+            "movie",
+            "movies",
+            "sport",
+            "sports",
+        ],
+    )
+    def test_lifestyle_event_aliases_route_to_entertainment(
+        self, taxonomy: HouseholdTaxonomy, raw: str
+    ) -> None:
+        assert taxonomy.canonical_category("lifestyle", raw) == "entertainment"
+
+    def test_lifestyle_travel_still_canonical(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        """Adding entertainment must not disturb the travel category."""
+        assert taxonomy.canonical_category("lifestyle", "travel") == "travel"
+
+
+class TestPersonalDomainRemoval:
+    """The `personal` domain was removed in prof-b7h.
+
+    Memberships, club/gym/library IDs, and donation acknowledgements route to
+    `lifestyle/membership`. Volunteer-org IDs route to `lifestyle/volunteering`.
+    Government-issued IDs route to `government/{federal,state,local}`.
+    LLM emissions of `personal` alias to `lifestyle` for graceful fallback.
+    """
+
+    @pytest.fixture
+    def taxonomy(self) -> HouseholdTaxonomy:
+        return HouseholdTaxonomy()
+
+    def test_personal_not_canonical_domain(self, taxonomy: HouseholdTaxonomy) -> None:
+        assert "personal" not in taxonomy.CANONICAL_DOMAINS
+        assert "personal" not in taxonomy.CANONICAL_CATEGORIES
+
+    def test_personal_domain_aliases_to_lifestyle(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        """Backward-compat: LLM-emitted `personal` resolves to lifestyle."""
+        assert taxonomy.canonical_domain("personal") == "lifestyle"
+
+    def test_nonprofit_aliases_to_lifestyle(self, taxonomy: HouseholdTaxonomy) -> None:
+        assert taxonomy.canonical_domain("nonprofit") == "lifestyle"
+        assert taxonomy.canonical_domain("non_profit") == "lifestyle"
+
+    def test_lifestyle_membership_canonical(self, taxonomy: HouseholdTaxonomy) -> None:
+        assert "membership" in taxonomy.CANONICAL_CATEGORIES["lifestyle"]
+        assert taxonomy.canonical_category("lifestyle", "membership") == "membership"
+
+    @pytest.mark.parametrize(
+        "raw",
+        [
+            "annual_report",
+            "club",
+            "clubs",
+            "donation",
+            "donations",
+            "gym",
+            "subscription",
+            "subscriptions",
+        ],
+    )
+    def test_lifestyle_membership_aliases(
+        self, taxonomy: HouseholdTaxonomy, raw: str
+    ) -> None:
+        assert taxonomy.canonical_category("lifestyle", raw) == "membership"
+
+    def test_no_remaining_personal_keyed_aliases(
+        self, taxonomy: HouseholdTaxonomy
+    ) -> None:
+        """No CATEGORY_ALIASES entries should still key on the personal domain."""
+        personal_keys = [
+            (d, c) for (d, c) in taxonomy.CATEGORY_ALIASES if d == "personal"
+        ]
+        assert personal_keys == []
 
 
 class TestTaxonomyLoader:

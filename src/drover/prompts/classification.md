@@ -106,6 +106,10 @@ Use functional domains when the document is fundamentally about a specific life 
 - Health records, visits, medical billing -> **medical**
 - Insurance policies and claims -> **insurance**
 - Vehicle-related policies -> **insurance** with auto category
+- Event reservations (concert tickets, sporting events, theater, movies) -> **lifestyle** with **entertainment** category. Do NOT use `travel`; travel is for transit and tourism artifacts (flights, lodging, itineraries). A Ticketmaster concert ticket is `lifestyle/entertainment/reservations`.
+- Club, gym, and donation memberships, subscriptions, library cards, and athletic-club IDs -> **lifestyle** with **membership** category. Volunteer-organization IDs and certificates -> **lifestyle** with **volunteering** category.
+- Government-issued identification (passports, driver's licenses, state IDs) -> **government** with **federal**, **state**, or **local** category as appropriate. The doctype carries the form (`passports`, `licenses`, `identifications`).
+- Do NOT emit a `personal` domain. There is no `personal` domain in the taxonomy; route to the specific functional domain instead (typically `lifestyle` for leisure/membership artifacts, `government` for government-issued IDs).
 
 ### Rule 5: Category and Document Type Selection
 

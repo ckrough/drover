@@ -18,6 +18,7 @@ ENV/
 
 # IDE
 .vscode
+.worktreeinclude
 
 # Testing & tooling caches
 .pytest_cache/
