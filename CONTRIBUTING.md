@@ -539,4 +539,4 @@ Design decisions are documented in `docs/adr/`:
 
 This project is licensed under GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later). By submitting a contribution, you agree that your contribution is licensed under the same terms.
 
-You retain copyright on your contributions. The project does not require a Contributor License Agreement (CLA).
+You retain copyright on your contributions.
