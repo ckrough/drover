@@ -396,7 +396,7 @@ class RenameAction:
 ### Conventions
 
 - Use pytest with pytest-asyncio (`asyncio_mode = "auto"`)
-- **Never call real LLMs in unit tests** — mock at the classifier level
+- **Never call real LLMs in unit tests**: mock at the classifier level
 - Test names: `test_<function>_<scenario>_<expected>`
 
 ### Mocking Pattern
@@ -534,3 +534,7 @@ Design decisions are documented in `docs/adr/`:
 - [ADR-003](docs/adr/003-nli-classifier-roadmap.md): Zero-shot NLI classifier roadmap (superseded by ADR-004)
 - [ADR-004](docs/adr/004-local-llm-as-primary-local-path.md): Local LLM (Ollama gemma4) as the primary local classification path
 - [ADR-005](docs/adr/005-docling-evaluation.md): Docling with full-page OCR as the default PDF loader
+
+## License of Contributions
+
+This project is licensed under GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later). By submitting a contribution, you agree that your contribution is licensed under the same terms.

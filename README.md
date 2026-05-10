@@ -267,6 +267,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full development workflow.
 
 ## License
 
-AGPL-3.0-or-later. See [LICENSE](LICENSE) for the full text.
+GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later). See [LICENSE](LICENSE) for the full text.
 
-Copyright (C) 2025 Chris Krough <dev@krough.org>
+Copyright (C) 2025 Backchain LLC
