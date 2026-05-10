@@ -212,15 +212,11 @@ def test_parse_response_direct_json() -> None:
 
     **Taxonomy (Round 4):** Canonical doctypes are plural (LCGFT genre/form alignment): folders use the plural (`receipts/`, `invoices/`, `agreements/`); filenames use the singular instance form (`receipt-...pdf`). `BaseTaxonomy.singular_form()` and `HouseholdTaxonomy.DOCTYPE_SINGULAR` mediate the split, applied by `PathBuilder` before the naming policy formats the filename. Cross-references to LCGFT and schema.org live in `docs/taxonomy/external-mapping.md`; design rationale in `docs/taxonomy/design-rationale.md`. The form-vs-subject structural rule (categories name subjects, doctypes name forms) is enforced by `tests/test_taxonomy.py::test_no_canonical_category_is_also_canonical_doctype`.
 
-12. **Docling first-run failure signature:** If every doc errors with `Docling models not found at ~/.cache/docling/models`, run `uv run docling-tools models download` once. The error is actionable but easy to miss in batch eval logs.
+12. **Docling first-run failure signature:** If every doc errors with `Docling models not found at ~/.cache/docling/models`, run `uvx --from docling docling-tools models download` once. The error is actionable but easy to miss in batch eval logs.
 
-    **OCR backend on macOS:** Docling auto-selects an OCR engine from what is installed. With only the `docling` extra it falls back to `rapidocr` on the torch CPU backend, which is slow. On macOS install the `ocr-mac` extra so Docling picks `ocrmac` (Apple Vision):
+    **OCR backend on macOS:** Docling auto-selects an OCR engine from what is installed. The `ocr-mac` extra installs `ocrmac` so Docling picks Apple Vision; without it, Docling falls back to `rapidocr` on the torch CPU backend, which is slower and uses Chinese-language model weights. `uv sync --all-extras` includes `ocr-mac`. The extra is gated on `sys_platform == 'darwin'`, so Linux/CI is unaffected via the marker.
 
-    - **Dev / eval (.venv):** the project's standard `uv sync --all-extras` already includes `ocr-mac`. No flag change needed; just resync after pulling this branch.
-    - **Targeted install:** `uv sync --extra docling --extra ocr-mac`.
-    - **OS-level tool:** `uv tool install --reinstall "drover[docling,ocr-mac] @ git+https://github.com/ckrough/drover"` (or with `--editable <path>` for a local checkout).
-
-    To verify the active OCR backend, the historical signal was a Docling INFO line (`Auto OCR model selected ocrmac.` vs `Auto OCR model selected rapidocr with torch`). That line is now suppressed by `logging.py`'s `quieted_loggers` (which floors `docling`/`docling_core`/`docling_ibm_models` at WARNING to keep `--log-level debug` readable). To surface it again, comment out the `docling` entries in `quieted_loggers` for the duration of the diagnostic run, or invoke Docling directly via `python -c "from docling.models.factories.ocr_factory import OcrFactory; ..."`. The `ocr-mac` extra is gated on `sys_platform == 'darwin'`, so Linux/CI installs are unaffected (CI's `uv sync --all-extras` skips it via the marker).
+    To verify the active backend, run classify with `--log-level debug` and look for Docling's `Auto OCR model selected ocrmac.` (or `... rapidocr ...` if the fallback is active). `logging.py`'s `quieted_loggers` floor is relative to the user-selected level — at DEBUG it allows INFO from `docling`/`docling_core`/`docling_ibm_models`, at VERBOSE/QUIET it floors them at WARNING.
 
 13. **Sandbox + Ollama:** The Bash sandbox blocks localhost (`127.0.0.1:11434`). Run any command that calls the Ollama provider with `dangerouslyDisableSandbox: true` (drover classify/evaluate, ollama list, etc.).
 

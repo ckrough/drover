@@ -1,14 +1,10 @@
 """Generate static PNG charts from eval/dashboard_data.json.
 
-Produces two artifacts in eval/charts/:
+Produces eval/charts/accuracy-over-time.png — a line chart of every
+metric for every run on the synthetic and real-world corpora, in
+chronological order.
 
-- ocr-mac-deltas.png — grouped bar chart contrasting the most recent
-  rapidocr-baseline run with the most recent ocrmac run on the synthetic
-  corpus, across the five accuracy metrics.
-- accuracy-over-time.png — line chart of every metric for every run on
-  the synthetic and real-world corpora, in chronological order.
-
-Idempotent: rerunning regenerates the PNGs from the current
+Idempotent: rerunning regenerates the PNG from the current
 dashboard_data.json. Charts are committed to the repo; the script only
 needs to run when new evaluation runs are added.
 
@@ -38,9 +34,6 @@ METRIC_KEYS = (
 )
 METRIC_LABELS = ("Domain", "Category", "Doctype", "Vendor", "Date")
 
-OCR_BASELINE_RUN_ID = "ocr-baseline-rapidocr-20260507-100620-gemma4_docling"
-OCR_MAC_RUN_ID = "ocr-mac-20260507-110208-gemma4_docling"
-
 
 def _load_runs() -> list[dict[str, Any]]:
     with DASHBOARD_DATA.open() as f:
@@ -48,72 +41,8 @@ def _load_runs() -> list[dict[str, Any]]:
     return data["runs"]
 
 
-def _find_run(runs: list[dict[str, Any]], run_id: str) -> dict[str, Any]:
-    for r in runs:
-        if r["run_id"] == run_id:
-            return r
-    raise KeyError(f"run not found: {run_id}")
-
-
 def _to_pct(values: list[float]) -> list[float]:
     return [v * 100 for v in values]
-
-
-def render_ocr_deltas(runs: list[dict[str, Any]], out_path: Path) -> None:
-    """Grouped bar chart: rapidocr baseline vs ocrmac across the five metrics."""
-    baseline = _find_run(runs, OCR_BASELINE_RUN_ID)
-    candidate = _find_run(runs, OCR_MAC_RUN_ID)
-
-    baseline_vals = _to_pct([baseline[k] for k in METRIC_KEYS])
-    candidate_vals = _to_pct([candidate[k] for k in METRIC_KEYS])
-
-    x = range(len(METRIC_LABELS))
-    width = 0.38
-
-    fig, ax = plt.subplots(figsize=(9, 5))
-    bars_a = ax.bar(
-        [i - width / 2 for i in x],
-        baseline_vals,
-        width,
-        label="Baseline: rapidocr + torch CPU",
-        color="#9aa0a6",
-    )
-    bars_b = ax.bar(
-        [i + width / 2 for i in x],
-        candidate_vals,
-        width,
-        label="ocr-mac: ocrmac (Apple Vision)",
-        color="#1a73e8",
-    )
-
-    ax.set_ylabel("Accuracy (%)")
-    ax.set_title(
-        "OCR backend impact on classification accuracy\n"
-        f"{baseline['model']} on {baseline['corpus']} corpus "
-        f"(n={baseline['corpus_size']})"
-    )
-    ax.set_xticks(list(x))
-    ax.set_xticklabels(METRIC_LABELS)
-    ax.set_ylim(0, 105)
-    ax.grid(axis="y", linestyle="--", alpha=0.4)
-    ax.legend(loc="lower right")
-
-    for bar_group in (bars_a, bars_b):
-        for bar in bar_group:
-            height = bar.get_height()
-            ax.annotate(
-                f"{height:.1f}",
-                xy=(bar.get_x() + bar.get_width() / 2, height),
-                xytext=(0, 3),
-                textcoords="offset points",
-                ha="center",
-                va="bottom",
-                fontsize=9,
-            )
-
-    fig.tight_layout()
-    fig.savefig(out_path, dpi=140)
-    plt.close(fig)
 
 
 def render_accuracy_over_time(runs: list[dict[str, Any]], out_path: Path) -> None:
@@ -181,9 +110,7 @@ def _short_label(run: dict[str, Any]) -> str:
 def main() -> None:
     CHARTS_DIR.mkdir(parents=True, exist_ok=True)
     runs = _load_runs()
-    render_ocr_deltas(runs, CHARTS_DIR / "ocr-mac-deltas.png")
     render_accuracy_over_time(runs, CHARTS_DIR / "accuracy-over-time.png")
-    print(f"Wrote {CHARTS_DIR / 'ocr-mac-deltas.png'}")
     print(f"Wrote {CHARTS_DIR / 'accuracy-over-time.png'}")
 
 
