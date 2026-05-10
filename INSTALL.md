@@ -40,8 +40,6 @@ uvx --from docling docling-tools models download
 
 This downloads to `~/.cache/docling/models/` (about 600 MB) and is shared across every Docling install on the machine, so it only needs to run once per user.
 
-Note: uv may emit a warning suggesting `uvx --from docling-slim docling-tools` instead. Ignore it. `docling-slim` ships the `docling-tools` entry point but excludes `torch`, which the model downloader imports transitively — using `--from docling-slim` fails with `ModuleNotFoundError: No module named 'torch'`.
-
 ## Set up Ollama (skip if using a hosted provider)
 
 Drover defaults to Ollama with `gemma4:latest`. To use that path, run Ollama and pull the model once:
@@ -53,19 +51,19 @@ ollama pull gemma4:latest
 
 ## Verify the OCR backend
 
-Run any PDF with verbose logging:
+Run any PDF with debug logging:
 
 ```bash
-drover classify --log-level verbose path/to/document.pdf
+drover classify --log-level debug path/to/document.pdf
 ```
 
-In the output, look for:
+Look for the Docling auto-selection line:
 
 ```
-Auto OCR model selected ocrmac with ...
+Auto OCR model selected ocrmac.
 ```
 
-If you see `rapidocr with torch` instead, the `ocr-mac` extra did not install. Reinstall:
+If you see `[RapidOCR] ... Using engine_name: torch` instead, the `ocr-mac` extra did not install. Reinstall:
 
 ```bash
 uv tool install --reinstall "drover[docling,ocr-mac] @ git+https://github.com/ckrough/drover"
@@ -115,4 +113,4 @@ uv tool install --reinstall --with onnxruntime \
 | `docling is not installed` error on every file | Installed without the `docling` extra | Reinstall with `[docling,ocr-mac]` |
 | Every file errors with `Docling models not found at ~/.cache/docling/models` | First-run model download was skipped | Run `uvx --from docling docling-tools models download` |
 | Classify hangs for ~30 s, then errors | Ollama not running or `gemma4:latest` not pulled | `ollama serve` and `ollama pull gemma4:latest`, or switch provider in `drover.yaml` |
-| Verbose log shows `rapidocr with torch` on macOS | `ocr-mac` extra missing | Reinstall with `[docling,ocr-mac]` |
+| Debug log shows `Auto OCR model selected rapidocr` on macOS | `ocr-mac` extra missing | Reinstall with `[docling,ocr-mac]` |

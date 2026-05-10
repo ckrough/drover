@@ -74,8 +74,16 @@ def configure_logging(
         # asyncio's "Using selector: KqueueSelector" startup line
         "asyncio",
     ]
+    # Floor noisy modules one notch quieter than the user-selected level so
+    # `--log-level debug` surfaces their INFO events (e.g. Docling's
+    # `Auto OCR model selected ...`) without the byte-level DEBUG chatter.
+    quieted_floor = {
+        logging.DEBUG: logging.INFO,
+        logging.INFO: logging.WARNING,
+        logging.WARNING: logging.WARNING,
+    }.get(log_level, logging.WARNING)
     for logger_name in quieted_loggers:
-        logging.getLogger(logger_name).setLevel(logging.WARNING)
+        logging.getLogger(logger_name).setLevel(quieted_floor)
 
     # Build processor chain
     processors: list[structlog.types.Processor] = [
