@@ -40,6 +40,8 @@ uvx --from docling docling-tools models download
 
 This downloads to `~/.cache/docling/models/` (about 600 MB) and is shared across every Docling install on the machine, so it only needs to run once per user.
 
+Note: uv may emit a warning suggesting `uvx --from docling-slim docling-tools` instead. Ignore it. `docling-slim` ships the `docling-tools` entry point but excludes `torch`, which the model downloader imports transitively — using `--from docling-slim` fails with `ModuleNotFoundError: No module named 'torch'`.
+
 ## Set up Ollama (skip if using a hosted provider)
 
 Drover defaults to Ollama with `gemma4:latest`. To use that path, run Ollama and pull the model once:
