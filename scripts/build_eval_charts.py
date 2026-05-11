@@ -1,11 +1,19 @@
 """Generate static PNG charts from eval/dashboard_data.json.
 
 Produces eval/charts/accuracy-over-time.png — a line chart of every
-metric for every run, in chronological order.
+metric for each run from the most-recent baseline forward, in
+chronological order. Runs are tagged as baseline by
+`build_eval_dashboard.py` when their directory name starts with
+`baseline-`; the chart filters to runs at-or-after the most recent
+baseline so the leftmost point is always the current reference run.
 
 The dashboard policy in `build_eval_dashboard.py` keeps only synthetic-
 corpus runs that have both a runtime_seconds and a corpus_size, so the
 chart inherits that filter automatically.
+
+X-axis labels are short commit hashes, matching the interactive
+dashboard's `fmtCommit`. Runs without a captured commit hash fall back
+to their run_id.
 
 Idempotent: rerunning regenerates the PNG from the current
 dashboard_data.json. Charts are committed to the repo; the script only
@@ -38,6 +46,8 @@ METRIC_KEYS = (
 )
 METRIC_LABELS = ("Domain", "Category", "Doctype", "Vendor", "Date")
 
+_RUN_TS_RE = re.compile(r"(\d{8}-\d{6})")
+
 
 def _load_runs() -> list[dict[str, Any]]:
     with DASHBOARD_DATA.open() as f:
@@ -50,12 +60,49 @@ def _to_pct(values: list[float]) -> list[float]:
     return [v * 100 for v in values]
 
 
+def _chrono_key(run: dict[str, Any]) -> tuple[str, str]:
+    """Chronological sort key: prefer YYYYMMDD-HHMMSS embedded in run_id.
+
+    Falls back to (date, run_id) so runs without a parseable timestamp still
+    sort deterministically.
+    """
+    rid = run.get("run_id", "")
+    match = _RUN_TS_RE.search(rid)
+    if match:
+        return (match.group(1), rid)
+    return (run.get("date", ""), rid)
+
+
+def _runs_from_baseline(runs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Return runs at-or-after the most recent baseline, oldest to newest.
+
+    Falls back to the full sorted list when no run is marked baseline, so
+    the script remains usable in repos that have not yet established one.
+    """
+    ordered = sorted(runs, key=_chrono_key)
+    baseline_idx = None
+    for idx, run in enumerate(ordered):
+        if run.get("baseline"):
+            baseline_idx = idx
+    if baseline_idx is None:
+        return ordered
+    return ordered[baseline_idx:]
+
+
+def _short_commit(run: dict[str, Any]) -> str:
+    """Short commit hash (7 char), matching the dashboard's fmtCommit."""
+    commit = run.get("commit_hash")
+    if isinstance(commit, str) and commit:
+        return commit[:7]
+    return str(run.get("run_id", ""))
+
+
 def render_accuracy_over_time(runs: list[dict[str, Any]], out_path: Path) -> None:
-    """Line chart: each metric across runs, oldest to newest."""
-    runs = sorted(runs, key=lambda r: (r["date"], r["run_id"]))
+    """Line chart: each metric across runs, oldest to newest, baseline first."""
+    runs = _runs_from_baseline(runs)
 
     fig, ax = plt.subplots(figsize=(11, 4.5))
-    labels = [_short_label(r) for r in runs]
+    labels = [_short_commit(r) for r in runs]
     x = range(len(runs))
 
     for metric_key, metric_label in zip(METRIC_KEYS, METRIC_LABELS, strict=True):
@@ -63,6 +110,7 @@ def render_accuracy_over_time(runs: list[dict[str, Any]], out_path: Path) -> Non
         ax.plot(x, values, marker="o", linewidth=1.6, label=metric_label)
 
     ax.set_ylabel("Accuracy (%)")
+    ax.set_xlabel("Commit")
     ax.set_ylim(0, 105)
     ax.set_xticks(list(x))
     ax.set_xticklabels(labels, rotation=30, ha="right", fontsize=8)
@@ -70,30 +118,12 @@ def render_accuracy_over_time(runs: list[dict[str, Any]], out_path: Path) -> Non
     ax.legend(loc="lower right", fontsize=8, ncol=5)
 
     fig.suptitle(
-        "Classification accuracy over time, by metric (synthetic corpus)",
+        "Classification accuracy from baseline forward, by metric (synthetic corpus)",
         fontsize=12,
     )
     fig.tight_layout(rect=(0, 0, 1, 0.97))
     fig.savefig(out_path, dpi=140)
     plt.close(fig)
-
-
-_RUN_TS_RE = re.compile(
-    r"(?P<y>\d{4})-?(?P<m>\d{2})-?(?P<d>\d{2})[-T](?P<H>\d{2})(?P<M>\d{2})"
-)
-
-
-def _short_label(run: dict[str, Any]) -> str:
-    """Compact x-axis label: date + HH:MM (when run_id encodes a timestamp).
-
-    Including the time keeps labels unique for runs that share a date, which
-    matches the interactive dashboard's behavior.
-    """
-    date = run["date"]
-    rid = run.get("run_id", "")
-    match = _RUN_TS_RE.search(rid)
-    time_suffix = f" {match.group('H')}:{match.group('M')}" if match else ""
-    return f"{date}{time_suffix}"
 
 
 def main() -> None:

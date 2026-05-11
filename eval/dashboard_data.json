@@ -1,25 +1,26 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-05-10T13:28:04-04:00",
+  "generated_at": "2026-05-10T21:55:56-04:00",
   "runs": [
     {
-      "run_id": "personal-removal-20260510-093641-results",
+      "run_id": "baseline-20260510-212126-eval",
       "date": "2026-05-10",
       "corpus": "synthetic",
       "corpus_size": 80,
       "model": "gemma4:latest",
       "provider": "ollama",
       "loader": "docling",
-      "domain_accuracy": 0.875,
+      "domain_accuracy": 0.8625,
       "category_accuracy": 0.6125,
-      "doctype_accuracy": 0.9375,
-      "vendor_accuracy": 0.9,
+      "doctype_accuracy": 0.9125,
+      "vendor_accuracy": 0.9125,
       "date_accuracy": 0.9,
       "errors": 0,
-      "source": "eval/runs/personal-removal-20260510-093641/results.json",
-      "notes": "prof-un5 + prof-b7h: lifestyle/entertainment + remove personal domain",
-      "runtime_seconds": 1139,
-      "commit_hash": "d96dd78-dirty"
+      "source": "eval/runs/baseline-20260510-212126/eval.json",
+      "notes": "",
+      "baseline": true,
+      "commit_hash": "f804c3c",
+      "runtime_seconds": 1432
     },
     {
       "run_id": "entity-field-rebased-20260510-165705-results",
@@ -39,6 +40,25 @@
       "notes": "",
       "commit_hash": "b7512b4",
       "runtime_seconds": 1339
+    },
+    {
+      "run_id": "personal-removal-20260510-093641-results",
+      "date": "2026-05-10",
+      "corpus": "synthetic",
+      "corpus_size": 80,
+      "model": "gemma4:latest",
+      "provider": "ollama",
+      "loader": "docling",
+      "domain_accuracy": 0.875,
+      "category_accuracy": 0.6125,
+      "doctype_accuracy": 0.9375,
+      "vendor_accuracy": 0.9,
+      "date_accuracy": 0.9,
+      "errors": 0,
+      "source": "eval/runs/personal-removal-20260510-093641/results.json",
+      "notes": "prof-un5 + prof-b7h: lifestyle/entertainment + remove personal domain",
+      "runtime_seconds": 1139,
+      "commit_hash": "d96dd78-dirty"
     },
     {
       "run_id": "ocr-mac-20260507-110208-gemma4_docling",

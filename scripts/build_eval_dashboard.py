@@ -20,6 +20,12 @@ JSON when present; otherwise backfilled best-effort from the parent of
 the commit that first added a tracked artifact in the run directory
 (`~` suffix marks the value as derived rather than captured at run time).
 
+Runs whose directory name starts with `baseline-` are tagged with
+`baseline: true`. `scripts/build_eval_charts.py` reads this flag and
+clips the static accuracy-over-time chart to runs at-or-after the most
+recent baseline so the chart's leftmost point is always the current
+reference run.
+
 Dashboard inclusion policy (enforced at write time):
 - Only synthetic-corpus runs are kept; real-world runs are dropped.
 - Only runs with both `runtime_seconds` and `corpus_size` are kept, so
@@ -73,7 +79,8 @@ _DATE_PATTERNS = (
     re.compile(r"(\d{4})(\d{2})(\d{2})"),
 )
 
-_STDERR_TS_RE = re.compile(r"(\d{4}-\d{2}-\d{2}) (\d{2}):(\d{2}):(\d{2})")
+_STDERR_TS_RE = re.compile(r"(\d{4}-\d{2}-\d{2})[ T](\d{2}):(\d{2}):(\d{2})")
+_RUN_ID_TS_RE = re.compile(r"(\d{8}-\d{6})")
 
 
 def _extract_aggregate(raw: dict[str, Any]) -> dict[str, Any]:
@@ -117,9 +124,11 @@ def _loader_from_comparisons(json_path: Path) -> str | None:
     comparisons = raw.get("comparisons")
     if not isinstance(comparisons, list) or not comparisons:
         return None
-    backend = comparisons[0].get("loader_backend") if isinstance(
-        comparisons[0], dict
-    ) else None
+    backend = (
+        comparisons[0].get("loader_backend")
+        if isinstance(comparisons[0], dict)
+        else None
+    )
     return backend if isinstance(backend, str) and backend else None
 
 
@@ -405,6 +414,8 @@ def scan_runs_dir(
         }
         if loader_variant:
             run["loader_variant"] = loader_variant
+        if dir_label.startswith("baseline-"):
+            run["baseline"] = True
 
         commit = _commit_hash(agg)
         if commit:
@@ -421,7 +432,19 @@ def scan_runs_dir(
 
 
 def _sort_key(run: dict[str, Any]) -> tuple[str, str]:
-    return (run.get("date", "0000-00-00"), run.get("run_id", ""))
+    """Sort runs chronologically.
+
+    Prefer the YYYYMMDD-HHMMSS timestamp embedded in `run_id` (which the
+    eval workflow encodes via `date +%Y%m%d-%H%M%S`) over the bare date,
+    so multiple runs on the same day order by actual run time rather
+    than alphabetic run_id prefix.
+    """
+    rid = run.get("run_id", "")
+    match = _RUN_ID_TS_RE.search(rid)
+    if match:
+        return (match.group(1), rid)
+    date = run.get("date", "0000-00-00")
+    return (date.replace("-", "") + "-000000", rid)
 
 
 def _qualifies_for_dashboard(run: dict[str, Any]) -> bool:
@@ -513,9 +536,7 @@ def main() -> None:
                 run["commit_hash"] = derived
                 backfilled_commit += 1
     if backfilled_runtime:
-        print(
-            f"  Backfilled runtime_seconds for {backfilled_runtime} existing run(s)."
-        )
+        print(f"  Backfilled runtime_seconds for {backfilled_runtime} existing run(s).")
     if backfilled_loader:
         print(f"  Backfilled loader for {backfilled_loader} existing run(s).")
     if backfilled_commit:
