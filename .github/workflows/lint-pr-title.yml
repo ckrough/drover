@@ -1,0 +1,37 @@
+name: Lint PR title
+
+# Validates PR titles against Conventional Commits. With squash-only merging,
+# the PR title becomes the commit on main, so python-semantic-release reads
+# its bump signal from the title.
+#
+# Reads the title from $GITHUB_EVENT_PATH via jq rather than ${{ github.event
+# ... }} so the value never flows through template substitution.
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions: {}
+
+jobs:
+  lint-title:
+    name: Conventional Commits title
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Check title
+        run: |
+          title=$(jq -r '.pull_request.title' "$GITHUB_EVENT_PATH")
+          # Conventional Commits 1.0.0:
+          #   <type>(<scope>)?(!)?: <subject>
+          pattern='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: .+'
+          if printf '%s' "$title" | grep -Eq "$pattern"; then
+            echo "OK: $title"
+            exit 0
+          fi
+          echo "::error::PR title does not match Conventional Commits."
+          echo "Got:      $title"
+          echo "Expected: <type>(<scope>)?(!)?: <subject>"
+          echo "Types:    feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert"
+          exit 1
