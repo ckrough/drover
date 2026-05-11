@@ -31,12 +31,20 @@ uv run python scripts/generate_eval_samples.py --count 30 --concurrency 5
 
 ### `build_eval_dashboard.py`
 
-Regenerator for `eval/dashboard_data.json` and the inline data block in `eval/dashboard.html`. Idempotent: existing entries are preserved, new runs in `eval/runs/` are appended, runs are sorted chronologically. Strips per-document records before writing so the committed summary is PII-safe.
+Regenerator for `eval/dashboard_data.json` and the inline data block in `eval/dashboard.html`. Idempotent: existing entries are preserved, new runs in `eval/runs/` are appended, runs are sorted chronologically. Strips per-document records before writing so the committed summary is PII-safe. Runs whose directory name starts with `baseline-` are tagged with `baseline: true` so the static chart can clip to runs at-or-after the most recent baseline.
 
 Per `CLAUDE.md` note 14, both `dashboard.html` and `dashboard_data.json` are regenerator-managed. Run this script after adding any run to `eval/runs/`. Never edit either file by hand.
 
 ```bash
 uv run python scripts/build_eval_dashboard.py
+```
+
+### `build_eval_charts.py`
+
+Regenerator for `eval/charts/accuracy-over-time.png`. Reads `eval/dashboard_data.json`, clips to runs at-or-after the most recent run tagged `baseline: true`, and renders one line per accuracy metric. X-axis labels are short commit hashes (matching the interactive dashboard's `fmtCommit`). Run after `build_eval_dashboard.py` updates the JSON.
+
+```bash
+uv run python scripts/build_eval_charts.py
 ```
 
 ## Taxonomy analysis
