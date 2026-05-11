@@ -535,6 +535,27 @@ Design decisions are documented in `docs/adr/`:
 - [ADR-004](docs/adr/004-local-llm-as-primary-local-path.md): Local LLM (Ollama gemma4) as the primary local classification path
 - [ADR-005](docs/adr/005-docling-evaluation.md): Docling with full-page OCR as the default PDF loader
 
+## Releases
+
+Drover uses [python-semantic-release](https://python-semantic-release.readthedocs.io) to automate version bumps, changelog updates, and Git tags. Releases run on every push to `main` via `.github/workflows/release.yml`.
+
+The release version is derived from [Conventional Commit](https://www.conventionalcommits.org/) messages since the previous tag:
+
+| Commit prefix | Effect |
+|---------------|--------|
+| `fix:` | Patch bump (0.1.0 → 0.1.1) |
+| `feat:` | Minor bump (0.1.0 → 0.2.0) |
+| `feat!:` or any commit with a `BREAKING CHANGE:` footer | Major bump (0.1.0 → 1.0.0) |
+| `task:`, `chore:`, `docs:` | No release |
+
+`pyproject.toml [project] version` is the single source of truth. `src/drover/__init__.py` derives `__version__` from package metadata at import time, so semantic-release only patches one file.
+
+To preview what semantic-release would do without publishing:
+
+```bash
+uv run --with python-semantic-release semantic-release --noop version
+```
+
 ## License of Contributions
 
 This project is licensed under GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later). By submitting a contribution, you agree that your contribution is licensed under the same terms.

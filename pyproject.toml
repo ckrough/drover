@@ -129,3 +129,15 @@ ignore_missing_imports = true
 [tool.bandit]
 exclude_dirs = ["tests", ".venv"]
 skips = ["B101"]                  # Skip assert warnings (used in tests)
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+tag_format = "v{version}"
+commit_message = "chore(release): {version}"
+branch = "main"
+
+[tool.semantic_release.changelog.default_templates]
+changelog_file = "CHANGELOG.md"
+
+[tool.semantic_release.remote]
+type = "github"
