@@ -71,11 +71,3 @@ drover organize ~/Inbox/scan.pdf --dest ~/Documents/filed --tag-fields category,
 ```
 
 See the top-level `README.md` and `CLAUDE.md` for the full flag matrix.
-
-### `check_version_consistency.py`
-
-Validates that the version in `src/drover/__init__.py` matches the version in `pyproject.toml`. Exits non-zero on mismatch. Wired into the version-consistency pre-commit guard.
-
-```bash
-uv run python scripts/check_version_consistency.py
-```
