@@ -1,0 +1,13 @@
+# Commit-message linting via commitizen. Run `pre-commit install --hook-type
+# commit-msg` once locally to enable the commit-msg hook. The CI-side
+# counterpart is .github/workflows/lint-pr-title.yml, which validates the
+# squash-merge PR title.
+#
+# To bump versions: pre-commit autoupdate
+
+repos:
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.15.1
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]

@@ -135,6 +135,9 @@ version_toml = ["pyproject.toml:project.version"]
 tag_format = "v{version}"
 commit_message = "chore(release): {version}"
 branch = "main"
+# Strict semver: breaking changes bump major even pre-1.0.
+major_on_zero = true
+allow_zero_version = true
 
 [tool.semantic_release.changelog.default_templates]
 changelog_file = "CHANGELOG.md"
