@@ -138,6 +138,7 @@ branch = "main"
 # Strict semver: breaking changes bump major even pre-1.0.
 major_on_zero = true
 allow_zero_version = true
+build_command = "uv build"
 
 [tool.semantic_release.changelog.default_templates]
 changelog_file = "CHANGELOG.md"
