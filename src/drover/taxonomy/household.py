@@ -35,6 +35,7 @@ class HouseholdTaxonomy(BaseTaxonomy):
         "lifestyle",
         "medical",
         "pets",
+        "political",
         "property",
         "reference",
         "utilities",
@@ -162,6 +163,12 @@ class HouseholdTaxonomy(BaseTaxonomy):
             "expense",
             "medical",
             "registration",
+        },
+        "political": {
+            "advocacy",
+            "campaign",
+            "donation",
+            "voter",
         },
         "reference": {
             "documentation",
@@ -321,6 +328,9 @@ class HouseholdTaxonomy(BaseTaxonomy):
         "non_profit": "lifestyle",
         "nonprofit": "lifestyle",
         "personal": "lifestyle",
+        "election": "political",
+        "elections": "political",
+        "politics": "political",
     }
 
     CATEGORY_ALIASES: ClassVar[dict[tuple[str, str], str]] = {
