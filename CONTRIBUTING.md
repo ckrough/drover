@@ -6,7 +6,7 @@ This guide covers development setup, architecture, and how to extend Drover.
 
 ### Prerequisites
 
-- Python 3.13.x
+- Python 3.14.x
 - [uv](https://docs.astral.sh/uv/) (package and environment manager)
 
 ### Environment Setup

@@ -1,10 +1,12 @@
 """Pydantic models for document classification."""
 
 from enum import StrEnum
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, Field
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class ErrorCode(StrEnum):
@@ -65,7 +67,7 @@ class ClassificationErrorResult(BaseModel):
     @classmethod
     def from_exception(
         cls, filename: str | Path, code: ErrorCode, exception: Exception
-    ) -> "ClassificationErrorResult":
+    ) -> ClassificationErrorResult:
         """Create error result from an exception."""
         return cls(
             original=str(filename),

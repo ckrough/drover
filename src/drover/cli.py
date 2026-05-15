@@ -57,7 +57,7 @@ def _git_head_marker() -> str:
             text=True,
             stderr=subprocess.DEVNULL,
         ).strip()
-    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
+    except subprocess.CalledProcessError, FileNotFoundError, OSError:
         return ""
     try:
         dirty = (
@@ -68,7 +68,7 @@ def _git_head_marker() -> str:
             ).returncode
             != 0
         )
-    except (FileNotFoundError, OSError):
+    except FileNotFoundError, OSError:
         dirty = False
     return f"{head}-dirty" if dirty else head
 

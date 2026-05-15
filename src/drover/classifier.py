@@ -12,19 +12,22 @@ import json
 import os
 import re
 import socket
-from collections.abc import Callable
 from importlib.resources import files
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from importlib.resources.abc import Traversable
+    from pathlib import Path
+
+    from langchain_core.language_models import BaseChatModel
+    from langchain_core.runnables import Runnable
+
+    from drover.taxonomy.base import BaseTaxonomy
 
 import yaml
 from json_repair import repair_json
-from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
-from langchain_core.runnables import Runnable
 from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
 from pydantic import ValidationError
@@ -39,7 +42,6 @@ from drover.config import AIProvider, TaxonomyMode
 from drover.logging import get_logger
 from drover.metrics import create_metrics_callback
 from drover.models import RawClassification
-from drover.taxonomy.base import BaseTaxonomy
 
 logger = get_logger(__name__)
 

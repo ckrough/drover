@@ -7,15 +7,18 @@ Run with: pytest tests/integration/ -m integration
 """
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
-from drover.classifier import DocumentClassifier
-from drover.loader import DoclingLoader
 from drover.models import RawClassification
 from drover.naming.nara import NARAPolicyNaming
 from drover.path_builder import PathBuilder
 from drover.taxonomy.household import HouseholdTaxonomy
+
+if TYPE_CHECKING:
+    from drover.classifier import DocumentClassifier
+    from drover.loader import DoclingLoader
 
 
 @pytest.mark.integration
