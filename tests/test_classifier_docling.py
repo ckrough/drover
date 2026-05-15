@@ -4,12 +4,15 @@ Verifies that classify() uses the content argument as prompt input and
 that the max_prompt_chars cap is applied correctly.
 """
 
-import pytest
+from typing import TYPE_CHECKING
 
 from drover.classifier import DocumentClassifier
 from drover.config import AIProvider, TaxonomyMode
 from drover.models import RawClassification
 from drover.taxonomy.household import HouseholdTaxonomy
+
+if TYPE_CHECKING:
+    import pytest
 
 
 class _StubStructuredLLM:

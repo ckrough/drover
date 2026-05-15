@@ -10,17 +10,20 @@ Example usage:
 """
 
 import json
-from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, Field
 
-from drover.classifier import DocumentClassifier
-from drover.loader import DoclingLoader
 from drover.logging import get_logger
-from drover.models import RawClassification
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from drover.classifier import DocumentClassifier
+    from drover.loader import DoclingLoader
+    from drover.models import RawClassification
 
 logger = get_logger(__name__)
 

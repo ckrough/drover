@@ -86,7 +86,7 @@ Exit code: 0 if every non-skipped test passed; 1 if any failed.
   "duration_ms": 134812,
   "environment": {
     "drover_version": "0.1.0",
-    "python_version": "3.13.x",
+    "python_version": "3.14.x",
     "platform": "darwin",
     "ollama_available": true,
     "ollama_endpoint": "http://127.0.0.1:11434",

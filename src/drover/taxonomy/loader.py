@@ -1,7 +1,11 @@
 """Taxonomy plugin discovery and loading."""
 
-from drover.taxonomy.base import BaseTaxonomy
+from typing import TYPE_CHECKING
+
 from drover.taxonomy.household import HouseholdTaxonomy
+
+if TYPE_CHECKING:
+    from drover.taxonomy.base import BaseTaxonomy
 
 _BUILTIN_TAXONOMIES: dict[str, type[BaseTaxonomy]] = {
     "household": HouseholdTaxonomy,

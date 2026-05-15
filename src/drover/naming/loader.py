@@ -1,7 +1,11 @@
 """Naming policy plugin discovery and loading."""
 
-from drover.naming.base import BaseNamingPolicy
+from typing import TYPE_CHECKING
+
 from drover.naming.nara import NARAPolicyNaming
+
+if TYPE_CHECKING:
+    from drover.naming.base import BaseNamingPolicy
 
 _BUILTIN_POLICIES: dict[str, type[BaseNamingPolicy]] = {
     "nara": NARAPolicyNaming,

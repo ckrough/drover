@@ -1,10 +1,12 @@
 """Base abstractions for file actions based on classification results."""
 
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
-from drover.models import ClassificationResult
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from drover.models import ClassificationResult
 
 
 @dataclass

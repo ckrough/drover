@@ -17,7 +17,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed architecture, code style, an
 - Use `uv add <package>` (or `uv add --optional dev <package>`) to introduce new dependencies — this updates `pyproject.toml` and `uv.lock` together
 
 ### Python Version
-- Use Python 3.13.x (pinned in `pyproject.toml`)
+- Use Python 3.14.x (pinned in `pyproject.toml`)
 - Check version: `uv run python --version`
 
 ### Before Running Any Python Code

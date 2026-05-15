@@ -6,13 +6,16 @@ is written correctly and that the flag is respected.
 """
 
 import json
-from pathlib import Path
 from types import SimpleNamespace
+from typing import TYPE_CHECKING
 from unittest.mock import patch
 
-import pytest
-
 from drover.loader import DoclingLoader, LoadedDocument
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import pytest
 
 
 def _patch_classifier(service: object, monkeypatch: pytest.MonkeyPatch) -> None:

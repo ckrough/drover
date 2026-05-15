@@ -35,7 +35,7 @@ Drover uses LLMs to analyze documents and suggest consistent, policy-compliant f
 
 ### Prerequisites
 
-- Python 3.13.x
+- Python 3.14.x
 - [uv](https://docs.astral.sh/uv/) (package and environment manager)
 - [Ollama](https://ollama.ai/) (for local inference) or API keys for cloud providers
 

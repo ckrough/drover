@@ -5,11 +5,13 @@ token counts, latency, and cost estimation.
 """
 
 import time
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from langchain_core.callbacks import BaseCallbackHandler
-from langchain_core.outputs import LLMResult
 from pydantic import BaseModel, Field
+
+if TYPE_CHECKING:
+    from langchain_core.outputs import LLMResult
 
 MODEL_PRICING: dict[str, tuple[float, float]] = {
     "gpt-4o": (2.50, 10.00),

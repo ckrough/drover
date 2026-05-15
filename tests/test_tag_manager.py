@@ -1,7 +1,7 @@
 """Tests for TagManager and tag operations."""
 
 import sys
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -13,6 +13,9 @@ from drover.actions.tag import (
     tags_from_result,
 )
 from drover.models import ClassificationResult
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # Skip all tests in this module on non-macOS platforms
 pytestmark = pytest.mark.skipif(

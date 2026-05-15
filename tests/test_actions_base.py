@@ -1,13 +1,15 @@
 """Tests for the action infrastructure."""
 
 from pathlib import Path
-
-import pytest
+from typing import TYPE_CHECKING
 
 from drover.actions.base import ActionPlan, ActionResult
 from drover.actions.runner import ActionRunner
 from drover.config import DroverConfig, ErrorMode
 from drover.models import ClassificationResult
+
+if TYPE_CHECKING:
+    import pytest
 
 
 class MockAction:
