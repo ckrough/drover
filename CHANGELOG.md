@@ -2,6 +2,20 @@
 
 <!-- version list -->
 
+## v0.2.1 (2026-05-29)
+
+### Bug Fixes
+
+- Reject partial-zero classification dates (prof-5qy)
+  ([#42](https://github.com/ckrough/drover/pull/42),
+  [`bce6498`](https://github.com/ckrough/drover/commit/bce6498344186b90344a28ce9476dcd1dc9535a1))
+
+### Chores
+
+- Upgrade Python to 3.14 (prof-1fa) ([#41](https://github.com/ckrough/drover/pull/41),
+  [`10c8150`](https://github.com/ckrough/drover/commit/10c8150850fecb0e3b8e9408780193f465f7b5b6))
+
+
 ## v0.2.0 (2026-05-11)
 
 ### Bug Fixes
