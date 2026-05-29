@@ -2,6 +2,15 @@
 
 <!-- version list -->
 
+## v0.2.2 (2026-05-29)
+
+### Bug Fixes
+
+- Derive eval subjects from document content (prof-cgu)
+  ([#43](https://github.com/ckrough/drover/pull/43),
+  [`d1cb867`](https://github.com/ckrough/drover/commit/d1cb867d6d9583643e0b23d7e55cbc51d085e0b4))
+
+
 ## v0.2.1 (2026-05-29)
 
 ### Bug Fixes
