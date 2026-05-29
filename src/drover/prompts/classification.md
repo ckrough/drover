@@ -46,6 +46,8 @@ Select the highest priority date found in the document:
 
 **If no date exists:** Use "00000000"
 
+**Never zero-fill a single component:** If the year, month, or day is unknown, use "00000000" for the entire date. Do not emit a partial-zero date such as "20240900" (unknown day) or "20240015" (unknown month) - these are invalid.
+
 ### Rule 2: Vendor Identification
 
 - Use the **full organization name** (e.g., "Northern Virginia Medical Center" not "NVMC")
@@ -159,7 +161,7 @@ If entity would equal the vendor, return "".
 Work through these steps internally before producing the structured output. Do NOT emit this analysis as text; the response is schema-constrained and must contain only the seven fields.
 
 1. **Extract evidence (cap your scan):** Note up to 5 organizations and up to 5 dates with their context. Prioritize letterhead, signature blocks, and the first and last pages over middle-of-document mentions. Note the document's structural form and the specific goods, services, or activities it covers.
-2. **Pick the date** by priority (transaction/service > statement/issue > due) and convert to YYYYMMDD. Use "00000000" if no date is available.
+2. **Pick the date** by priority (transaction/service > statement/issue > due) and convert to YYYYMMDD. Use "00000000" if no date is available or if any single component (year, month, or day) is unknown - never zero-fill one component.
 3. **Pick the vendor** as the full issuing organization name, or "unknown".
 4. **Draft the subject** as 2-4 lowercase words describing content (not document form).
 5. **Pick the domain** by fundamental purpose. If "financial" is a candidate, explicitly check whether the financial aspect is merely transactional over a functional domain (medical, pets, property, vehicles, insurance, etc.).

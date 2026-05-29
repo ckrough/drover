@@ -3,7 +3,9 @@
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+from drover.dates import normalize_classification_date
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -52,6 +54,18 @@ class ClassificationResult(BaseModel):
         default=None, description="AI metrics for this classification, if collected"
     )
 
+    @field_validator("date", mode="before")
+    @classmethod
+    def _normalize_date(cls, value: Any) -> str:
+        """Normalize the date at the model boundary, never raise.
+
+        Routes through :func:`drover.dates.normalize_classification_date`
+        so every downstream consumer (filename, tag actions, JSON export,
+        eval comparison) sees a real YYYYMMDD or the no-date sentinel,
+        never a partial-zero or non-ASCII-digit string.
+        """
+        return normalize_classification_date(value if isinstance(value, str) else None)
+
 
 class ClassificationErrorResult(BaseModel):
     """Error result when classification fails."""
@@ -92,6 +106,20 @@ class RawClassification(BaseModel):
             " account-holder, brand). Empty string when no clear entity exists."
         ),
     )
+
+    @field_validator("date", mode="before")
+    @classmethod
+    def _normalize_date(cls, value: Any) -> str:
+        """Normalize the LLM-supplied date at the model boundary, never raise.
+
+        Routes through :func:`drover.dates.normalize_classification_date`
+        so a hallucinated partial-zero or non-ASCII-digit date is coerced
+        to the no-date sentinel before any downstream consumer (naming
+        policy, tag action, eval comparison, JSON export) reads it. The
+        validator never raises, which keeps it compatible with LangChain's
+        ``with_structured_output`` retry loop.
+        """
+        return normalize_classification_date(value if isinstance(value, str) else None)
 
 
 class PathConstraints(BaseModel):

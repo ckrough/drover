@@ -2,6 +2,7 @@
 
 import pytest
 
+from drover.dates import NO_DATE_SENTINEL
 from drover.naming import (
     NARAPolicyNaming,
     get_naming_loader,
@@ -85,6 +86,32 @@ class TestNARAPolicyNaming:
             extension=".pdf",
         )
         assert "20240115" in filename
+
+    @pytest.mark.parametrize("bad_date", ["20240900", "20240015", "00000901"])
+    def test_format_filename_partial_zero_date_becomes_sentinel(
+        self, policy: NARAPolicyNaming, bad_date: str
+    ) -> None:
+        """Partial-zero dates normalize to the no-date sentinel, not the filename."""
+        filename = policy.format_filename(
+            doctype="statement",
+            vendor="test",
+            subject="test",
+            date=bad_date,
+            extension=".pdf",
+        )
+        assert bad_date not in filename
+        assert NO_DATE_SENTINEL in filename
+
+    def test_normalize_date_delegates_to_shared_normalizer(
+        self, policy: NARAPolicyNaming
+    ) -> None:
+        """_normalize_date routes invalid dates to the sentinel and preserves real dates."""
+        assert policy._normalize_date("20240900") == NO_DATE_SENTINEL
+        assert policy._normalize_date("20240230") == NO_DATE_SENTINEL
+        assert policy._normalize_date(None) == NO_DATE_SENTINEL
+        assert policy._normalize_date("20240115") == "20240115"
+        assert policy._normalize_date("240115") == "20240115"
+        assert policy._normalize_date(NO_DATE_SENTINEL) == NO_DATE_SENTINEL
 
     def test_format_filename_missing_extension_dot(
         self, policy: NARAPolicyNaming

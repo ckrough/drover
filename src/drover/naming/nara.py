@@ -11,6 +11,7 @@ conventions for electronic records. Emphasizes:
 
 from typing import ClassVar
 
+from drover.dates import normalize_classification_date
 from drover.naming.base import BaseNamingPolicy, NamingConstraints
 
 
@@ -120,26 +121,18 @@ class NARAPolicyNaming(BaseNamingPolicy):
 
         return filename
 
-    def _normalize_date(self, date: str) -> str:
-        """Normalize date to YYYYMMDD format.
+    def _normalize_date(self, date: str | None) -> str:
+        """Normalize a date string to YYYYMMDD format.
 
-        Accepts various formats and normalizes to 8-digit date.
+        Delegates to :func:`drover.dates.normalize_classification_date`,
+        which strips non-ASCII-digit characters, expands 6-digit
+        ``YYMMDD`` inputs, and returns the ``"00000000"`` sentinel for
+        any partial-zero, impossible, or otherwise invalid date.
 
         Args:
-            date: Date string in various formats.
+            date: Date string in various formats, or ``None``.
 
         Returns:
-            Date in YYYYMMDD format, or "00000000" if unparseable.
+            A real YYYYMMDD date, or ``"00000000"`` if unparseable or invalid.
         """
-        digits = "".join(c for c in date if c.isdigit())
-
-        if len(digits) == 8:
-            return digits
-
-        if len(digits) == 6:
-            return f"20{digits}"
-
-        if len(digits) >= 8:
-            return digits[:8]
-
-        return "00000000"
+        return normalize_classification_date(date)
