@@ -1,11 +1,18 @@
 """Tests for Pydantic models."""
 
+import pytest
+
+from drover.dates import NO_DATE_SENTINEL
 from drover.models import (
     ClassificationErrorResult,
     ClassificationResult,
     ErrorCode,
     RawClassification,
 )
+
+# Confusable-digit string encoding "20240115" with fullwidth code points,
+# used to verify the model-boundary normalizer rejects non-ASCII digits.
+_FULLWIDTH_DIGITS_DATE = "２０２４0115"  # noqa: RUF001
 
 
 def test_classification_result_success():
@@ -95,3 +102,47 @@ def test_classification_result_entity_defaults_to_empty():
         subject="checking",
     )
     assert result.entity == ""
+
+
+@pytest.mark.parametrize(
+    ("raw_date", "expected"),
+    [
+        ("20240115", "20240115"),  # real date preserved
+        (NO_DATE_SENTINEL, NO_DATE_SENTINEL),  # sentinel preserved
+        ("20240900", NO_DATE_SENTINEL),  # day 00 normalized
+        ("20240015", NO_DATE_SENTINEL),  # month 00 normalized
+        ("00000901", NO_DATE_SENTINEL),  # year 0000 normalized
+        ("20240230", NO_DATE_SENTINEL),  # impossible day normalized
+        (_FULLWIDTH_DIGITS_DATE, NO_DATE_SENTINEL),  # confusable digits normalized
+        ("240115", "20240115"),  # 6-digit YYMMDD expanded
+    ],
+)
+def test_raw_classification_normalizes_date_at_boundary(
+    raw_date: str, expected: str
+) -> None:
+    """The LLM-supplied date is normalized before any downstream consumer reads it."""
+    raw = RawClassification(
+        domain="financial",
+        category="banking",
+        doctype="statement",
+        vendor="chase",
+        date=raw_date,
+        subject="checking",
+    )
+    assert raw.date == expected
+
+
+def test_classification_result_normalizes_date_at_boundary() -> None:
+    """ClassificationResult also normalizes its date for safe downstream reuse."""
+    result = ClassificationResult(
+        original="doc.pdf",
+        suggested_path="financial/banking/statement/doc.pdf",
+        suggested_filename="doc.pdf",
+        domain="financial",
+        category="banking",
+        doctype="statement",
+        vendor="chase",
+        date="20240900",  # day 00 from the LLM
+        subject="checking",
+    )
+    assert result.date == NO_DATE_SENTINEL

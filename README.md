@@ -26,7 +26,7 @@ Drover uses LLMs to analyze documents and suggest consistent, policy-compliant f
 - **Intelligent Classification** — Categorizes documents by domain, category, and document type
 - **Smart Sampling** — Adaptive page sampling for efficient processing of large documents
 - **Taxonomy System** — Extensible controlled vocabularies with strict or fallback modes
-- **NARA-Compliant Naming** — Generates standardized filenames: `{doctype}-{vendor}-{subject}-{entity}-{date}.pdf`. The `entity` slot (pet, patient, performer, brand) is optional and is dropped when empty, when it would duplicate the vendor, or for privacy-sensitive domains.
+- **NARA-Compliant Naming** — Generates standardized filenames: `{doctype}-{vendor}-{subject}-{entity}-{date}.pdf`. The `entity` slot (pet, patient, performer, brand) is optional and is dropped when empty, when it would duplicate the vendor, or for privacy-sensitive domains. The `date` slot is a real YYYYMMDD calendar date or the `00000000` no-date sentinel; partial-zero or impossible dates from the model collapse to the sentinel rather than entering the filename.
 - **macOS Tagging** — Apply classification as native filesystem tags
 - **Batch Processing** — Classify multiple documents with JSONL output
 - **Evaluation Framework** — Measure accuracy against ground truth datasets

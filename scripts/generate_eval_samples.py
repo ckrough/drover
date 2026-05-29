@@ -31,6 +31,7 @@ from pydantic import BaseModel, ValidationError, field_validator
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from drover.config import LogLevel
+from drover.dates import is_valid_classification_date
 from drover.logging import configure_logging, get_logger
 from drover.taxonomy.loader import get_taxonomy
 
@@ -220,12 +221,11 @@ class GroundTruthRow(BaseModel):
     @field_validator("date")
     @classmethod
     def _validate_date(cls, v: str) -> str:
-        if v == "00000000":
-            return v
-        if not re.fullmatch(r"\d{8}", v):
-            raise ValueError(f"date must be YYYYMMDD or '00000000', got {v!r}")
-        if "0000" in (v[:4], v[4:6], v[6:8]):
-            raise ValueError(f"partial-zero dates are forbidden, got {v!r}")
+        if not is_valid_classification_date(v):
+            raise ValueError(
+                "date must be the '00000000' sentinel or a real YYYYMMDD "
+                f"date, got {v!r}"
+            )
         return v
 
 

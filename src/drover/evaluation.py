@@ -14,8 +14,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
+from drover.dates import is_valid_classification_date
 from drover.logging import get_logger
 
 if TYPE_CHECKING:
@@ -40,6 +41,28 @@ class GroundTruthEntry(BaseModel):
     subject: str | None = Field(default=None, description="Expected subject (optional)")
     entity: str | None = Field(default=None, description="Expected entity (optional)")
     notes: str | None = Field(default=None, description="Notes about this entry")
+
+    @field_validator("date")
+    @classmethod
+    def _validate_date(cls, value: str | None) -> str | None:
+        """Reject partial-zero or impossible ground-truth dates.
+
+        A ground-truth date must be the "00000000" sentinel or a real
+        YYYYMMDD calendar date. A partial-zero date (e.g. "20240900") in
+        authored ground truth is a data-entry bug. The validator raises
+        on bad values; ``_load_ground_truth`` catches the resulting
+        ``ValidationError`` and logs the offending line so a single bad
+        entry does not abort the whole load.
+        """
+        if value is None:
+            return value
+        if not is_valid_classification_date(value):
+            msg = (
+                "date must be the '00000000' sentinel or a real YYYYMMDD "
+                f"date, got {value!r}"
+            )
+            raise ValueError(msg)
+        return value
 
 
 @dataclass

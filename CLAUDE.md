@@ -140,6 +140,8 @@ uv run bandit -r src/ -f json --severity-level medium --confidence-level medium 
 - `ClassificationResult` → Final output with suggested_path
 - `ClassificationErrorResult` → Error response with error_code
 
+The `date` field on `RawClassification` and `ClassificationResult` carries a `mode="before"` normalizing validator that routes through `drover.dates.normalize_classification_date`. The model boundary always returns either a real `YYYYMMDD` calendar date (ASCII digits, leap-aware) or the `"00000000"` no-date sentinel; partial-zero components, impossible days, and non-ASCII digit characters collapse to the sentinel. Ground-truth entries (`evaluation.GroundTruthEntry.date`) reject the same set with a raising validator instead, so authored data fails at load.
+
 ### Configuration (`config.py`)
 Precedence: CLI options > config file > environment (DROVER_*) > defaults
 
