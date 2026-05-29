@@ -21,6 +21,7 @@ import random
 import re
 import sys
 import tempfile
+from collections import Counter
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, NamedTuple
@@ -927,6 +928,19 @@ def _render_pdf(text: str, out_path: Path) -> None:
         )
 
 
+def _write_text_atomic(path: Path, payload: str) -> None:
+    """Atomically write `payload` to `path` via a temp sibling + rename."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_path = tempfile.mkstemp(prefix=path.name + ".", dir=str(path.parent))
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(payload)
+        Path(tmp_path).replace(path)
+    except Exception:
+        Path(tmp_path).unlink(missing_ok=True)
+        raise
+
+
 def _append_jsonl_atomic(row: GroundTruthRow, jsonl_path: Path) -> None:
     """Append one row by writing the full new file to a temp sibling and renaming."""
     existing = jsonl_path.read_text() if jsonl_path.exists() else ""
@@ -936,18 +950,7 @@ def _append_jsonl_atomic(row: GroundTruthRow, jsonl_path: Path) -> None:
         if existing.endswith("\n") or not existing
         else existing + "\n" + new_line
     )
-
-    jsonl_path.parent.mkdir(parents=True, exist_ok=True)
-    fd, tmp_path = tempfile.mkstemp(
-        prefix=jsonl_path.name + ".", dir=str(jsonl_path.parent)
-    )
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as f:
-            f.write(payload)
-        Path(tmp_path).replace(jsonl_path)
-    except Exception:
-        Path(tmp_path).unlink(missing_ok=True)
-        raise
+    _write_text_atomic(jsonl_path, payload)
 
 
 def _existing_filenames(output_dir: Path, jsonl_path: Path) -> set[str]:
@@ -1097,8 +1100,92 @@ def _topup_plan(
 # -- Generation orchestration ------------------------------------------------
 
 
-def _subject_for(triple: Triple) -> str:
-    return f"{triple.category} {triple.doctype}".replace("_", " ")
+SUBJECT_SYSTEM = (
+    "You read a document and name its specific subject in 2-4 lowercase "
+    "words. The subject describes WHAT THE DOCUMENT IS ABOUT (its content, "
+    "parties, or topic), never the document type. For an auto insurance "
+    "policy, answer 'sedan collision coverage', not 'auto policy'. For a "
+    "utility bill, answer something like 'march electricity usage', not "
+    "'electric invoice'. Output ONLY the 2-4 word subject: no label, no "
+    "quotes, no punctuation, no explanation."
+)
+
+
+def _sanitize_subject(raw: str) -> str | None:
+    """Normalize a model reply into a 2-4 word lowercase content subject.
+
+    Format only; the prompt owns the "content, not document type" semantics.
+    Returns None when the reply cannot satisfy the convention (empty, or a
+    single word), signaling the caller to retry.
+    """
+    text = re.sub(r"^\s*subject\s*:\s*", "", raw.strip(), flags=re.IGNORECASE)
+    text = text.strip().strip("\"'")
+    text = re.sub(r"[^a-z0-9]+", " ", text.lower()).strip()
+    words = text.split()
+    if len(words) < 2:
+        return None
+    return " ".join(words[:4])
+
+
+_STOPWORDS = frozenset(
+    {"the", "and", "for", "this", "that", "with", "from", "your", "are", "was"}
+)
+
+
+def _fallback_subject(text: str) -> str | None:
+    """First content words of a document, or None if the text is too empty.
+
+    Returns None instead of a literal placeholder when the document yields
+    fewer than two distinct content words; the caller decides how to surface
+    that signal rather than silently writing 'document content' into ground
+    truth (prof-cgu regression guard).
+    """
+    picked = [w for w in re.findall(r"[a-z]{3,}", text.lower()) if w not in _STOPWORDS][
+        :3
+    ]
+    if len(picked) < 2:
+        return None
+    return " ".join(picked)
+
+
+class EmptyDocumentTextError(ValueError):
+    """Raised when subject derivation has no document text to work with."""
+
+
+async def _subject_from_text(
+    client: ChatAnthropic, text: str, forbidden: str | None = None
+) -> tuple[str, Counter[str]]:
+    """Derive a convention-compliant content subject from document text.
+
+    Makes up to three model calls, sanitizing each reply. Replies matching
+    ``forbidden`` (the row's ``f"{category} {doctype}"`` form) trigger a retry
+    — the prof-cgu invariant has a structural guard, not just a prompt. On
+    retry exhaustion, falls back to the document's first content words; if
+    even that is empty, raises ``EmptyDocumentTextError`` so the caller can
+    surface a real signal instead of silently writing a placeholder.
+    Returns (subject, cumulative_usage).
+    """
+    excerpt = text.strip()[:2000]
+    total: Counter[str] = Counter()
+    if not excerpt:
+        fallback = _fallback_subject(text)
+        if fallback is None:
+            raise EmptyDocumentTextError("document text is empty")
+        return fallback, total
+    user = f"Document:\n\n{excerpt}\n\nSubject:"
+    for _ in range(3):
+        reply, usage = await _call_anthropic_async(client, SUBJECT_SYSTEM, user)
+        total.update(usage)
+        subject = _sanitize_subject(reply)
+        if subject is None:
+            continue
+        if forbidden is not None and subject == forbidden:
+            continue
+        return subject, total
+    fallback = _fallback_subject(text)
+    if fallback is None:
+        raise EmptyDocumentTextError("document text yields no content subject")
+    return fallback, total
 
 
 def _length_target(triple: Triple) -> int:
@@ -1148,6 +1235,21 @@ async def _generate_one(
             logger.error("sanitize_exhausted", filename=filename)
             return None
 
+        # Derive subject from generated content BEFORE writing the PDF
+        # (prof-cgu): otherwise an exception here would orphan the PDF on disk
+        # and skip_filenames would poison it as "done" on the next run. The
+        # subject call's tokens are folded into this row's usage so the cost
+        # cap and per-row cost column reflect real spend.
+        forbidden = f"{triple.category} {triple.doctype}".replace("_", " ")
+        try:
+            subject, subject_usage = await _subject_from_text(
+                client, text, forbidden=forbidden
+            )
+        except EmptyDocumentTextError:
+            logger.error("subject_empty_text", filename=filename)
+            return None
+        usage = dict(Counter(usage) + subject_usage)
+
         out_path = output_dir / filename
         output_dir.mkdir(parents=True, exist_ok=True)
         _render_pdf(text, out_path)
@@ -1159,7 +1261,7 @@ async def _generate_one(
             doctype=triple.doctype,
             vendor=vendor,
             date=doc_date.strftime("%Y%m%d"),
-            subject=_subject_for(triple),
+            subject=subject,
             notes=f"synthetic, generated {datetime.now(UTC).date().isoformat()}",
         )
 
