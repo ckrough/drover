@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: Drover
+abstract: "Document classification CLI that uses LLMs to herd files into organized folders."
+type: software
+authors:
+  - family-names: Krough
+    given-names: Chris
+    alias: ckrough
+    email: dev@krough.org
+repository-code: "https://github.com/ckrough/drover"
+url: "https://dev.krough.org"
+license: Apache-2.0

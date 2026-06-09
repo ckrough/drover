@@ -267,6 +267,14 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full development workflow.
 
 ## License
 
-GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later). See [LICENSE](LICENSE) for the full text.
+Apache License 2.0 (Apache-2.0). See [LICENSE](LICENSE) for the full text.
 
 Copyright (C) 2025 Backchain LLC
+
+## About
+
+I'm Chris Krough. I build local-first AI tooling like Drover and write about putting AI to work in real systems. More of my work lives at [dev.krough.org](https://dev.krough.org), and I'm on [LinkedIn](https://www.linkedin.com/in/ckrough).
+
+Drover is published by [Backchain](https://backchain.ai), my AI transformation consulting practice. Backchain helps teams discover where AI works. If document classification is one piece of a larger automation problem you're solving, that's the conversation Backchain is built for.
+
+If Drover saves you time, a star on [GitHub](https://github.com/ckrough/drover) helps other people find it.

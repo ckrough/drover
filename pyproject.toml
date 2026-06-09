@@ -4,7 +4,9 @@ version = "0.2.2"
 description = "Document classification CLI that classifies files into organized folder structures"
 readme = "README.md"
 requires-python = ">=3.14"
-license = "AGPL-3.0-or-later"
+license = "Apache-2.0"
+authors = [{ name = "Chris Krough", email = "dev@krough.org" }]
+maintainers = [{ name = "Chris Krough", email = "dev@krough.org" }]
 dependencies = [
     "langchain>=0.3,<1.0",
     "langchain-openai>=0.2,<1.0",
@@ -40,6 +42,11 @@ ocr-mac = [
 
 [project.scripts]
 drover = "drover.cli:main"
+
+[project.urls]
+Homepage = "https://dev.krough.org"
+Repository = "https://github.com/ckrough/drover"
+Documentation = "https://github.com/ckrough/drover#readme"
 
 [build-system]
 requires = ["hatchling"]
