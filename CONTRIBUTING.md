@@ -558,4 +558,13 @@ uv run --with python-semantic-release semantic-release --noop version
 
 ## License of Contributions
 
-This project is licensed under GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later). By submitting a contribution, you agree that your contribution is licensed under the same terms.
+This project is licensed under the Apache License 2.0 (Apache-2.0). By submitting a contribution, you agree that your contribution is licensed under Apache-2.0. You retain copyright on your contributions. There is no CLA, no DCO sign-off, and no copyright assignment.
+
+New source files should carry the standard Apache header at the top:
+
+```python
+# Copyright 2025 Backchain LLC
+# SPDX-License-Identifier: Apache-2.0
+```
+
+Existing files are not being retrofitted; add the header to files you create.
